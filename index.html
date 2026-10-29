@@ -1,11 +1,11 @@
 /**
- * ระบบบันทึกและรายงานผลการเช็คชื่อลูกเสือ - เนตรนารี ม.1 (เพิ่มฟิลด์ตำแหน่ง Role)
+ * ระบบบันทึกและรายงานผลการเช็คชื่อลูกเสือ - เนตรนารี ม.1
  * โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น
  */
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(20000); // รอคิวบันทึกสูงสุด 20 วินาที
+  lock.tryLock(20000);
 
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -17,7 +17,7 @@ function doPost(e) {
     }
 
     if (!rawData) {
-      throw new Error("ไม่พบข้อมูลส่งเข้ามา (Payload is empty)");
+      throw new Error("ไม่พบข้อมูลส่งเข้ามา");
     }
 
     var data = JSON.parse(rawData);
@@ -30,16 +30,14 @@ function doPost(e) {
     var lastRow = sheet.getLastRow();
     var existingRowMap = {};
     
-    // ทำ Index ตรวจสอบข้อมูลซ้ำเดิม (Date + Student_ID)
     if (lastRow > 1) {
-      // คอลัมน์ B (Date) และ คอลัมน์ G (Student_ID)
       var dateValues = sheet.getRange(2, 2, lastRow - 1, 1).getDisplayValues();
       var idValues = sheet.getRange(2, 7, lastRow - 1, 1).getDisplayValues();
       for (var r = 0; r < dateValues.length; r++) {
         var dVal = String(dateValues[r][0]).trim();
         var idVal = String(idValues[r][0]).trim();
         if (dVal && idVal) {
-          existingRowMap[dVal + "_" + idVal] = r + 2; // แถวจริงในชีต
+          existingRowMap[dVal + "_" + idVal] = r + 2;
         }
       }
     }
@@ -55,27 +53,16 @@ function doPost(e) {
         var role = s.role || "สมาชิก";
         var key = dateStr + "_" + sId;
 
-        // ข้อมูล 10 คอลัมน์
         var rowData = [
-          timestamp,
-          dateStr,
-          category,
-          unit,
-          s.patrol || "",
-          role,
-          sId,
-          s.name || "",
-          s.status || "มา",
-          recordedBy
+          timestamp, dateStr, category, unit, s.patrol || "",
+          role, sId, s.name || "", s.status || "มา", recordedBy
         ];
 
         if (existingRowMap[key]) {
-          // หากมีข้อมูลเดิมของวันนั้นแล้ว ให้อัปเดตแถวเดิม
           var targetRow = existingRowMap[key];
           sheet.getRange(targetRow, 1, 1, 10).setValues([rowData]);
           updatedCount++;
         } else {
-          // ข้อมูลใหม่ เตรียมเพิ่มต่อท้าย
           rowsToAdd.push(rowData);
           insertedCount++;
         }
@@ -89,8 +76,7 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({
       "status": "success",
       "updated": updatedCount,
-      "inserted": insertedCount,
-      "message": "บันทึกเรียบร้อย (อัปเดต " + updatedCount + ", เพิ่มใหม่ " + insertedCount + ")"
+      "inserted": insertedCount
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -103,7 +89,6 @@ function doPost(e) {
   }
 }
 
-// ฟังก์ชันดึงประวัติสำหรับหน้าสรุปรายงาน
 function doGet(e) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -142,7 +127,6 @@ function doGet(e) {
   }
 }
 
-// ตรวจสอบหรือสร้างชีตพร้อมหัวตาราง 10 คอลัมน์
 function getOrCreateSheet(ss) {
   var sheet = ss.getSheetByName("Attendance_Logs");
   if (!sheet) {
@@ -153,13 +137,6 @@ function getOrCreateSheet(ss) {
     ]);
     sheet.getRange(1, 1, 1, 10).setFontWeight("bold").setBackground("#e2e8f0");
     sheet.setFrozenRows(1);
-  } else {
-    // ถ้ามีชีตเดิมอยู่แล้วแต่แถวหัวข้อคอลัมน์ F ยังไม่ใช่ Role ให้ตรวจสอบ/แก้ไข
-    var colFHeader = sheet.getRange(1, 6).getValue();
-    if (colFHeader !== "Role") {
-      sheet.insertColumnBefore(6);
-      sheet.getRange(1, 6).setValue("Role").setFontWeight("bold");
-    }
   }
   return sheet;
 }
