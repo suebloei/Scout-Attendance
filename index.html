@@ -1,1157 +1,165 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบเช็คชื่อและรายงานสรุปลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
-  <!-- Tailwind CSS & Lucide Icons -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+/**
+ * ระบบบันทึกและรายงานผลการเช็คชื่อลูกเสือ - เนตรนารี ม.1 (เพิ่มฟิลด์ตำแหน่ง Role)
+ * โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น
+ */
 
-  <style>
-    body {
-      font-family: 'Sarabun', sans-serif;
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(20000); // รอคิวบันทึกสูงสุด 20 วินาที
+
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = getOrCreateSheet(ss);
+
+    var rawData = e.postData ? e.postData.contents : null;
+    if (!rawData && e.parameter && e.parameter.data) {
+      rawData = e.parameter.data;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
+
+    if (!rawData) {
+      throw new Error("ไม่พบข้อมูลส่งเข้ามา (Payload is empty)");
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    @media print {
-      body {
-        background: #ffffff !important;
-        padding-bottom: 0 !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-only {
-        display: block !important;
-      }
-      .shadow-sm, .shadow-md, .shadow-xl {
-        box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
-      }
-    }
-  </style>
-</head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
 
-  <!-- แถบ Header นำทาง -->
-  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
-      
-      <!-- โลโก้และชื่อโรงเรียน -->
-      <div class="flex items-center gap-3 w-full md:w-auto">
-        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
-          <img src="logo.png" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
-        </div>
-        <div>
-          <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
-          <p class="text-xs sm:text-sm text-amber-100 opacity-90">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
-        </div>
-      </div>
+    var data = JSON.parse(rawData);
+    var dateStr = String(data.date || Utilities.formatDate(new Date(), "Asia/Bangkok", "yyyy-MM-dd")).trim();
+    var category = data.category || "";
+    var unit = data.unit || "";
+    var recordedBy = data.recordedBy ? String(data.recordedBy).trim() : "ผู้กำกับลูกเสือ";
+    var timestamp = Utilities.formatDate(new Date(), "Asia/Bangkok", "yyyy-MM-dd HH:mm:ss");
 
-      <!-- เมนูสลับโหมด: เช็คชื่อหน้าแถว / สรุปรายงาน -->
-      <div class="flex items-center gap-2 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold">
-        <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-3.5 py-1.5 rounded-lg transition bg-white text-slate-900 shadow">
-          <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i>เช็คชื่อหน้าแถว
-        </button>
-        <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-3.5 py-1.5 rounded-lg transition text-white hover:text-amber-200">
-          <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1"></i>สรุปรายงาน
-        </button>
-      </div>
-
-      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ตั้งค่า -->
-      <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
-          <input type="date" id="checkDate" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs sm:text-sm">
-        </div>
-        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
-          <input type="text" id="recordedByInput" placeholder="ชื่อผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-28 sm:w-36">
-        </div>
-        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm font-medium transition" title="ตั้งค่าเชื่อมต่อ Google Sheets">
-          <i data-lucide="sheet" class="w-4 h-4 text-emerald-300"></i>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- เนื้อหาหลัก -->
-  <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
-
-    <!-- ==================== โหมด 1: หน้าเช็คชื่อหน้าแถว ==================== -->
-    <section id="sectionCheckin" class="space-y-5">
-      <!-- ตัวสลับลูกเสือ/เนตรนารี และเลือกกอง -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
-            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white">
-              <i data-lucide="compass" class="w-4 h-4"></i>
-              <span>ลูกเสือ ม.1 (สีกากี)</span>
-            </button>
-            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900">
-              <i data-lucide="clover" class="w-4 h-4"></i>
-              <span>เนตรนารี ม.1 (สีเขียว)</span>
-            </button>
-          </div>
-
-          <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
-            <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">เลือกกอง:</span>
-            <button onclick="selectUnit(1)" id="btnUnit1" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-amber-800 text-white border-amber-800">กอง 1</button>
-            <button onclick="selectUnit(2)" id="btnUnit2" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 2</button>
-            <button onclick="selectUnit(3)" id="btnUnit3" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 3</button>
-          </div>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-2">
-            <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
-            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">9 นาย</span>
-          </div>
-          <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
-            <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
-            <span>มาครบทุกคนทั้งกอง</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
-      <div id="patrolsContainer" class="space-y-5"></div>
-    </section>
-
-    <!-- ==================== โหมด 2: หน้ารายงานสรุป (Dashboard) ==================== -->
-    <section id="sectionReport" class="hidden space-y-5">
-      
-      <!-- หัวกระดาษรายงานสำหรับการสั่งพิมพ์ A4 -->
-      <div class="hidden print-only mb-6 text-center border-b pb-4">
-        <div class="flex items-center justify-center gap-3 mb-2">
-          <img src="logo.png" alt="Logo" class="w-16 h-16 object-contain">
-          <div>
-            <h2 class="text-xl font-bold">โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</h2>
-            <p class="text-sm text-slate-600">รายงานสรุปการเข้าร่วมกิจกรรมลูกเสือ - เนตรนารี ชั้นมัธยมศึกษาปีที่ 1</p>
-          </div>
-        </div>
-        <p id="printReportSubtitle" class="text-xs font-semibold text-slate-700"></p>
-      </div>
-
-      <!-- แผงตัวกรองรายงาน -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 no-print space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          
-          <!-- แท็บมิติเวลา: รายวัน / รายเดือน / รายภาคเรียน -->
-          <div class="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
-            <button onclick="switchReportPeriod('daily')" id="repTabDaily" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow">
-              <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1"></i>รายวัน
-            </button>
-            <button onclick="switchReportPeriod('monthly')" id="repTabMonthly" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
-              <i data-lucide="calendar" class="w-4 h-4 inline-block mr-1"></i>รายเดือน
-            </button>
-            <button onclick="switchReportPeriod('semester')" id="repTabSemester" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
-              <i data-lucide="award" class="w-4 h-4 inline-block mr-1"></i>รายภาคเรียน (ประเมิน มผ.)
-            </button>
-          </div>
-
-          <!-- ปุ่มคำสั่งพิมพ์และรีเฟรช -->
-          <div class="flex items-center gap-2">
-            <button onclick="fetchSheetDataForReports()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5 transition">
-              <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
-              <span>ดึงข้อมูลจากชีต</span>
-            </button>
-            <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow">
-              <i data-lucide="printer" class="w-4 h-4"></i>
-              <span>พิมพ์รายงาน A4</span>
-            </button>
-          </div>
-
-        </div>
-
-        <!-- ตัวเลือกเงื่อนไขย่อย -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภท</label>
-            <select id="repFilterCategory" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-              <option value="all">ทั้งหมด (ลูกเสือ + เนตรนารี)</option>
-              <option value="ลูกเสือ">ลูกเสือ ม.1</option>
-              <option value="เนตรนารี">เนตรนารี ม.1</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">กอง</label>
-            <select id="repFilterUnit" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-              <option value="all">ทุกกอง</option>
-              <option value="กอง 1">กอง 1</option>
-              <option value="กอง 2">กอง 2</option>
-              <option value="กอง 3">กอง 3</option>
-            </select>
-          </div>
-          
-          <!-- ตัวเลือกเฉพาะช่วงเวลา -->
-          <div id="subFilterDaily">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกวันที่</label>
-            <input type="date" id="repFilterDate" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-          </div>
-          <div id="subFilterMonthly" class="hidden">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกเดือน</label>
-            <input type="month" id="repFilterMonth" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-          </div>
-          <div id="subFilterSemester" class="hidden">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
-            <select id="repFilterSemester" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-              <option value="1">ภาคเรียนที่ 1 (พ.ค. - ต.ค.)</option>
-              <option value="2">ภาคเรียนที่ 2 (พ.ย. - มี.ค.)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- บัตรสรุปภาพรวม KPI (Overview Stat Cards) -->
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-semibold text-slate-500">อัตราการมาเรียน</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span id="kpiRate" class="text-3xl font-extrabold text-slate-800">0%</span>
-            <span id="kpiTotal" class="text-xs text-slate-500">จาก 0 คน</span>
-          </div>
-        </div>
-        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา
-          </span>
-          <span id="kpiPresent" class="text-2xl font-black text-emerald-700 mt-2">0</span>
-        </div>
-        <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด
-          </span>
-          <span id="kpiAbsent" class="text-2xl font-black text-rose-700 mt-2">0</span>
-        </div>
-        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-amber-800 flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา
-          </span>
-          <span id="kpiLeave" class="text-2xl font-black text-amber-700 mt-2">0</span>
-        </div>
-        <div class="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย
-          </span>
-          <span id="kpiLate" class="text-2xl font-black text-blue-700 mt-2">0</span>
-        </div>
-      </div>
-
-      <!-- ตารางแสดงผลรายงานตามมิติเวลา -->
-      <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <!-- เรนเดอร์ด้วย JavaScript -->
-      </div>
-
-      <!-- ส่วนลงนามท้ายรายงานสำหรับพิมพ์ A4 -->
-      <div class="hidden print-only pt-12 mt-8 grid grid-cols-2 text-center text-xs">
-        <div>
-          <p>ลงชื่อ......................................................ผู้กำกับกองลูกเสือ</p>
-          <p class="mt-1">(......................................................)</p>
-          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
-        </div>
-        <div>
-          <p>ลงชื่อ......................................................รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</p>
-          <p class="mt-1">(นางสุภาวดี ภาระดี)</p>
-          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- บรรทัดเครดิตผู้พัฒนา (จบในบรรทัดเดียว) -->
-    <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
-      <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
-        <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
-      </div>
-      <span>พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
-    </div>
-
-  </main>
-
-  <!-- แถบลอยสรุปหน้าแถว (แสดงเฉพาะโหมดเช็คชื่อ) -->
-  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
-        <div class="flex items-center gap-1.5 text-emerald-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-rose-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-amber-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-blue-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2 w-full sm:w-auto">
-        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="download" class="w-4 h-4"></i>
-          <span>ส่งออก CSV</span>
-        </button>
-        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
-          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-          <span>บันทึกลง Google Sheets</span>
-        </button>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Modal สำหรับตั้งค่า Google Apps Script Web App URL -->
-  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-        <div class="flex items-center gap-2 text-slate-800 font-bold">
-          <i data-lucide="settings" class="w-5 h-5 text-emerald-600"></i>
-          <span>ตั้งค่าการเชื่อมต่อ Google Sheets</span>
-        </div>
-        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL (ลงท้ายด้วย /exec)</label>
-          <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
-        </div>
-      </div>
-      <div class="mt-5 flex justify-end gap-2">
-        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
-        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึก URL</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVepnUK3pI6HlJCwfYZOUX9obBpQlq47YvB-RhqmMH1QBegRxgbRWNoR3hIKt5pfiV/exec";
-
-    // ฐานข้อมูลจำลองประเภทละ 3 กอง
-    const rawDatabase = {
-      scout: {
-        units: {
-          1: {
-            name: "กอง 1",
-            patrols: [
-              { patrolName: "หมู่จระเข้", members: [
-                { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา" },
-                { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา" },
-                { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่สิงโต", members: [
-                { id: "10104", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา" },
-                { id: "10105", name: "ด.ช. พงศกร มุ่งดี", role: "สมาชิก", status: "มา" },
-                { id: "10106", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่เหยี่ยว", members: [
-                { id: "10107", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา" },
-                { id: "10108", name: "ด.ช. วรัญญู สว่างวงศ์", role: "สมาชิก", status: "มา" },
-                { id: "10109", name: "ด.ช. ภัทรดนัย บุญยัง", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          },
-          2: {
-            name: "กอง 2",
-            patrols: [
-              { patrolName: "หมู่กวาง", members: [
-                { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา" },
-                { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "สมาชิก", status: "มา" },
-                { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่ช้าง", members: [
-                { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา" },
-                { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "สมาชิก", status: "มา" },
-                { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่เสือ", members: [
-                { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา" },
-                { id: "10208", name: "ด.ช. รชต มงคล", role: "สมาชิก", status: "มา" },
-                { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          },
-          3: {
-            name: "กอง 3",
-            patrols: [
-              { patrolName: "หมู่หมี", members: [
-                { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา" },
-                { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "สมาชิก", status: "มา" },
-                { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่อินทรี", members: [
-                { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา" },
-                { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "สมาชิก", status: "มา" },
-                { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่นกเงือก", members: [
-                { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา" },
-                { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "สมาชิก", status: "มา" },
-                { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          }
-        }
-      },
-      guide: {
-        units: {
-          1: {
-            name: "กอง 1",
-            patrols: [
-              { patrolName: "หมู่มะลิ", members: [
-                { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา" },
-                { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา" },
-                { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่กุหลาบ", members: [
-                { id: "20104", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา" },
-                { id: "20105", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "สมาชิก", status: "มา" },
-                { id: "20106", name: "ด.ญ. นภัสสร สุริยา", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่บัวหลวง", members: [
-                { id: "20107", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา" },
-                { id: "20108", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "สมาชิก", status: "มา" },
-                { id: "20109", name: "ด.ญ. อารียา เพชรรัตน์", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          },
-          2: {
-            name: "กอง 2",
-            patrols: [
-              { patrolName: "หมู่ชบา", members: [
-                { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา" },
-                { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "สมาชิก", status: "มา" },
-                { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่กล้วยไม้", members: [
-                { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา" },
-                { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "สมาชิก", status: "มา" },
-                { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่พุทธรักษา", members: [
-                { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา" },
-                { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "สมาชิก", status: "มา" },
-                { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          },
-          3: {
-            name: "กอง 3",
-            patrols: [
-              { patrolName: "หมู่ทานตะวัน", members: [
-                { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา" },
-                { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "สมาชิก", status: "มา" },
-                { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่ดาวเรือง", members: [
-                { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา" },
-                { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "สมาชิก", status: "มา" },
-                { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "สมาชิก", status: "มา" }
-              ]},
-              { patrolName: "หมู่แก้ว", members: [
-                { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา" },
-                { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "สมาชิก", status: "มา" },
-                { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "สมาชิก", status: "มา" }
-              ]}
-            ]
-          }
+    var lastRow = sheet.getLastRow();
+    var existingRowMap = {};
+    
+    // ทำ Index ตรวจสอบข้อมูลซ้ำเดิม (Date + Student_ID)
+    if (lastRow > 1) {
+      // คอลัมน์ B (Date) และ คอลัมน์ G (Student_ID)
+      var dateValues = sheet.getRange(2, 2, lastRow - 1, 1).getDisplayValues();
+      var idValues = sheet.getRange(2, 7, lastRow - 1, 1).getDisplayValues();
+      for (var r = 0; r < dateValues.length; r++) {
+        var dVal = String(dateValues[r][0]).trim();
+        var idVal = String(idValues[r][0]).trim();
+        if (dVal && idVal) {
+          existingRowMap[dVal + "_" + idVal] = r + 2; // แถวจริงในชีต
         }
       }
-    };
-
-    let currentCategory = 'scout';
-    let currentUnitId = 1;
-    let db = JSON.parse(JSON.stringify(rawDatabase));
-    let currentMainTab = 'checkin';
-    let currentReportPeriod = 'daily';
-    let attendanceHistoryData = []; // เก็บประวัติที่ดึงจากชีต
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('checkDate').value = today;
-      document.getElementById('repFilterDate').value = today;
-      document.getElementById('repFilterMonth').value = today.substring(0, 7);
-
-      const savedUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      document.getElementById('scriptUrlInput').value = savedUrl;
-
-      const savedRecorder = localStorage.getItem('scout_recorded_by') || '';
-      if (savedRecorder) {
-        document.getElementById('recordedByInput').value = savedRecorder;
-      }
-
-      applyTheme();
-      renderCurrentUnit();
-      lucide.createIcons();
-    });
-
-    // สลับโหมด เช็คชื่อ / รายงานสรุป
-    function switchMainTab(tab) {
-      currentMainTab = tab;
-      const secCheckin = document.getElementById('sectionCheckin');
-      const secReport = document.getElementById('sectionReport');
-      const bottomBar = document.getElementById('bottomCheckinBar');
-      const btnCheckin = document.getElementById('tabBtnCheckin');
-      const btnReport = document.getElementById('tabBtnReport');
-      const headerTools = document.getElementById('checkinHeaderTools');
-
-      if (tab === 'checkin') {
-        secCheckin.classList.remove('hidden');
-        secReport.classList.add('hidden');
-        bottomBar.classList.remove('hidden');
-        headerTools.classList.remove('hidden');
-        btnCheckin.className = "px-3.5 py-1.5 rounded-lg transition bg-white text-slate-900 shadow";
-        btnReport.className = "px-3.5 py-1.5 rounded-lg transition text-white hover:text-amber-200";
-      } else {
-        secCheckin.classList.add('hidden');
-        secReport.classList.remove('hidden');
-        bottomBar.classList.add('hidden');
-        headerTools.classList.add('hidden');
-        btnReport.className = "px-3.5 py-1.5 rounded-lg transition bg-white text-slate-900 shadow";
-        btnCheckin.className = "px-3.5 py-1.5 rounded-lg transition text-white hover:text-amber-200";
-        fetchSheetDataForReports();
-      }
     }
 
-    // สลับมิติเวลารายงาน: daily, monthly, semester
-    function switchReportPeriod(period) {
-      currentReportPeriod = period;
-      ['daily', 'monthly', 'semester'].forEach(p => {
-        const btn = document.getElementById(`repTab${p.charAt(0).toUpperCase() + p.slice(1)}`);
-        const sub = document.getElementById(`subFilter${p.charAt(0).toUpperCase() + p.slice(1)}`);
-        if (p === period) {
-          btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow";
-          sub.classList.remove('hidden');
+    var rowsToAdd = [];
+    var updatedCount = 0;
+    var insertedCount = 0;
+
+    if (data.students && data.students.length > 0) {
+      for (var i = 0; i < data.students.length; i++) {
+        var s = data.students[i];
+        var sId = String(s.id || "").trim();
+        var role = s.role || "สมาชิก";
+        var key = dateStr + "_" + sId;
+
+        // ข้อมูล 10 คอลัมน์
+        var rowData = [
+          timestamp,
+          dateStr,
+          category,
+          unit,
+          s.patrol || "",
+          role,
+          sId,
+          s.name || "",
+          s.status || "มา",
+          recordedBy
+        ];
+
+        if (existingRowMap[key]) {
+          // หากมีข้อมูลเดิมของวันนั้นแล้ว ให้อัปเดตแถวเดิม
+          var targetRow = existingRowMap[key];
+          sheet.getRange(targetRow, 1, 1, 10).setValues([rowData]);
+          updatedCount++;
         } else {
-          btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900";
-          sub.classList.add('hidden');
+          // ข้อมูลใหม่ เตรียมเพิ่มต่อท้าย
+          rowsToAdd.push(rowData);
+          insertedCount++;
         }
-      });
-      renderActiveReport();
-    }
+      }
 
-    // ดึงประวัติจาก Google Sheets ผ่าน doGet
-    async function fetchSheetDataForReports() {
-      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      const refIcon = document.getElementById('refreshIcon');
-      if (refIcon) refIcon.classList.add('animate-spin');
-
-      try {
-        const res = await fetch(scriptUrl);
-        const json = await res.json();
-        if (json.status === 'success' && Array.isArray(json.data)) {
-          attendanceHistoryData = json.data;
-        }
-      } catch (err) {
-        console.warn('โหลดประวัติจากชีตไม่สำเร็จ กำลังใช้ข้อมูลท้องถิ่น:', err);
-      } finally {
-        if (refIcon) refIcon.classList.remove('animate-spin');
-        renderActiveReport();
+      if (rowsToAdd.length > 0) {
+        sheet.getRange(sheet.getLastRow() + 1, 1, rowsToAdd.length, 10).setValues(rowsToAdd);
       }
     }
 
-    // ประมวลผลและแสดงรายงานตามเงื่อนไขที่เลือก
-    function renderActiveReport() {
-      const cat = document.getElementById('repFilterCategory').value;
-      const unit = document.getElementById('repFilterUnit').value;
-      const area = document.getElementById('reportContentArea');
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "success",
+      "updated": updatedCount,
+      "inserted": insertedCount,
+      "message": "บันทึกเรียบร้อย (อัปเดต " + updatedCount + ", เพิ่มใหม่ " + insertedCount + ")"
+    })).setMimeType(ContentService.MimeType.JSON);
 
-      // กรองข้อมูลตาม Category และ Unit
-      let filtered = attendanceHistoryData.filter(row => {
-        const matchCat = (cat === 'all') || (row.category === cat);
-        const matchUnit = (unit === 'all') || (row.unit === unit);
-        return matchCat && matchUnit;
-      });
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "error",
+      "message": err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
 
-      if (currentReportPeriod === 'daily') {
-        renderDailyReport(filtered);
-      } else if (currentReportPeriod === 'monthly') {
-        renderMonthlyReport(filtered);
-      } else if (currentReportPeriod === 'semester') {
-        renderSemesterReport(filtered);
-      }
-      lucide.createIcons();
+// ฟังก์ชันดึงประวัติสำหรับหน้าสรุปรายงาน
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = getOrCreateSheet(ss);
+    var lastRow = sheet.getLastRow();
+
+    if (lastRow <= 1) {
+      return ContentService.createTextOutput(JSON.stringify({ "status": "success", "data": [] }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 1. รายงาน "รายวัน"
-    function renderDailyReport(data) {
-      const targetDate = document.getElementById('repFilterDate').value;
-      document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate}`;
-      
-      const dayData = data.filter(r => r.date === targetDate);
-      updateKpis(dayData);
+    var values = sheet.getRange(2, 1, lastRow - 1, 10).getDisplayValues();
+    var result = [];
 
-      if (dayData.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
-          <div class="p-10 text-center text-slate-400">
-            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
-            <p>ไม่พบข้อมูลการเช็คชื่อในวันที่ ${targetDate}</p>
-          </div>
-        `;
-        return;
-      }
-
-      // สรุปแยกรายหมู่
-      const patrolMap = {};
-      dayData.forEach(r => {
-        const key = `${r.category} ${r.unit} - ${r.patrol}`;
-        if (!patrolMap[key]) {
-          patrolMap[key] = { name: key, total: 0, present: 0, absent: 0, leave: 0, late: 0 };
-        }
-        patrolMap[key].total++;
-        if (r.status === 'มา') patrolMap[key].present++;
-        else if (r.status === 'ขาด') patrolMap[key].absent++;
-        else if (r.status === 'ลา') patrolMap[key].leave++;
-        else if (r.status === 'สาย') patrolMap[key].late++;
-      });
-
-      let html = `
-        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปสถิติรายหมู่ ประจำวันที่ ${targetDate}</h3>
-          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">บันทึกทั้งหมด ${dayData.length} คน</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th class="p-3">กอง / หมู่</th>
-                <th class="p-3 text-center">จำนวนสมาชิก</th>
-                <th class="p-3 text-center text-emerald-700">มา</th>
-                <th class="p-3 text-center text-rose-700">ขาด</th>
-                <th class="p-3 text-center text-amber-700">ลา</th>
-                <th class="p-3 text-center text-blue-700">สาย</th>
-                <th class="p-3 text-center font-bold">ร้อยละการมา</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-      `;
-
-      Object.values(patrolMap).forEach(p => {
-        const pct = Math.round((p.present / p.total) * 100);
-        html += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3 font-semibold text-slate-800">${p.name}</td>
-            <td class="p-3 text-center font-medium">${p.total}</td>
-            <td class="p-3 text-center font-bold text-emerald-600">${p.present}</td>
-            <td class="p-3 text-center font-bold text-rose-600">${p.absent}</td>
-            <td class="p-3 text-center font-bold text-amber-600">${p.leave}</td>
-            <td class="p-3 text-center font-bold text-blue-600">${p.late}</td>
-            <td class="p-3 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table></div>`;
-
-      // แสดงรายชื่อผู้ ขาด / ลา / สาย
-      const absents = dayData.filter(r => r.status !== 'มา');
-      if (absents.length > 0) {
-        html += `
-          <div class="p-4 bg-slate-50 border-t border-slate-200">
-            <h4 class="font-bold text-xs text-slate-700 mb-2">รายชื่อนักเรียนที่ไม่มาเรียน / มีหมายเหตุ (${absents.length} คน)</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-        `;
-        absents.forEach(a => {
-          let badgeColor = a.status === 'ขาด' ? 'bg-rose-100 text-rose-800' : (a.status === 'ลา' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800');
-          html += `
-            <div class="p-2 bg-white rounded-lg border border-slate-200 text-xs flex items-center justify-between">
-              <div>
-                <span class="font-bold text-slate-800">${a.name}</span>
-                <p class="text-[10px] text-slate-500">${a.patrol} (${a.unit})</p>
-              </div>
-              <span class="px-2 py-0.5 rounded font-bold ${badgeColor}">${a.status}</span>
-            </div>
-          `;
-        });
-        html += `</div></div>`;
-      }
-
-      document.getElementById('reportContentArea').innerHTML = html;
-    }
-
-    // 2. รายงาน "รายเดือน"
-    function renderMonthlyReport(data) {
-      const targetMonth = document.getElementById('repFilterMonth').value; // YYYY-MM
-      document.getElementById('printReportSubtitle').innerText = `รายงานสรุปการมาเรียนประจำเดือน: ${targetMonth}`;
-
-      const monthData = data.filter(r => r.date && r.date.startsWith(targetMonth));
-      updateKpis(monthData);
-
-      if (monthData.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
-          <div class="p-10 text-center text-slate-400">
-            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
-            <p>ไม่พบข้อมูลการเช็คชื่อในเดือน ${targetMonth}</p>
-          </div>
-        `;
-        return;
-      }
-
-      // หาว่ามีวันที่ใดบ้างที่ทำการเช็คชื่อในเดือนนี้
-      const activeDates = [...new Set(monthData.map(r => r.date))].sort();
-
-      // จัดกลุ่มนักเรียน
-      const studentMap = {};
-      monthData.forEach(r => {
-        if (!studentMap[r.id]) {
-          studentMap[r.id] = { id: r.id, name: r.name, patrol: r.patrol, unit: r.unit, dates: {}, presentCount: 0, total: 0 };
-        }
-        studentMap[r.id].dates[r.date] = r.status;
-        studentMap[r.id].total++;
-        if (r.status === 'มา') studentMap[r.id].presentCount++;
-      });
-
-      let html = `
-        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="font-bold text-slate-800 text-sm sm:text-base">ตารางประวัติการเข้าแถว ประจำเดือน ${targetMonth}</h3>
-          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">มีกิจกรรม ${activeDates.length} สัปดาห์/วัน</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th class="p-2.5">รหัส</th>
-                <th class="p-2.5">ชื่อ - นามสกุล</th>
-                <th class="p-2.5">หมู่</th>
-      `;
-
-      activeDates.forEach(d => {
-        const shortD = d.substring(8, 10);
-        html += `<th class="p-2 text-center whitespace-nowrap">${shortD} พ.ย.</th>`;
-      });
-
-      html += `
-                <th class="p-2.5 text-center font-bold text-emerald-700">มา</th>
-                <th class="p-2.5 text-center font-bold">% การมา</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-      `;
-
-      Object.values(studentMap).forEach(s => {
-        const pct = Math.round((s.presentCount / activeDates.length) * 100);
-        html += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-2.5 font-mono text-slate-500">${s.id}</td>
-            <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${s.name}</td>
-            <td class="p-2.5 text-slate-500 whitespace-nowrap">${s.patrol}</td>
-        `;
-
-        activeDates.forEach(d => {
-          const st = s.dates[d] || '-';
-          let stIcon = `<span class="text-slate-300">-</span>`;
-          if (st === 'มา') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold text-center leading-4">ม</span>`;
-          else if (st === 'ขาด') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold text-center leading-4">ข</span>`;
-          else if (st === 'ลา') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold text-center leading-4">ล</span>`;
-          else if (st === 'สาย') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold text-center leading-4">ส</span>`;
-          html += `<td class="p-2 text-center">${stIcon}</td>`;
-        });
-
-        html += `
-            <td class="p-2.5 text-center font-bold text-emerald-700">${s.presentCount}</td>
-            <td class="p-2.5 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table></div>`;
-      document.getElementById('reportContentArea').innerHTML = html;
-    }
-
-    // 3. รายงาน "รายภาคเรียน" (ประเมินเกณฑ์ผ่าน 80% / มผ.)
-    function renderSemesterReport(data) {
-      const sem = document.getElementById('repFilterSemester').value;
-      document.getElementById('printReportSubtitle').innerText = `รายงานผลการประเมินเวลาเรียน กิจกรรมลูกเสือ-เนตรนารี ม.1 (ภาคเรียนที่ ${sem})`;
-
-      updateKpis(data);
-
-      if (data.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
-          <div class="p-10 text-center text-slate-400">
-            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
-            <p>ยังไม่มีบันทึกข้อมูลในภาคเรียนนี้</p>
-          </div>
-        `;
-        return;
-      }
-
-      // นับจำนวนสัปดาห์ทั้งหมดที่มีการจัดกิจกรรม
-      const totalSessions = [...new Set(data.map(r => r.date))].length;
-
-      const studentSummary = {};
-      data.forEach(r => {
-        if (!studentSummary[r.id]) {
-          studentSummary[r.id] = { id: r.id, name: r.name, patrol: r.patrol, unit: r.unit, category: r.category, present: 0, absent: 0, leave: 0, late: 0, total: 0 };
-        }
-        studentSummary[r.id].total++;
-        if (r.status === 'มา') studentSummary[r.id].present++;
-        else if (r.status === 'ขาด') studentSummary[r.id].absent++;
-        else if (r.status === 'ลา') studentSummary[r.id].leave++;
-        else if (r.status === 'สาย') studentSummary[r.id].late++;
-      });
-
-      let passCount = 0;
-      let failCount = 0;
-
-      let html = `
-        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปผลการประเมินเวลาเรียนเพื่อตัดสินผลการเรียน (เกณฑ์ 80%)</h3>
-            <p class="text-xs text-slate-500">จำนวนครั้งที่มีการจัดกิจกรรมทั้งหมด: ${totalSessions} ครั้ง</p>
-          </div>
-          <div class="text-xs font-bold flex gap-2">
-            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg" id="semPassBadge">ผ่าน: 0 คน</span>
-            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg" id="semFailBadge">มผ.: 0 คน</span>
-          </div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th class="p-3">รหัส</th>
-                <th class="p-3">ชื่อ - นามสกุล</th>
-                <th class="p-3">กอง / หมู่</th>
-                <th class="p-3 text-center text-emerald-700">มา</th>
-                <th class="p-3 text-center text-rose-700">ขาด</th>
-                <th class="p-3 text-center text-amber-700">ลา</th>
-                <th class="p-3 text-center text-blue-700">สาย</th>
-                <th class="p-3 text-center font-bold">เวลาเรียน (%)</th>
-                <th class="p-3 text-center font-bold">ผลการประเมิน</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-      `;
-
-      Object.values(studentSummary).forEach(s => {
-        // เวลาเรียนคำนวณจาก (มา / ครั้งทั้งหมด)
-        const pct = totalSessions > 0 ? Math.round((s.present / totalSessions) * 100) : 0;
-        const isPass = pct >= 80;
-        if (isPass) passCount++; else failCount++;
-
-        html += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono text-slate-500">${s.id}</td>
-            <td class="p-3 font-semibold text-slate-800">${s.name}</td>
-            <td class="p-3 text-slate-500">${s.unit} - ${s.patrol}</td>
-            <td class="p-3 text-center font-bold text-emerald-600">${s.present}</td>
-            <td class="p-3 text-center font-bold text-rose-600">${s.absent}</td>
-            <td class="p-3 text-center font-bold text-amber-600">${s.leave}</td>
-            <td class="p-3 text-center font-bold text-blue-600">${s.late}</td>
-            <td class="p-3 text-center font-extrabold ${isPass ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
-            <td class="p-3 text-center">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPass ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                ${isPass ? 'ผ่าน' : 'มผ.'}
-              </span>
-            </td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table></div>`;
-      document.getElementById('reportContentArea').innerHTML = html;
-
-      // ปรับยอดผ่าน / มผ.
-      setTimeout(() => {
-        const pb = document.getElementById('semPassBadge');
-        const fb = document.getElementById('semFailBadge');
-        if (pb) pb.innerText = `ผ่าน: ${passCount} คน`;
-        if (fb) fb.innerText = `มผ.: ${failCount} คน`;
-      }, 50);
-    }
-
-    // อัปเดตตัวเลขบัตรสรุป KPI 5 ช่อง
-    function updateKpis(records) {
-      let p = 0, a = 0, l = 0, lt = 0;
-      records.forEach(r => {
-        if (r.status === 'มา') p++;
-        else if (r.status === 'ขาด') a++;
-        else if (r.status === 'ลา') l++;
-        else if (r.status === 'สาย') lt++;
-      });
-      const total = records.length;
-      const rate = total > 0 ? Math.round((p / total) * 100) : 0;
-
-      document.getElementById('kpiRate').innerText = `${rate}%`;
-      document.getElementById('kpiTotal').innerText = `จาก ${total} รายการ`;
-      document.getElementById('kpiPresent').innerText = p;
-      document.getElementById('kpiAbsent').innerText = a;
-      document.getElementById('kpiLeave').innerText = l;
-      document.getElementById('kpiLate').innerText = lt;
-    }
-
-    // ================= โค้ดส่วนเช็คชื่อหน้าแถวเดิม =================
-    function switchCategory(cat) {
-      currentCategory = cat;
-      applyTheme();
-      renderCurrentUnit();
-    }
-
-    function applyTheme() {
-      const isScout = currentCategory === 'scout';
-      const nav = document.getElementById('navbarHeader');
-      const btnScout = document.getElementById('btnCatScout');
-      const btnGuide = document.getElementById('btnCatGuide');
-      const btnSave = document.getElementById('btnSaveSheets');
-
-      if (isScout) {
-        nav.style.background = "linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)";
-        btnScout.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white";
-        btnGuide.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
-        btnSave.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900";
-      } else {
-        nav.style.background = "linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)";
-        btnScout.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
-        btnGuide.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-emerald-800 text-white";
-        btnSave.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-emerald-800 hover:bg-emerald-900";
-      }
-      updateUnitButtonsUI();
-    }
-
-    function selectUnit(unitId) {
-      currentUnitId = unitId;
-      updateUnitButtonsUI();
-      renderCurrentUnit();
-    }
-
-    function updateUnitButtonsUI() {
-      const isScout = currentCategory === 'scout';
-      const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800" : "bg-emerald-800 text-white border-emerald-800";
-
-      [1, 2, 3].forEach(id => {
-        const btn = document.getElementById(`btnUnit${id}`);
-        if (id === currentUnitId) {
-          btn.className = `px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition ${activeColorClass}`;
-        } else {
-          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300";
-        }
+    for (var i = 0; i < values.length; i++) {
+      result.push({
+        timestamp: values[i][0],
+        date: values[i][1],
+        category: values[i][2],
+        unit: values[i][3],
+        patrol: values[i][4],
+        role: values[i][5],
+        id: values[i][6],
+        name: values[i][7],
+        status: values[i][8],
+        recordedBy: values[i][9]
       });
     }
 
-    function renderCurrentUnit() {
-      const container = document.getElementById('patrolsContainer');
-      const unitData = db[currentCategory].units[currentUnitId];
-      const categoryLabel = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+    return ContentService.createTextOutput(JSON.stringify({ "status": "success", "data": result }))
+      .setMimeType(ContentService.MimeType.JSON);
 
-      document.getElementById('currentUnitTitle').innerText = `${unitData.name} (${categoryLabel})`;
-      
-      let totalMembers = 0;
-      let html = '';
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-      unitData.patrols.forEach((patrol, pIndex) => {
-        totalMembers += patrol.members.length;
-        const pPresent = patrol.members.filter(m => m.status === 'มา').length;
-        const pAbsent = patrol.members.filter(m => m.status === 'ขาด').length;
-        const pLeave = patrol.members.filter(m => m.status === 'ลา').length;
-        const pLate = patrol.members.filter(m => m.status === 'สาย').length;
-
-        html += `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
-                <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
-                <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold mr-2">
-                  <span class="text-emerald-700">มา ${pPresent}</span>
-                  <span class="text-rose-700">ขาด ${pAbsent}</span>
-                  <span class="text-amber-700">ลา ${pLeave}</span>
-                  <span class="text-blue-700">สาย ${pLate}</span>
-                </div>
-                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm transition">
-                  มาครบหมู่นี้
-                </button>
-              </div>
-            </div>
-            <div class="divide-y divide-slate-100">
-        `;
-
-        patrol.members.forEach((student, sIndex) => {
-          html += `
-            <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/60 transition">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
-                  ${sIndex + 1}
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="font-semibold text-sm text-slate-800">${student.name}</span>
-                    <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${student.role === 'นายหมู่' ? 'bg-amber-100 text-amber-800 border border-amber-200' : (student.role === 'รองนายหมู่' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600')}">${student.role}</span>
-                  </div>
-                  <div class="text-xs text-slate-400">รหัสประจำตัว: ${student.id}</div>
-                </div>
-              </div>
-              <div class="grid grid-cols-4 gap-1 sm:w-64 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
-              </div>
-            </div>
-          `;
-        });
-
-        html += `</div></div>`;
-      });
-
-      document.getElementById('totalUnitMembers').innerText = `${totalMembers} นาย`;
-      container.innerHTML = html;
-      updateBottomStats();
+// ตรวจสอบหรือสร้างชีตพร้อมหัวตาราง 10 คอลัมน์
+function getOrCreateSheet(ss) {
+  var sheet = ss.getSheetByName("Attendance_Logs");
+  if (!sheet) {
+    sheet = ss.insertSheet("Attendance_Logs");
+    sheet.appendRow([
+      "Timestamp", "Date", "Category", "Unit", "Patrol", 
+      "Role", "Student_ID", "Name", "Status", "Recorded_By"
+    ]);
+    sheet.getRange(1, 1, 1, 10).setFontWeight("bold").setBackground("#e2e8f0");
+    sheet.setFrozenRows(1);
+  } else {
+    // ถ้ามีชีตเดิมอยู่แล้วแต่แถวหัวข้อคอลัมน์ F ยังไม่ใช่ Role ให้ตรวจสอบ/แก้ไข
+    var colFHeader = sheet.getRange(1, 6).getValue();
+    if (colFHeader !== "Role") {
+      sheet.insertColumnBefore(6);
+      sheet.getRange(1, 6).setValue("Role").setFontWeight("bold");
     }
-
-    function setStatus(patrolIndex, studentIndex, status) {
-      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members[studentIndex].status = status;
-      renderCurrentUnit();
-    }
-
-    function markPatrolPresent(patrolIndex) {
-      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members.forEach(m => m.status = 'มา');
-      renderCurrentUnit();
-    }
-
-    function markAllCurrentUnitPresent() {
-      db[currentCategory].units[currentUnitId].patrols.forEach(p => {
-        p.members.forEach(m => m.status = 'มา');
-      });
-      renderCurrentUnit();
-    }
-
-    function updateBottomStats() {
-      let present = 0, absent = 0, leave = 0, late = 0;
-      const unitData = db[currentCategory].units[currentUnitId];
-
-      unitData.patrols.forEach(p => {
-        p.members.forEach(m => {
-          if (m.status === 'มา') present++;
-          else if (m.status === 'ขาด') absent++;
-          else if (m.status === 'ลา') leave++;
-          else if (m.status === 'สาย') late++;
-        });
-      });
-
-      document.getElementById('statPresent').innerText = present;
-      document.getElementById('statAbsent').innerText = absent;
-      document.getElementById('statLeave').innerText = leave;
-      document.getElementById('statLate').innerText = late;
-    }
-
-    async function saveToGoogleSheets() {
-      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      const checkDate = document.getElementById('checkDate').value;
-      const recordedBy = document.getElementById('recordedByInput').value.trim();
-
-      if (!recordedBy) {
-        alert('กรุณาระบุชื่อผู้บันทึกก่อนทำการส่งข้อมูล');
-        document.getElementById('recordedByInput').focus();
-        return;
-      }
-
-      localStorage.setItem('scout_recorded_by', recordedBy);
-
-      const unitData = db[currentCategory].units[currentUnitId];
-      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
-
-      const studentsPayload = [];
-      unitData.patrols.forEach(patrol => {
-        patrol.members.forEach(member => {
-          studentsPayload.push({
-            patrol: patrol.patrolName,
-            id: member.id,
-            name: member.name,
-            status: member.status
-          });
-        });
-      });
-
-      const payload = {
-        date: checkDate,
-        category: categoryText,
-        unit: unitData.name,
-        recordedBy: recordedBy,
-        students: studentsPayload
-      };
-
-      const btnSave = document.getElementById('btnSaveSheets');
-      const originalText = btnSave.innerHTML;
-      btnSave.disabled = true;
-      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก...</span>`;
-      lucide.createIcons();
-
-      try {
-        const response = await fetch(scriptUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.status === 'success') {
-          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- อัปเดตข้อมูลเดิม: ${result.updated || 0} คน\n- บันทึกใหม่: ${result.inserted || 0} คน\n- ผู้บันทึก: ${recordedBy}`);
-        } else {
-          alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'เกิดข้อผิดพลาด'));
-        }
-      } catch (error) {
-        console.warn('Network Notice:', error);
-        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบในชีต`);
-      } finally {
-        btnSave.disabled = false;
-        btnSave.innerHTML = originalText;
-        lucide.createIcons();
-      }
-    }
-
-    function exportToCSV() {
-      const checkDate = document.getElementById('checkDate').value;
-      const recordedBy = document.getElementById('recordedByInput').value.trim() || 'ผู้กำกับลูกเสือ';
-      const unitData = db[currentCategory].units[currentUnitId];
-      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
-
-      let csvContent = "\uFEFF";
-      csvContent += "วันที่,ประเภท,กอง,หมู่,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,ผู้บันทึก\n";
-
-      unitData.patrols.forEach(p => {
-        p.members.forEach(m => {
-          csvContent += `"${checkDate}","${categoryText}","${unitData.name}","${p.patrolName}","${m.id}","${m.name}","${m.status}","${recordedBy}"\n`;
-        });
-      });
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `เช็คชื่อ_${categoryText}_${unitData.name}_${checkDate}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function toggleConfigModal() {
-      const modal = document.getElementById('configModal');
-      modal.classList.toggle('hidden');
-    }
-
-    function saveConfig() {
-      const url = document.getElementById('scriptUrlInput').value.trim();
-      if (url) {
-        localStorage.setItem('scout_script_url', url);
-        alert('บันทึก Web App URL เรียบร้อยแล้ว');
-      }
-      toggleConfigModal();
-    }
-  </script>
-</body>
-</html>
+  }
+  return sheet;
+}
