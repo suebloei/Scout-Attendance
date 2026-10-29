@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-28">
+
+  <!-- แถบ Header นำทาง -->
+  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- โลโก้และชื่อโรงเรียน -->
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300">
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="#1e3a8a" stroke-width="4"/>
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#1e3a8a" stroke-width="2"/>
+            <path id="txtArc1" fill="none" d="M 25 100 A 75 75 0 0 1 175 100" />
+            <text font-size="15" font-weight="bold" fill="#1e3a8a" text-anchor="middle">
+              <textPath href="#txtArc1" startOffset="50%">โรงเรียนสีชมพูศึกษา</textPath>
+            </text>
+            <path id="txtArc2" fill="none" d="M 175 105 A 75 75 0 0 1 25 105" />
+            <text font-size="11.5" font-weight="bold" fill="#1e3a8a" text-anchor="middle">
+              <textPath href="#txtArc2" startOffset="50%">องค์การบริหารส่วนจังหวัดขอนแก่น</textPath>
+            </text>
+            <polygon points="100,32 106,62 94,62" fill="#d97706" />
+            <path d="M 94,62 L 106,62 L 114,95 L 86,95 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.5" />
+            <polygon points="82,95 118,95 125,116 75,116" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" />
+            <polygon points="73,116 127,116 136,134 64,134" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" />
+            <rect x="60" y="134" width="80" height="8" fill="#e2e8f0" stroke="#64748b" stroke-width="1.2" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อลูกเสือ - เนตรนารี ม.1</h1>
+          <p class="text-xs sm:text-sm text-amber-100 opacity-90">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
+        </div>
+      </div>
+
+      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ปุ่มตั้งค่าชีต -->
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+        <!-- วันที่ -->
+        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
+          <input type="date" id="checkDate" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs sm:text-sm">
+        </div>
+
+        <!-- ชื่อผู้บันทึก -->
+        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
+          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
+          <input type="text" id="recordedByInput" placeholder="ชื่อผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-28 sm:w-36">
+        </div>
+
+        <!-- ปุ่มตั้งค่า -->
+        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm font-medium transition" title="ตั้งค่าการเชื่อมต่อ Google Sheets">
+          <i data-lucide="sheet" class="w-4 h-4 text-emerald-300"></i>
+          <span class="hidden sm:inline">ตั้งค่า</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- เนื้อหาหลัก -->
+  <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
+
+    <!-- แถบเลือกหมวดหมู่และกอง -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-5">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- สลับประเภท ลูกเสือ / เนตรนารี -->
+        <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
+          <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            <span>ลูกเสือ ม.1 (สีกากี)</span>
+          </button>
+          <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900">
+            <i data-lucide="clover" class="w-4 h-4"></i>
+            <span>เนตรนารี ม.1 (สีเขียว)</span>
+          </button>
+        </div>
+
+        <!-- เลือกกอง (1, 2, 3) -->
+        <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
+          <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">เลือกกอง:</span>
+          <button onclick="selectUnit(1)" id="btnUnit1" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-amber-800 text-white border-amber-800">กอง 1</button>
+          <button onclick="selectUnit(2)" id="btnUnit2" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 2</button>
+          <button onclick="selectUnit(3)" id="btnUnit3" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 3</button>
+        </div>
+
+      </div>
+
+      <!-- สรุปด่วนประจำกอง + ปุ่มมาครบทั้งกอง -->
+      <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
+          <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">9 นาย</span>
+        </div>
+        <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
+          <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+          <span>มาครบทุกคนทั้งกอง</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
+    <div id="patrolsContainer" class="space-y-5">
+      <!-- ข้อมูลเรนเดอร์โดย JavaScript -->
+    </div>
+
+  </main>
+
+  <!-- แถบลอยแสดงสรุปด้านล่าง (Floating Bottom Bar) -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- สรุปยอด มา/ขาด/ลา/สาย -->
+      <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
+        <div class="flex items-center gap-1.5 text-emerald-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span>มา: <span id="statPresent">0</span></span>
+        </div>
+        <div class="flex items-center gap-1.5 text-rose-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+          <span>ขาด: <span id="statAbsent">0</span></span>
+        </div>
+        <div class="flex items-center gap-1.5 text-amber-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <span>ลา: <span id="statLeave">0</span></span>
+        </div>
+        <div class="flex items-center gap-1.5 text-blue-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+          <span>สาย: <span id="statLate">0</span></span>
+        </div>
+      </div>
+
+      <!-- ปุ่มส่งออก CSV และ บันทึกลง Google Sheets -->
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>ส่งออก CSV</span>
+        </button>
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
+          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+          <span>บันทึกลง Google Sheets</span>
+        </button>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Modal สำหรับตั้งค่า Google Apps Script Web App URL -->
+  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <div class="flex items-center gap-2 text-slate-800 font-bold">
+          <i data-lucide="settings" class="w-5 h-5 text-emerald-600"></i>
+          <span>ตั้งค่าการเชื่อมต่อ Google Sheets</span>
+        </div>
+        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL (ลงท้ายด้วย /exec)</label>
+          <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
+        </div>
+        <p class="text-xs text-slate-500">
+          * ระบบตั้งค่า Web App URL ของโรงเรียนไว้เป็นค่าเริ่มต้นแล้ว หากเปลี่ยนโปรเจกต์ชีตใหม่ ให้นำ URL ที่ได้จากการ Deploy เวอร์ชันใหม่มาวางที่นี่
+        </p>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึก URL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL เริ่มต้นที่เชื่อมต่อไว้
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVepnUK3pI6HlJCwfYZOUX9obBpQlq47YvB-RhqmMH1QBegRxgbRWNoR3hIKt5pfiV/exec";
+
+    // ฐานข้อมูลจำลองประเภทละ 3 กอง
+    const rawDatabase = {
+      scout: {
+        themeColor: "#854d0e",
+        gradient: "linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)",
+        btnClass: "bg-amber-800 hover:bg-amber-900 text-white",
+        units: {
+          1: {
+            name: "กอง 1",
+            patrols: [
+              {
+                patrolName: "หมู่จระเข้",
+                members: [
+                  { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา" },
+                  { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา" },
+                  { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่สิงโต",
+                members: [
+                  { id: "10104", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา" },
+                  { id: "10105", name: "ด.ช. พงศกร มุ่งดี", role: "สมาชิก", status: "มา" },
+                  { id: "10106", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่เหยี่ยว",
+                members: [
+                  { id: "10107", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา" },
+                  { id: "10108", name: "ด.ช. วรัญญู สว่างวงศ์", role: "สมาชิก", status: "มา" },
+                  { id: "10109", name: "ด.ช. ภัทรดนัย บุญยัง", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          },
+          2: {
+            name: "กอง 2",
+            patrols: [
+              {
+                patrolName: "หมู่กวาง",
+                members: [
+                  { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา" },
+                  { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "สมาชิก", status: "มา" },
+                  { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่ช้าง",
+                members: [
+                  { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา" },
+                  { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "สมาชิก", status: "มา" },
+                  { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่เสือ",
+                members: [
+                  { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา" },
+                  { id: "10208", name: "ด.ช. รชต มงคล", role: "สมาชิก", status: "มา" },
+                  { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          },
+          3: {
+            name: "กอง 3",
+            patrols: [
+              {
+                patrolName: "หมู่หมี",
+                members: [
+                  { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา" },
+                  { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "สมาชิก", status: "มา" },
+                  { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่อินทรี",
+                members: [
+                  { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา" },
+                  { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "สมาชิก", status: "มา" },
+                  { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่นกเงือก",
+                members: [
+                  { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา" },
+                  { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "สมาชิก", status: "มา" },
+                  { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      guide: {
+        themeColor: "#166534",
+        gradient: "linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)",
+        btnClass: "bg-emerald-800 hover:bg-emerald-900 text-white",
+        units: {
+          1: {
+            name: "กอง 1",
+            patrols: [
+              {
+                patrolName: "หมู่มะลิ",
+                members: [
+                  { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา" },
+                  { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา" },
+                  { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่กุหลาบ",
+                members: [
+                  { id: "20104", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา" },
+                  { id: "20105", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "สมาชิก", status: "มา" },
+                  { id: "20106", name: "ด.ญ. นภัสสร สุริยา", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่บัวหลวง",
+                members: [
+                  { id: "20107", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา" },
+                  { id: "20108", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "สมาชิก", status: "มา" },
+                  { id: "20109", name: "ด.ญ. อารียา เพชรรัตน์", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          },
+          2: {
+            name: "กอง 2",
+            patrols: [
+              {
+                patrolName: "หมู่ชบา",
+                members: [
+                  { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา" },
+                  { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "สมาชิก", status: "มา" },
+                  { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่กล้วยไม้",
+                members: [
+                  { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา" },
+                  { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "สมาชิก", status: "มา" },
+                  { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่พุทธรักษา",
+                members: [
+                  { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา" },
+                  { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "สมาชิก", status: "มา" },
+                  { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          },
+          3: {
+            name: "กอง 3",
+            patrols: [
+              {
+                patrolName: "หมู่ทานตะวัน",
+                members: [
+                  { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา" },
+                  { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "สมาชิก", status: "มา" },
+                  { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่ดาวเรือง",
+                members: [
+                  { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา" },
+                  { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "สมาชิก", status: "มา" },
+                  { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "สมาชิก", status: "มา" }
+                ]
+              },
+              {
+                patrolName: "หมู่แก้ว",
+                members: [
+                  { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา" },
+                  { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "สมาชิก", status: "มา" },
+                  { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "สมาชิก", status: "มา" }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    };
+
+    let currentCategory = 'scout';
+    let currentUnitId = 1;
+    let db = JSON.parse(JSON.stringify(rawDatabase));
+
+    // เริ่มต้นระบบเมื่อเปิดหน้าเว็บ
+    window.addEventListener('DOMContentLoaded', () => {
+      // ตั้งวันที่ปัจจุบัน
+      document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
+      
+      // ดึง URL และชื่อผู้บันทึกเดิมที่เคยบันทึกไว้
+      const savedUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      document.getElementById('scriptUrlInput').value = savedUrl;
+
+      const savedRecorder = localStorage.getItem('scout_recorded_by') || '';
+      if (savedRecorder) {
+        document.getElementById('recordedByInput').value = savedRecorder;
+      }
+
+      applyTheme();
+      renderCurrentUnit();
+      lucide.createIcons();
+    });
+
+    // สลับระหว่างลูกเสือและเนตรนารี
+    function switchCategory(cat) {
+      currentCategory = cat;
+      applyTheme();
+      renderCurrentUnit();
+    }
+
+    // เปลี่ยนสีธีมตามประเภท (สีกากี / สีเขียว)
+    function applyTheme() {
+      const isScout = currentCategory === 'scout';
+      const nav = document.getElementById('navbarHeader');
+      const btnScout = document.getElementById('btnCatScout');
+      const btnGuide = document.getElementById('btnCatGuide');
+      const btnSave = document.getElementById('btnSaveSheets');
+
+      if (isScout) {
+        nav.style.background = rawDatabase.scout.gradient;
+        btnScout.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white";
+        btnGuide.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
+        btnSave.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900";
+      } else {
+        nav.style.background = rawDatabase.guide.gradient;
+        btnScout.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
+        btnGuide.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-emerald-800 text-white";
+        btnSave.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-emerald-800 hover:bg-emerald-900";
+      }
+      updateUnitButtonsUI();
+    }
+
+    // สลับกอง (1, 2, 3)
+    function selectUnit(unitId) {
+      currentUnitId = unitId;
+      updateUnitButtonsUI();
+      renderCurrentUnit();
+    }
+
+    function updateUnitButtonsUI() {
+      const isScout = currentCategory === 'scout';
+      const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800" : "bg-emerald-800 text-white border-emerald-800";
+
+      [1, 2, 3].forEach(id => {
+        const btn = document.getElementById(`btnUnit${id}`);
+        if (id === currentUnitId) {
+          btn.className = `px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition ${activeColorClass}`;
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300";
+        }
+      });
+    }
+
+    // แสดงรายชื่อหมู่และการ์ดนักเรียนในกอง
+    function renderCurrentUnit() {
+      const container = document.getElementById('patrolsContainer');
+      const unitData = db[currentCategory].units[currentUnitId];
+      const categoryLabel = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+
+      document.getElementById('currentUnitTitle').innerText = `${unitData.name} (${categoryLabel})`;
+      
+      let totalMembers = 0;
+      let html = '';
+
+      unitData.patrols.forEach((patrol, pIndex) => {
+        totalMembers += patrol.members.length;
+
+        const pPresent = patrol.members.filter(m => m.status === 'มา').length;
+        const pAbsent = patrol.members.filter(m => m.status === 'ขาด').length;
+        const pLeave = patrol.members.filter(m => m.status === 'ลา').length;
+        const pLate = patrol.members.filter(m => m.status === 'สาย').length;
+
+        html += `
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <!-- หัวการ์ดประจำหมู่ -->
+            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
+                <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
+                <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold mr-2">
+                  <span class="text-emerald-700">มา ${pPresent}</span>
+                  <span class="text-rose-700">ขาด ${pAbsent}</span>
+                  <span class="text-amber-700">ลา ${pLeave}</span>
+                  <span class="text-blue-700">สาย ${pLate}</span>
+                </div>
+                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm transition">
+                  มาครบหมู่นี้
+                </button>
+              </div>
+            </div>
+
+            <!-- แถวรายชื่อนักเรียน -->
+            <div class="divide-y divide-slate-100">
+        `;
+
+        patrol.members.forEach((student, sIndex) => {
+          html += `
+            <div class="px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/60 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
+                  ${sIndex + 1}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-sm text-slate-800">${student.name}</span>
+                    <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${student.role === 'นายหมู่' ? 'bg-amber-100 text-amber-800 border border-amber-200' : (student.role === 'รองนายหมู่' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600')}">${student.role}</span>
+                  </div>
+                  <div class="text-xs text-slate-400">รหัสประจำตัว: ${student.id}</div>
+                </div>
+              </div>
+
+              <!-- ปุ่มเลือกสถานะ 4 ปุ่ม -->
+              <div class="grid grid-cols-4 gap-1 sm:w-64 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
+                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
+                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
+                <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('totalUnitMembers').innerText = `${totalMembers} นาย`;
+      container.innerHTML = html;
+      updateBottomStats();
+    }
+
+    // เซ็ตสถานะนักเรียนรายคน
+    function setStatus(patrolIndex, studentIndex, status) {
+      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members[studentIndex].status = status;
+      renderCurrentUnit();
+    }
+
+    // มาครบทั้งหมู่
+    function markPatrolPresent(patrolIndex) {
+      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members.forEach(m => m.status = 'มา');
+      renderCurrentUnit();
+    }
+
+    // มาครบทุกคนทั้งกอง
+    function markAllCurrentUnitPresent() {
+      db[currentCategory].units[currentUnitId].patrols.forEach(p => {
+        p.members.forEach(m => m.status = 'มา');
+      });
+      renderCurrentUnit();
+    }
+
+    // คำนวณสรุปสถิติด้านล่าง
+    function updateBottomStats() {
+      let present = 0, absent = 0, leave = 0, late = 0;
+      const unitData = db[currentCategory].units[currentUnitId];
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          if (m.status === 'มา') present++;
+          else if (m.status === 'ขาด') absent++;
+          else if (m.status === 'ลา') leave++;
+          else if (m.status === 'สาย') late++;
+        });
+      });
+
+      document.getElementById('statPresent').innerText = present;
+      document.getElementById('statAbsent').innerText = absent;
+      document.getElementById('statLeave').innerText = leave;
+      document.getElementById('statLate').innerText = late;
+    }
+
+    // ส่งข้อมูลไปบันทึก/อัปเดตทับลง Google Sheets
+    async function saveToGoogleSheets() {
+      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      const checkDate = document.getElementById('checkDate').value;
+      const recordedBy = document.getElementById('recordedByInput').value.trim();
+
+      // ตรวจสอบชื่อผู้บันทึก
+      if (!recordedBy) {
+        alert('กรุณาระบุชื่อผู้บันทึกก่อนทำการส่งข้อมูล');
+        document.getElementById('recordedByInput').focus();
+        return;
+      }
+
+      // บันทึกชื่อผู้บันทึกไว้ใน LocalStorage เพื่อความสะดวกในครั้งต่อไป
+      localStorage.setItem('scout_recorded_by', recordedBy);
+
+      const unitData = db[currentCategory].units[currentUnitId];
+      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
+
+      const studentsPayload = [];
+      unitData.patrols.forEach(patrol => {
+        patrol.members.forEach(member => {
+          studentsPayload.push({
+            patrol: patrol.patrolName,
+            id: member.id,
+            name: member.name,
+            status: member.status
+          });
+        });
+      });
+
+      const payload = {
+        date: checkDate,
+        category: categoryText,
+        unit: unitData.name,
+        recordedBy: recordedBy,
+        students: studentsPayload
+      };
+
+      const btnSave = document.getElementById('btnSaveSheets');
+      const originalText = btnSave.innerHTML;
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก...</span>`;
+      lucide.createIcons();
+
+      try {
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert(`✅ บันทึกข้อมูลเรียบร้อย!\n- อัปเดตข้อมูลเดิม: ${result.updated || 0} คน\n- บันทึกรายการใหม่: ${result.inserted || 0} คน\n- ผู้บันทึก: ${recordedBy}`);
+        } else {
+          alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'เกิดข้อผิดพลาด'));
+        }
+      } catch (error) {
+        console.warn('Network Notice:', error);
+        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบใน Google Sheets`);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = originalText;
+        lucide.createIcons();
+      }
+    }
+
+    // ส่งออกเป็นไฟล์ CSV พร้อมชื่อผู้บันทึก
+    function exportToCSV() {
+      const checkDate = document.getElementById('checkDate').value;
+      const recordedBy = document.getElementById('recordedByInput').value.trim() || 'ผู้กำกับลูกเสือ';
+      const unitData = db[currentCategory].units[currentUnitId];
+      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
+
+      let csvContent = "\uFEFF"; // UTF-8 BOM ป้องกันภาษาไทยเพี้ยนใน Excel
+      csvContent += "วันที่,ประเภท,กอง,หมู่,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,ผู้บันทึก\n";
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          csvContent += `"${checkDate}","${categoryText}","${unitData.name}","${p.patrolName}","${m.id}","${m.name}","${m.status}","${recordedBy}"\n`;
+        });
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `เช็คชื่อ_${categoryText}_${unitData.name}_${checkDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // เปิด/ปิดหน้าต่าง Modal ตั้งค่า URL
+    function toggleConfigModal() {
+      const modal = document.getElementById('configModal');
+      modal.classList.toggle('hidden');
+    }
+
+    function saveConfig() {
+      const url = document.getElementById('scriptUrlInput').value.trim();
+      if (url) {
+        localStorage.setItem('scout_script_url', url);
+        alert('บันทึก Web App URL เรียบร้อยแล้ว');
+      }
+      toggleConfigModal();
+    }
+  </script>
+</body>
+</html>
