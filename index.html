@@ -24,7 +24,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-28">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
 
   <!-- แถบ Header นำทาง -->
   <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
@@ -32,24 +32,8 @@
       
       <!-- โลโก้และชื่อโรงเรียน -->
       <div class="flex items-center gap-3 w-full md:w-auto">
-        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <circle cx="100" cy="100" r="96" fill="#ffffff" stroke="#1e3a8a" stroke-width="4"/>
-            <circle cx="100" cy="100" r="82" fill="none" stroke="#1e3a8a" stroke-width="2"/>
-            <path id="txtArc1" fill="none" d="M 25 100 A 75 75 0 0 1 175 100" />
-            <text font-size="15" font-weight="bold" fill="#1e3a8a" text-anchor="middle">
-              <textPath href="#txtArc1" startOffset="50%">โรงเรียนสีชมพูศึกษา</textPath>
-            </text>
-            <path id="txtArc2" fill="none" d="M 175 105 A 75 75 0 0 1 25 105" />
-            <text font-size="11.5" font-weight="bold" fill="#1e3a8a" text-anchor="middle">
-              <textPath href="#txtArc2" startOffset="50%">องค์การบริหารส่วนจังหวัดขอนแก่น</textPath>
-            </text>
-            <polygon points="100,32 106,62 94,62" fill="#d97706" />
-            <path d="M 94,62 L 106,62 L 114,95 L 86,95 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.5" />
-            <polygon points="82,95 118,95 125,116 75,116" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" />
-            <polygon points="73,116 127,116 136,134 64,134" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" />
-            <rect x="60" y="134" width="80" height="8" fill="#e2e8f0" stroke="#64748b" stroke-width="1.2" />
-          </svg>
+        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
+          <img src="Engineering Logo.jpg" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
         </div>
         <div>
           <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อลูกเสือ - เนตรนารี ม.1</h1>
@@ -128,6 +112,14 @@
       <!-- ข้อมูลเรนเดอร์โดย JavaScript -->
     </div>
 
+    <!-- บรรทัดเครดิตผู้พัฒนา (จบในบรรทัดเดียว) -->
+    <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2">
+      <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
+        <img src="Engineering Logo.jpg" alt="Logo" class="w-full h-full object-contain">
+      </div>
+      <span>พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
+    </div>
+
   </main>
 
   <!-- แถบลอยแสดงสรุปด้านล่าง (Floating Bottom Bar) -->
@@ -188,7 +180,7 @@
           <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
         </div>
         <p class="text-xs text-slate-500">
-          * ระบบตั้งค่า Web App URL ของโรงเรียนไว้เป็นค่าเริ่มต้นแล้ว หากเปลี่ยนโปรเจกต์ชีตใหม่ ให้นำ URL ที่ได้จากการ Deploy เวอร์ชันใหม่มาวางที่นี่
+          * ระบบตั้งค่า Web App URL เริ่มต้นไว้แล้ว หากเปลี่ยนชีตใหม่ให้นำ URL จากการ Deploy มาวางที่นี่
         </p>
       </div>
 
@@ -200,7 +192,6 @@
   </div>
 
   <script>
-    // URL เริ่มต้นที่เชื่อมต่อไว้
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVepnUK3pI6HlJCwfYZOUX9obBpQlq47YvB-RhqmMH1QBegRxgbRWNoR3hIKt5pfiV/exec";
 
     // ฐานข้อมูลจำลองประเภทละ 3 กอง
@@ -399,12 +390,9 @@
     let currentUnitId = 1;
     let db = JSON.parse(JSON.stringify(rawDatabase));
 
-    // เริ่มต้นระบบเมื่อเปิดหน้าเว็บ
     window.addEventListener('DOMContentLoaded', () => {
-      // ตั้งวันที่ปัจจุบัน
       document.getElementById('checkDate').value = new Date().toISOString().split('T')[0];
       
-      // ดึง URL และชื่อผู้บันทึกเดิมที่เคยบันทึกไว้
       const savedUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       document.getElementById('scriptUrlInput').value = savedUrl;
 
@@ -418,14 +406,12 @@
       lucide.createIcons();
     });
 
-    // สลับระหว่างลูกเสือและเนตรนารี
     function switchCategory(cat) {
       currentCategory = cat;
       applyTheme();
       renderCurrentUnit();
     }
 
-    // เปลี่ยนสีธีมตามประเภท (สีกากี / สีเขียว)
     function applyTheme() {
       const isScout = currentCategory === 'scout';
       const nav = document.getElementById('navbarHeader');
@@ -447,7 +433,6 @@
       updateUnitButtonsUI();
     }
 
-    // สลับกอง (1, 2, 3)
     function selectUnit(unitId) {
       currentUnitId = unitId;
       updateUnitButtonsUI();
@@ -468,7 +453,6 @@
       });
     }
 
-    // แสดงรายชื่อหมู่และการ์ดนักเรียนในกอง
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
       const unitData = db[currentCategory].units[currentUnitId];
@@ -489,7 +473,6 @@
 
         html += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <!-- หัวการ์ดประจำหมู่ -->
             <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
@@ -510,7 +493,6 @@
               </div>
             </div>
 
-            <!-- แถวรายชื่อนักเรียน -->
             <div class="divide-y divide-slate-100">
         `;
 
@@ -530,7 +512,6 @@
                 </div>
               </div>
 
-              <!-- ปุ่มเลือกสถานะ 4 ปุ่ม -->
               <div class="grid grid-cols-4 gap-1 sm:w-64 bg-slate-100 p-1 rounded-xl border border-slate-200">
                 <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
                 <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
@@ -552,19 +533,16 @@
       updateBottomStats();
     }
 
-    // เซ็ตสถานะนักเรียนรายคน
     function setStatus(patrolIndex, studentIndex, status) {
       db[currentCategory].units[currentUnitId].patrols[patrolIndex].members[studentIndex].status = status;
       renderCurrentUnit();
     }
 
-    // มาครบทั้งหมู่
     function markPatrolPresent(patrolIndex) {
       db[currentCategory].units[currentUnitId].patrols[patrolIndex].members.forEach(m => m.status = 'มา');
       renderCurrentUnit();
     }
 
-    // มาครบทุกคนทั้งกอง
     function markAllCurrentUnitPresent() {
       db[currentCategory].units[currentUnitId].patrols.forEach(p => {
         p.members.forEach(m => m.status = 'มา');
@@ -572,7 +550,6 @@
       renderCurrentUnit();
     }
 
-    // คำนวณสรุปสถิติด้านล่าง
     function updateBottomStats() {
       let present = 0, absent = 0, leave = 0, late = 0;
       const unitData = db[currentCategory].units[currentUnitId];
@@ -592,20 +569,17 @@
       document.getElementById('statLate').innerText = late;
     }
 
-    // ส่งข้อมูลไปบันทึก/อัปเดตทับลง Google Sheets
     async function saveToGoogleSheets() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       const checkDate = document.getElementById('checkDate').value;
       const recordedBy = document.getElementById('recordedByInput').value.trim();
 
-      // ตรวจสอบชื่อผู้บันทึก
       if (!recordedBy) {
         alert('กรุณาระบุชื่อผู้บันทึกก่อนทำการส่งข้อมูล');
         document.getElementById('recordedByInput').focus();
         return;
       }
 
-      // บันทึกชื่อผู้บันทึกไว้ใน LocalStorage เพื่อความสะดวกในครั้งต่อไป
       localStorage.setItem('scout_recorded_by', recordedBy);
 
       const unitData = db[currentCategory].units[currentUnitId];
@@ -654,7 +628,7 @@
         }
       } catch (error) {
         console.warn('Network Notice:', error);
-        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบใน Google Sheets`);
+        alert(`ℹ️ ส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบใน Google Sheets`);
       } finally {
         btnSave.disabled = false;
         btnSave.innerHTML = originalText;
@@ -662,14 +636,13 @@
       }
     }
 
-    // ส่งออกเป็นไฟล์ CSV พร้อมชื่อผู้บันทึก
     function exportToCSV() {
       const checkDate = document.getElementById('checkDate').value;
       const recordedBy = document.getElementById('recordedByInput').value.trim() || 'ผู้กำกับลูกเสือ';
       const unitData = db[currentCategory].units[currentUnitId];
       const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
 
-      let csvContent = "\uFEFF"; // UTF-8 BOM ป้องกันภาษาไทยเพี้ยนใน Excel
+      let csvContent = "\uFEFF";
       csvContent += "วันที่,ประเภท,กอง,หมู่,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,ผู้บันทึก\n";
 
       unitData.patrols.forEach(p => {
@@ -688,7 +661,6 @@
       document.body.removeChild(link);
     }
 
-    // เปิด/ปิดหน้าต่าง Modal ตั้งค่า URL
     function toggleConfigModal() {
       const modal = document.getElementById('configModal');
       modal.classList.toggle('hidden');
