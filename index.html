@@ -50,7 +50,7 @@
         </button>
       </div>
 
-      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ซิงค์ชีต, ตั้งค่า -->
+      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ตั้งค่า -->
       <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
         <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
           <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
@@ -60,10 +60,6 @@
           <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
           <input type="text" id="recordedByInput" placeholder="ชื่อผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-28 sm:w-36">
         </div>
-        <button onclick="syncRosterFromSheets()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1 text-xs font-semibold" title="ซิงค์รายชื่อนักเรียนจาก Sheets">
-          <i data-lucide="users" class="w-4 h-4 text-cyan-300"></i>
-          <span class="hidden sm:inline">ดึงรายชื่อ</span>
-        </button>
         <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium" title="ตั้งค่าเชื่อมต่อ">
           <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
         </button>
@@ -78,7 +74,7 @@
     <!-- ==================== โหมด 1: เช็คชื่อหน้าแถว ==================== -->
     <section id="sectionCheckin" class="space-y-4">
       
-      <!-- การ์ดเลือกกิจกรรมประจำสัปดาห์ (หัวข้อกิจกรรม) -->
+      <!-- การ์ดเลือกกิจกรรมประจำสัปดาห์ -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-2">
@@ -87,7 +83,7 @@
             </span>
             <div>
               <label class="block text-xs font-bold text-slate-700">กิจกรรมประจำสัปดาห์ / ฐานการเรียนรู้</label>
-              <p class="text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติการฝึก</p>
+              <p class="text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติ</p>
             </div>
           </div>
 
@@ -110,7 +106,7 @@
         </div>
       </div>
 
-      <!-- การ์ดตัวเลือกประเภทและกอง -->
+      <!-- ตัวเลือกประเภทและกอง -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
@@ -124,18 +120,16 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
-            <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">เลือกกอง:</span>
-            <button onclick="selectUnit(1)" id="btnUnit1" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-amber-800 text-white border-amber-800">กอง 1</button>
-            <button onclick="selectUnit(2)" id="btnUnit2" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 2</button>
-            <button onclick="selectUnit(3)" id="btnUnit3" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300">กอง 3</button>
+          <!-- ปุ่มเลือกกอง (Dynamic: ลูกเสือ 4 กอง / เนตรนารี 3 กอง) -->
+          <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
+            <!-- เรนเดอร์ด้วย JavaScript -->
           </div>
         </div>
 
         <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
             <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
-            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">9 นาย</span>
+            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">0 นาย</span>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="markAllCurrentUnitUniform(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
@@ -148,6 +142,11 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- การ์ดแสดงข้อมูลผู้บังคับบัญชาประจำกอง (Commander Info Card) -->
+      <div id="unitCommanderCard" class="bg-gradient-to-r from-amber-50/80 via-white to-amber-50/40 rounded-2xl p-4 border border-amber-200/80 shadow-xs">
+        <!-- Rendered by JavaScript -->
       </div>
 
       <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
@@ -209,6 +208,7 @@
               <option value="กอง 1">กอง 1</option>
               <option value="กอง 2">กอง 2</option>
               <option value="กอง 3">กอง 3</option>
+              <option value="กอง 4">กอง 4</option>
             </select>
           </div>
           <div id="subFilterDaily">
@@ -350,66 +350,234 @@
     const SCOUT_ROLES = ["นายหมู่", "รองนายหมู่", "พลาธิการ", "คนครัว", "ผู้ช่วยคนครัว", "คนหาฟืน", "คนหาน้ำ", "ผู้ช่วยเหลือทั่วไป"];
     const UNIFORM_ITEMS = ["หมวก", "ผ้าผูกคอ", "วอกเกิ้ล", "ป้ายชื่อ", "รองเท้า/ถุงเท้า"];
 
-    const initialDatabase = {
+    // ข้อมูลผู้บังคับบัญชาระดับโรงเรียน
+    const schoolCommanders = {
+      groupLeader: "นายพงศ์ธรรม ปลัดศรีช่วย",
+      deputyGroupLeader: "นายปัญญา คำสะไมล์"
+    };
+
+    // ฐานข้อมูลรายชื่อจริงและผังผู้บังคับบัญชาโรงเรียนสีชมพูศึกษา
+    const schoolOfficialDatabase = {
       scout: {
         units: {
           1: {
             name: "กอง 1",
+            leader: "นายวีระยุทธ์ ปู่เพ็ง",
+            assistants: ["นายนพคุณ สืบเลย", "นายสุภีรชัย ภิญโญดม", "นายอลงกรณ์ ชมพูแดง"],
             patrols: [
-              { patrolName: "หมู่จระเข้", score: 10, members: [
-                { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่ศรีอินทราทิตย์", leader: "นายนพคุณ สืบเลย", score: 10, members: [
+                { id: "10101", name: "เด็กชายคุณนภัส ทับแช่ม", classRoom: "ม.1/4", no: 1, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10102", name: "เด็กชายภานุพงษ์ เข้าใจการ", classRoom: "ม.1/4", no: 10, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10103", name: "เด็กชายนาวา หวังเชิดกลาง", classRoom: "ม.1/4", no: 8, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10104", name: "เด็กชายภูชิต ประโลมนาม", classRoom: "ม.1/4", no: 11, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10105", name: "เด็กชายภูผา ทองรัก", classRoom: "ม.1/4", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10106", name: "เด็กชายศุภกลวิชญ์ สถิตย์", classRoom: "ม.1/4", no: 14, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10107", name: "เด็กชายชิติพัฒน์ แถมนา", classRoom: "ม.1/4", no: 5, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10108", name: "เด็กชายกมลภพ โมคา", classRoom: "ม.1/1", no: 1, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่สิงโต", score: 10, members: [
-                { id: "10104", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10105", name: "ด.ช. พงศกร มุ่งดี", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10106", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่รามคำแหง", leader: "นายสุภีรชัย ภิญโญดม", score: 10, members: [
+                { id: "10109", name: "เด็กชายคุณากร กองหาโคตร", classRoom: "ม.1/4", no: 2, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10110", name: "เด็กชายจักรพรรด์ ภูมิพัฒน์", classRoom: "ม.1/4", no: 3, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10111", name: "เด็กชายณิชคุณ สอนกอง", classRoom: "ม.1/4", no: 7, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10112", name: "เด็กชายจิราธร ธนะกลม", classRoom: "ม.1/4", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10113", name: "เด็กชายณัฎฐวัฒน์ มะโรงฤทธิ์", classRoom: "ม.1/4", no: 6, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10114", name: "เด็กชายภูมิพัฒน์ แก้วบับภา", classRoom: "ม.1/4", no: 13, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10115", name: "เด็กชายพลากร ดวงจันทร์", classRoom: "ม.1/4", no: 9, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10116", name: "เด็กชายอนุศร ยุติธรรม", classRoom: "ม.1/4", no: 15, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เหยี่ยว", score: 10, members: [
-                { id: "10107", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10108", name: "ด.ช. วรัญญู สว่างวงศ์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10109", name: "ด.ช. ภัทรดนัย บุญยัง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่อู่ทอง", leader: "นายสุภีรชัย ภิญโญดม", score: 10, members: [
+                { id: "10117", name: "เด็กชายธนินท์รัฐ ธนบูลย์เมธี", classRoom: "ม.1/3", no: 36, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10118", name: "เด็กชายธนภัทร จันทาขุ่ม", classRoom: "ม.1/1", no: 8, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10119", name: "เด็กชายสาระเวย์ ชัยจีน", classRoom: "ม.1/1", no: 19, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10120", name: "เด็กชายธนาเดช ราชวงค์", classRoom: "ม.1/1", no: 10, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10121", name: "เด็กชายธนัชชนม์ บุตรนวน", classRoom: "ม.1/1", no: 9, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10122", name: "เด็กชายวรพิพัฒน์ ศรีนา", classRoom: "ม.1/1", no: 17, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10123", name: "เด็กชายพุฒิพัฒน์ ชัยบุตร", classRoom: "ม.1/1", no: 13, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10124", name: "เด็กชายกิตติพัศ พืชสิงห์", classRoom: "ม.1/1", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10125", name: "เด็กชายจตุรวิชญ์ สมสี", classRoom: "ม.1/1", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่บรมไตรโลกนาถ", leader: "นายอลงกรณ์ ชมพูแดง", score: 10, members: [
+                { id: "10126", name: "เด็กชายเจนวิทย์ มาทน", classRoom: "ม.1/1", no: 5, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10127", name: "เด็กชายวิทวัส คำหล่อ", classRoom: "ม.1/3", no: 6, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10128", name: "เด็กชายปรัชญา เกลี้ยงโท้", classRoom: "ม.1/3", no: 4, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10129", name: "เด็กชายพิทยุตม์ แก้วกระจ่าง", classRoom: "ม.1/3", no: 5, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10130", name: "เด็กชายทนวินท์ โตภูเขียว", classRoom: "ม.1/3", no: 2, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10131", name: "เด็กชายกันต์กวี อินตะโคตร", classRoom: "ม.1/3", no: 1, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10132", name: "เด็กชายกวินกานต์ ทาแก้ง", classRoom: "ม.1/3", no: 35, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10133", name: "เด็กชายทองแท้ บุตรปัญญา", classRoom: "ม.1/3", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่มหาจักรพรรดิ", leader: "นายอลงกรณ์ ชมพูแดง", score: 10, members: [
+                { id: "10134", name: "เด็กชายธราเทพ ตาปัน", classRoom: "ม.1/1", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10135", name: "เด็กชายกรวิชญ์ ชลพันธุ์", classRoom: "ม.1/1", no: 2, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10136", name: "เด็กชายภาคิน สำฤทธิ์ริน", classRoom: "ม.1/1", no: 14, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10137", name: "เด็กชายภูริภัทร บัวบน", classRoom: "ม.1/1", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10138", name: "เด็กชายพงศกร สุขยอด", classRoom: "ม.1/1", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10139", name: "เด็กชายสหรัตน์ แสนลา", classRoom: "ม.1/1", no: 18, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10140", name: "เด็กชายสิรินวัฒน์ ขุนสอน", classRoom: "ม.1/1", no: 2, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10141", name: "เด็กชายแทนไทย สุขสบาย", classRoom: "ม.1/1", no: 6, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10142", name: "เด็กชายธนกร พิมเร่าหนาด", classRoom: "ม.1/1", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           2: {
             name: "กอง 2",
+            leader: "นายอนัน ขุนเดช",
+            assistants: ["นางวิยะดา หาจันดา", "นางธนิดา จันทะเดช", "นางสาวพิมพ์ณดา รวมลำภา"],
             patrols: [
-              { patrolName: "หมู่กวาง", score: 10, members: [
-                { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่สุริโยทัย", leader: "นางวิยะดา หาจันดา", score: 10, members: [
+                { id: "10201", name: "เด็กชายพูนทรัพย์ ชนะสิมมา", classRoom: "ม.1/2", no: 9, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10202", name: "เด็กชายภาคิน ยั่งยืน", classRoom: "ม.1/2", no: 10, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10203", name: "เด็กชายธนกฤต ธรรมขันธ์", classRoom: "ม.1/1", no: 6, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10204", name: "เด็กชายชิษณุพงศ์ ชัยเนตร", classRoom: "ม.1/2", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10205", name: "เด็กชายสิทธิกร วงศ์ยุ", classRoom: "ม.1/2", no: 15, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10206", name: "เด็กชายวรากร เชื้อสาวะถี", classRoom: "ม.1/2", no: 12, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10207", name: "เด็กชายปกรณ์ บุตรวงษ์", classRoom: "ม.1/2", no: 8, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10208", name: "เด็กชายภูบดินทร์ มณีวงษ์", classRoom: "ม.1/1", no: 15, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ช้าง", score: 10, members: [
-                { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นเรศวร", leader: "นางวิยะดา หาจันดา", score: 10, members: [
+                { id: "10209", name: "เด็กชายรณพีร์ บุญผล", classRoom: "ม.1/2", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10210", name: "เด็กชายวิชภูมิ พันธ์ประทุม", classRoom: "ม.1/2", no: 13, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10211", name: "เด็กชายกิตติคุณ เย็นตุรัส", classRoom: "ม.1/2", no: 1, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10212", name: "เด็กชายสหรัฐ พิมพ์กลาง", classRoom: "ม.1/2", no: 14, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10213", name: "เด็กชายจอมทัพ อ่อนศิริ", classRoom: "ม.1/2", no: 2, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10214", name: "เด็กชายณฐกร ศรวิเศษ", classRoom: "ม.1/2", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10215", name: "เด็กชายสิรวิชญ์ บุพพิ", classRoom: "ม.1/2", no: 16, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10216", name: "เด็กชายนัธทวัฒน์ ผ่องแผ้ว", classRoom: "ม.1/2", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10217", name: "เด็กชายจิรายุ ชำนาญ", classRoom: "ม.1/2", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เสือ", score: 10, members: [
-                { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10208", name: "ด.ช. รชต มงคล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่เอกาทศรถ", leader: "นางธนิดา จันทะเดช", score: 10, members: [
+                { id: "10218", name: "เด็กชายสิท์ธิปติ สีไชยหมื่อ", classRoom: "ม.1/5", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10219", name: "เด็กชายชวกร ไชยพิมพ์", classRoom: "ม.1/5", no: 3, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10220", name: "เด็กชายชิษณุพงค์ ขุนเดช", classRoom: "ม.1/5", no: 5, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10221", name: "เด็กชายชินภัทร คำเชื้อ", classRoom: "ม.1/5", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10222", name: "เด็กชายชัชวาล แสงนอก", classRoom: "ม.1/5", no: 3, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10223", name: "เด็กชายพีระพัฒน์ ศรีนาง", classRoom: "ม.1/5", no: 8, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10224", name: "เด็กชายธีรเดช อิธิตา", classRoom: "ม.1/5", no: 7, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10225", name: "เด็กชายวาเลนไทม์ อินทะชัย", classRoom: "ม.1/5", no: 9, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10226", name: "เด็กชายกฤตภาส เหล่าม่วง", classRoom: "ม.1/5", no: 1, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่ปราสาททอง", leader: "นางสาวพิมพ์ณดา รวมลำภา", score: 10, members: [
+                { id: "10227", name: "เด็กชายพีระกานต์ วงษาบุตร", classRoom: "ม.1/5", no: 0, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10228", name: "เด็กชายระพิพัฒน์ ขุนเดช", classRoom: "ม.1/5", no: 9, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10229", name: "เด็กชายพีรพงค์ แซงดานุช", classRoom: "ม.1/6", no: 12, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10230", name: "เด็กชายพัชรพล เกื้อกูลวงษ์", classRoom: "ม.1/6", no: 11, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10231", name: "เด็กชายปรมินทร์ สีหาคุณ", classRoom: "ม.1/6", no: 0, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10232", name: "เด็กชายธีระศักดิ์ แพงพิศาล", classRoom: "ม.1/6", no: 0, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10233", name: "เด็กชายมังกร ศรีเชียงสา", classRoom: "ม.1/6", no: 0, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10234", name: "เด็กชายณัฐพล จันดาเบ้า", classRoom: "ม.1/6", no: 0, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           3: {
             name: "กอง 3",
+            leader: "นายสิทธิศักดิ์ สิงห์โสภา",
+            assistants: ["นางสาวสไบแพร จันทร์ต้น", "นางสาวพริมา ศรีดารา", "นายชาญยุทธ เร็วสา"],
             patrols: [
-              { patrolName: "หมู่หมี", score: 10, members: [
-                { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่พระนารายณ์", leader: "นางสาวสไบแพร จันทร์ต้น", score: 10, members: [
+                { id: "10301", name: "เด็กชายกิตตินันท์ ศรีหาวงค์", classRoom: "ม.1/7", no: 1, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10302", name: "เด็กชายชนเมธ ศิริธรรมมา", classRoom: "ม.1/7", no: 4, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10303", name: "เด็กชายภานุภัทร ชาติศิริ", classRoom: "ม.1/7", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10304", name: "เด็กชายร่มเกล้า สุทธิญาณ", classRoom: "ม.1/7", no: 12, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10305", name: "เด็กชายจิรายุ เทือกเพีย", classRoom: "ม.1/7", no: 4, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10306", name: "เด็กชายพงศธร พรมแพง", classRoom: "ม.1/7", no: 8, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10307", name: "เด็กชายภูเมฆา พรมโสภา", classRoom: "ม.1/7", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10308", name: "เด็กชายผนินทร ไพรเขต", classRoom: "ม.1/7", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10309", name: "เด็กชายไกรวิชญ์ เผือกหอม", classRoom: "ม.1/7", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10310", name: "เด็กชายรัชชานนท์ โยค์ทาวัน", classRoom: "ม.1/9", no: 14, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่อินทรี", score: 10, members: [
-                { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่โกษาปาน", leader: "นางสาวสไบแพร จันทร์ต้น", score: 10, members: [
+                { id: "10311", name: "เด็กชายปวริศร ศรีสอาด", classRoom: "ม.1/7", no: 6, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10312", name: "เด็กชายภานุพงศ์ ชาติศิริ", classRoom: "ม.1/7", no: 9, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10313", name: "เด็กชายณัฐวุฒิ น้อยอุดม", classRoom: "ม.1/7", no: 5, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10314", name: "เด็กชายทัตพงศ์ มีชัย", classRoom: "ม.1/8", no: 9, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10315", name: "เด็กชายทักษ์ดนัย เพ็ชรทอง", classRoom: "ม.1/8", no: 8, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10316", name: "เด็กชายชนะพล พงษ์สระพัง", classRoom: "ม.1/8", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10317", name: "เด็กชายกัลณภัทร สีหาวัต", classRoom: "ม.1/8", no: 1, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10318", name: "เด็กชายธนทรัพย์ ทองมี", classRoom: "ม.1/8", no: 12, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10319", name: "เด็กชายพงศภัค โกยทา", classRoom: "ม.1/8", no: 14, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่นกเงือก", score: 10, members: [
-                { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่โกษาเหล็ก", leader: "นางสาวพริมา ศรีดารา", score: 10, members: [
+                { id: "10320", name: "เด็กชายเจษฎาพร จำเริญ", classRoom: "ม.1/8", no: 4, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10321", name: "เด็กชายภูรี โพธิสาราช", classRoom: "ม.1/8", no: 16, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10322", name: "เด็กชายธนโชติ คงเจริญ", classRoom: "ม.1/8", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10323", name: "เด็กชายชาคริต อ้วนวงษ์", classRoom: "ม.1/9", no: 6, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10324", name: "เด็กชายชวนากร อุณาพรหม", classRoom: "ม.1/9", no: 5, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10325", name: "เด็กชายจิรายุทธ ทับขุนทด", classRoom: "ม.1/9", no: 3, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10326", name: "เด็กชายธันวา สามารถ", classRoom: "ม.1/9", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10327", name: "เด็กชายณัฐวุฒิ นันต๊ะ", classRoom: "ม.1/9", no: 8, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่พันท้ายนรสิงห์", leader: "นายชาญยุทธ เร็วสา", score: 10, members: [
+                { id: "10328", name: "เด็กชายเตชพัฒน์ แสนสิงห์", classRoom: "ม.1/9", no: 4, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10329", name: "เด็กชายอภิชาติ ปัญทา", classRoom: "ม.1/10", no: 16, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10330", name: "เด็กชายพุฒิพงศ์ ยมสีดำ", classRoom: "ม.1/10", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10331", name: "เด็กชายธวัชชัย อินรส", classRoom: "ม.1/10", no: 6, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10332", name: "เด็กชายภานุวัชร เท่าบุตรศรี", classRoom: "ม.1/10", no: 14, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10333", name: "เด็กชายภัทรนันท์ สร้อยคำ", classRoom: "ม.1/10", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10334", name: "เด็กชายเบญจมินทร์ แดนศรีแก้ว", classRoom: "ม.1/10", no: 3, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10335", name: "เด็กชายธนภัทร พรมภักดี", classRoom: "ม.1/10", no: 11, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10336", name: "เด็กชายเขตต์ ชินเพ็ง", classRoom: "ม.1/9", no: 8, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]}
+            ]
+          },
+          4: {
+            name: "กอง 4",
+            leader: "นายภูมินทร์ รุ่งศรี",
+            assistants: ["นายสุวิทย์ สังสีแก้ว", "นางระพีพร โสสวัสดิ์"],
+            patrols: [
+              { patrolName: "หมู่พระเจ้าตาก", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10401", name: "เด็กชายณัฐวุฒิ จันทร์ใส", classRoom: "ม.1/8", no: 7, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10402", name: "เด็กชายธีรธัช พิลโยพันธ์", classRoom: "ม.1/8", no: 13, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10403", name: "เด็กชายพีรพงศ์ ลาปะ", classRoom: "ม.1/8", no: 15, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10404", name: "เด็กชายจิรพงษ์ ไชยผา", classRoom: "ม.1/8", no: 3, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10405", name: "เด็กชายรัชชานนท์ ปัญญาโส", classRoom: "ม.1/8", no: 17, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10406", name: "เด็กชายชินดนัย เนาว์จำรัส", classRoom: "ม.1/8", no: 6, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10407", name: "เด็กชายธนกร เถื่อนลือชัย", classRoom: "ม.1/8", no: 10, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10408", name: "เด็กชายสหรัฐ ราชรินทร์", classRoom: "ม.1/8", no: 18, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10409", name: "เด็กชายกุณพัฒน์ ภาพันธุ์", classRoom: "ม.1/8", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10410", name: "เด็กชายสุทธิภัร จามะรี", classRoom: "ม.1/10", no: 20, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่พระพุทธยอดฟ้า", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10411", name: "เด็กชายธนวัฒน์ ไชยนา", classRoom: "ม.1/9", no: 10, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10412", name: "เด็กชายสงกรานต์ พันมิตร", classRoom: "ม.1/9", no: 17, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10413", name: "เด็กชายณัฐกิตศ์ สวัสดิ์", classRoom: "ม.1/9", no: 7, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10414", name: "เด็กชายภูมิพัฒน์ คงเด็ด", classRoom: "ม.1/9", no: 13, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10415", name: "เด็กชายปรมัตถ์ ดอนโคตร", classRoom: "ม.1/9", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10416", name: "เด็กชายเจษฎา โจมทา", classRoom: "ม.1/9", no: 4, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10417", name: "เด็กชายจิรภัทร ชัยบุตร", classRoom: "ม.1/9", no: 2, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10418", name: "เด็กชายวงศธร เอกรักษา", classRoom: "ม.1/9", no: 0, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่เทพกษัตริย์", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10419", name: "เด็กชายอัษฎาวุฒิ ศรวิเศษ", classRoom: "ม.1/10", no: 24, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10420", name: "เด็กชายวีรชัย จันทรี", classRoom: "ม.1/10", no: 18, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10421", name: "เด็กชายปริชญา ตั้งถิ่น", classRoom: "ม.1/10", no: 9, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10422", name: "เด็กชายวายุ ญาณประเสริฐ", classRoom: "ม.1/10", no: 17, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10423", name: "เด็กชายศิวพงษ์ เพชรศรี", classRoom: "ม.1/10", no: 19, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10424", name: "เด็กชายสุรพงษ์ ผิวอ่อน", classRoom: "ม.1/10", no: 21, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10425", name: "เด็กชายปิยะวัฒน์ ชิตพงศ์ไชย", classRoom: "ม.1/10", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10426", name: "เด็กชายนัทชานนท์ แก้วสง่า", classRoom: "ม.1/10", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10427", name: "เด็กชายธนภัทร พรมภักดี", classRoom: "ม.1/10", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่ศรีสุนทร", leader: "นางระพีพร โสสวัสดิ์", score: 10, members: [
+                { id: "10428", name: "เด็กชายพีรภัทร สีหาดี", classRoom: "ม.1/10", no: 13, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10429", name: "เด็กชายวีรชัย จันทร์ทรี", classRoom: "ม.1/10", no: 20, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10430", name: "เด็กชายชัชวาล นามรักษา", classRoom: "ม.1/10", no: 3, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10431", name: "เด็กชายจิรภัทร ประตังยาสัง", classRoom: "ม.1/10", no: 1, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10432", name: "เด็กชายปัณณวัฒน์ วงศ์ศรีรัตน์", classRoom: "ม.1/10", no: 10, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10433", name: "เด็กชายนครินทร์ ปรามาตย์", classRoom: "ม.1/10", no: 6, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10434", name: "เด็กชายพลภัทร์ ชิณสงกา", classRoom: "ม.1/10", no: 12, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10435", name: "เด็กชายวศิน ผุยตาด", classRoom: "ม.1/10", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10436", name: "เด็กชายฐิติกรกฤต แจ้งจันทร์", classRoom: "ม.1/10", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่พญาเสือ", leader: "นางระพีพร โสสวัสดิ์", score: 10, members: [
+                { id: "10437", name: "เด็กชายฉัตรนิรุธ สีพัฒน์เมือง", classRoom: "ม.1/6", no: 3, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10438", name: "เด็กชายกฤษต์จินต์ พรมเขียว", classRoom: "ม.1/6", no: 2, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10439", name: "เด็กชายธีรวัต บวโนนแดง", classRoom: "ม.1/6", no: 6, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10440", name: "เด็กชายธันวา ลาหลง", classRoom: "ม.1/6", no: 7, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10441", name: "เด็กชายเอกสิทธิ์ กองเกิด", classRoom: "ม.1/6", no: 16, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10442", name: "เด็กชายรัชชานนท์ ไสภาจว", classRoom: "ม.1/6", no: 15, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10443", name: "เด็กชายรัชชานนท์ พันธุ์ชื่น", classRoom: "ม.1/6", no: 14, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10444", name: "เด็กชายชิษณุพงศ์ อินนอก", classRoom: "ม.1/6", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10445", name: "เด็กชายกมลพิภัทร ธิตะปัญ", classRoom: "ม.1/6", no: 9, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           }
@@ -419,61 +587,144 @@
         units: {
           1: {
             name: "กอง 1",
+            leader: "นางสาวบุศลาวัลย์ ชูภักดี",
+            assistants: ["นางวาสนา เหลาธรรม", "นางสาวอ้อยทิพย์ เพียทา", "นางสาวเพ็ญภัสสร อุดมธนโรจน์"],
             patrols: [
-              { patrolName: "หมู่มะลิ", score: 10, members: [
-                { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกกระทุง", leader: "นางวาสนา เหลาธรรม", score: 10, members: [
+                { id: "20101", name: "เด็กหญิงพีรยา อินทุมาร", classRoom: "ม.1/9", no: 24, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20102", name: "เด็กหญิงกนกวรรณ พุทธกัง", classRoom: "ม.1/8", no: 19, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20103", name: "เด็กหญิงกันต์ฤทัย จิตตะธรรม", classRoom: "ม.1/6", no: 17, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20104", name: "เด็กหญิงหนึ่งธิดา สะโสดา", classRoom: "ม.1/7", no: 31, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20105", name: "เด็กหญิงปัณฑิตา จิตพิทัก", classRoom: "ม.1/3", no: 21, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20106", name: "เด็กหญิงจรรยพร คงเชียงชา", classRoom: "ม.1/5", no: 11, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20107", name: "เด็กหญิงพิมพ์ลภัส โคตมุงคุล", classRoom: "ม.1/7", no: 24, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กุหลาบ", score: 10, members: [
-                { id: "20104", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20105", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20106", name: "ด.ญ. นภัสสร สุริยา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกแก้ว", leader: "นางวาสนา เหลาธรรม", score: 10, members: [
+                { id: "20108", name: "เด็กหญิงนภาพร ผุยลา", classRoom: "ม.1/9", no: 20, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20109", name: "เด็กหญิงพรชนก ชัยเนตร", classRoom: "ม.1/8", no: 27, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20110", name: "เด็กหญิงนารารินทร์ ทะนงค์", classRoom: "ม.1/7", no: 20, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20111", name: "เด็กหญิงพิชญา วงษ์สกุล", classRoom: "ม.1/6", no: 24, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20112", name: "เด็กหญิงอริดา เจียมภูเขียว", classRoom: "ม.1/5", no: 36, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20113", name: "เด็กหญิงชญานี อนุสนธิ์", classRoom: "ม.1/4", no: 20, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20114", name: "เด็กหญิงพัชรี บัวชุม", classRoom: "ม.1/3", no: 24, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20115", name: "เด็กหญิงกัลยารัตน์ เบ็ญขุนทด", classRoom: "ม.1/2", no: 19, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่บัวหลวง", score: 10, members: [
-                { id: "20107", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20108", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20109", name: "ด.ญ. อารียา เพชรรัตน์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกพิราบ", leader: "นางสาวอ้อยทิพย์ เพียทา", score: 10, members: [
+                { id: "20116", name: "เด็กหญิงอินธิรา จำปาชาติ", classRoom: "ม.1/6", no: 34, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20117", name: "เด็กหญิงจรรยมณฑน์ ฝ้ายป่าน", classRoom: "ม.1/7", no: 34, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20118", name: "เด็กหญิงคณาพร มาหนองโดน", classRoom: "ม.1/8", no: 20, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20119", name: "เด็กหญิงธิดารัตน์ บุตดี", classRoom: "ม.1/9", no: 19, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20120", name: "เด็กหญิงสุพิชญา นาจันทัด", classRoom: "ม.1/5", no: 34, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20121", name: "เด็กหญิงปิยะพร กำแซง", classRoom: "ม.1/4", no: 28, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20122", name: "เด็กหญิงอมลวรรณ กองโพธิ์", classRoom: "ม.1/3", no: 31, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20123", name: "เด็กหญิงกาญจนา อาจกล้า", classRoom: "ม.1/2", no: 20, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่นกขมิ้น", leader: "นางสาวเพ็ญภัสสร อุดมธนโรจน์", score: 10, members: [
+                { id: "20124", name: "เด็กหญิงสิริวิมล แก้วเวียง", classRoom: "ม.1/9", no: 31, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20125", name: "เด็กหญิงนภัสรา ดวงคำ", classRoom: "ม.1/8", no: 26, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20126", name: "เด็กหญิงอริสา ผิวอ่อน", classRoom: "ม.1/7", no: 32, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20127", name: "เด็กหญิงกัณญาวี คลังระหัด", classRoom: "ม.1/6", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20128", name: "เด็กหญิงอรัญญา ช่วยศิริ", classRoom: "ม.1/5", no: 35, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20129", name: "เด็กหญิงวรัญญา แฟมไธสง", classRoom: "ม.1/4", no: 34, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20130", name: "เด็กหญิงสิริยากร ขวาแซ่น", classRoom: "ม.1/2", no: 34, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20131", name: "เด็กหญิงยุวธิดา จันวัน", classRoom: "ม.1/1", no: 36, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           2: {
             name: "กอง 2",
+            leader: "นางพิสมัย สืบเลย",
+            assistants: ["นางจันทิมา สิงห์ฝ่าย", "นางปิยะวรรณ ศรีธร"],
             patrols: [
-              { patrolName: "หมู่ชบา", score: 10, members: [
-                { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกเค้าแมว", leader: "นางจันทิมา สิงห์ฝ่าย", score: 10, members: [
+                { id: "20201", name: "เด็กหญิงกนกทิพย์ แก้วมหาวงษ์", classRoom: "ม.1/9", no: 17, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20202", name: "เด็กหญิงธนัชญา พิมพันธ์", classRoom: "ม.1/8", no: 25, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20203", name: "เด็กหญิงกันยกร โนนทิง", classRoom: "ม.1/6", no: 18, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20204", name: "เด็กหญิงธัญญารัตน์ หันยะ", classRoom: "ม.1/5", no: 17, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20205", name: "เด็กหญิงนันท์นภัส ดลโสภณ", classRoom: "ม.1/7", no: 18, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20206", name: "เด็กหญิงนิตยา อรรถจักร์", classRoom: "ม.1/4", no: 26, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20207", name: "เด็กหญิงบุษบา ใจอารีย์", classRoom: "ม.1/3", no: 19, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20208", name: "เด็กหญิงวิราพร สระขาม", classRoom: "ม.1/5", no: 29, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กล้วยไม้", score: 10, members: [
-                { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกแซงแซว", leader: "นางจันทิมา สิงห์ฝ่าย", score: 10, members: [
+                { id: "20209", name: "เด็กหญิงสุพรรษา ทองมาก", classRoom: "ม.1/9", no: 32, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20210", name: "เด็กหญิงวิรงรอง สีอวน", classRoom: "ม.1/8", no: 31, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20211", name: "เด็กหญิงอรัญญา ขนแดง", classRoom: "ม.1/7", no: 31, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20212", name: "เด็กหญิงณัฐธิดา โดนสุข", classRoom: "ม.1/6", no: 21, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20213", name: "เด็กหญิงชญาน์นันท์ ทองสุข", classRoom: "ม.1/4", no: 19, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20214", name: "เด็กหญิงนุศรา ล้านสา", classRoom: "ม.1/5", no: 19, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20215", name: "เด็กหญิงเพียงวาฒม์ ไทยยิ้ม", classRoom: "ม.1/7", no: 25, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20216", name: "เด็กหญิงเพียงขวัญ อ้อนอุบล", classRoom: "ม.1/6", no: 26, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่พุทธรักษา", score: 10, members: [
-                { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกเขา", leader: "นางปิยะวรรณ ศรีธร", score: 10, members: [
+                { id: "20217", name: "เด็กหญิงนันท์นภัส ทรัพย์สมบัติ", classRoom: "ม.1/7", no: 19, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20218", name: "เด็กหญิงกัลยา ขวาแซ้น", classRoom: "ม.1/6", no: 19, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20219", name: "เด็กหญิงนัทปภา พงษาเวียง", classRoom: "ม.1/5", no: 18, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20220", name: "เด็กหญิงกนิษฐา วงค์ธรรม", classRoom: "ม.1/4", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20221", name: "เด็กหญิงขวัญสุดา พรมนิล", classRoom: "ม.1/3", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20222", name: "เด็กหญิงณัฐณิชา ทองมา", classRoom: "ม.1/2", no: 35, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20223", name: "เด็กหญิงชัชฎาภรณ์ ศรีคำภา", classRoom: "ม.1/1", no: 27, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20224", name: "เด็กหญิงพิมพ์ชนก สิงห์ทองทราย", classRoom: "ม.1/5", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่นกกางเขน", leader: "นางปิยะวรรณ ศรีธร", score: 10, members: [
+                { id: "20225", name: "เด็กหญิงพลอย โชติฉันท์", classRoom: "ม.1/8", no: 28, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20226", name: "เด็กหญิงญาณิศา หนูฤกษ์", classRoom: "ม.1/8", no: 22, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20227", name: "เด็กหญิงลิณลดา วงศา", classRoom: "ม.1/7", no: 27, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20228", name: "เด็กหญิงเสาวลักษณ์ สุดพังยาง", classRoom: "ม.1/6", no: 32, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20229", name: "เด็กหญิงณัฐชานันท์ อ่อนอ่างคำ", classRoom: "ม.1/5", no: 15, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20230", name: "เด็กหญิงภัทรธิดา หาดคำ", classRoom: "ม.1/1", no: 34, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20231", name: "เด็กหญิงพีรดา ไขแสง", classRoom: "ม.1/5", no: 25, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20232", name: "เด็กหญิงปุณญานุช ตรงใจ", classRoom: "ม.1/3", no: 23, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           3: {
             name: "กอง 3",
+            leader: "นางสุพัตรา ขวัญบุญจันทร์",
+            assistants: ["นางสาวสุภณิดา ทองอ่าง", "นางสาวศรัญญา ศรีชุมพร"],
             patrols: [
-              { patrolName: "หมู่ทานตะวัน", score: 10, members: [
-                { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกอินทรี", leader: "นางสาวสุภณิดา ทองอ่าง", score: 10, members: [
+                { id: "20301", name: "เด็กหญิงเณศรา กรไชยา", classRoom: "ม.1/2", no: 25, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20302", name: "เด็กหญิงพิมพ์นดา เท่าบุรี", classRoom: "ม.1/3", no: 25, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20303", name: "เด็กหญิงพิมพ์ชนก วรรณใส", classRoom: "ม.1/5", no: 23, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20304", name: "เด็กหญิงปฏิมาภรณ์ ก่อสุวรรณ", classRoom: "ม.1/1", no: 30, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20305", name: "เด็กหญิงมรกต ตรีเนตร", classRoom: "ม.1/1", no: 35, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20306", name: "เด็กหญิงโศภิชนัณฐ์ พละกาพย์", classRoom: "ม.1/5", no: 32, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20307", name: "เด็กหญิงภัทรปภา มงคลแก้ว", classRoom: "ม.1/6", no: 27, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20308", name: "เด็กหญิงณัฐนิชา ทีภูเขียว", classRoom: "ม.1/4", no: 23, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ดาวเรือง", score: 10, members: [
-                { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกหัวขวาน", leader: "นางสาวสุภณิดา ทองอ่าง", score: 10, members: [
+                { id: "20309", name: "เด็กหญิงกมลชนก ปัญจะภักดี", classRoom: "ม.1/3", no: 8, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20310", name: "เด็กหญิงพิมพ์ดาว ธิตะปัญ", classRoom: "ม.1/1", no: 33, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20311", name: "เด็กหญิงขนิษฐา เชื้อทอง", classRoom: "ม.1/1", no: 25, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20312", name: "เด็กหญิงวีราพร แสนอาจ", classRoom: "ม.1/2", no: 33, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20313", name: "เด็กหญิงพิชามญชุ์ ทองปด", classRoom: "ม.1/2", no: 30, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20314", name: "เด็กหญิงภัคจิรา จีจันทร์", classRoom: "ม.1/3", no: 26, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20315", name: "เด็กหญิงณัฎธิดาภร สมานชัย", classRoom: "ม.1/5", no: 14, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20316", name: "เด็กหญิงอรินรดา ขำประถม", classRoom: "ม.1/1", no: 39, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่แก้ว", score: 10, members: [
-                { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
-                { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
+              { patrolName: "หมู่นกกระยาง", leader: "นางสาวศรัญญา ศรีชุมพร", score: 10, members: [
+                { id: "20317", name: "เด็กหญิงจรรยาพร โพธิ์ชัย", classRoom: "ม.1/1", no: 26, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20318", name: "เด็กหญิงกานต์ธิดา สีม่วง", classRoom: "ม.1/3", no: 11, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20319", name: "เด็กหญิงวิภูษณี ทุมมา", classRoom: "ม.1/5", no: 28, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20320", name: "เด็กหญิงกรรณิการ์ แรงดี", classRoom: "ม.1/1", no: 22, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20321", name: "เด็กหญิงรมย์รดา บุดดาเวียง", classRoom: "ม.1/2", no: 31, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20322", name: "เด็กหญิงณิชาดา เลิศนอก", classRoom: "ม.1/2", no: 24, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20323", name: "เด็กหญิงวีริญญา ดวงคำ", classRoom: "ม.1/5", no: 30, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20324", name: "เด็กหญิงภัชชราพร ปัดสำราญ", classRoom: "ม.1/9", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20325", name: "เด็กหญิงสิรยาทร วรรณวิชิต", classRoom: "ม.1/6", no: 31, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
+              ]},
+              { patrolName: "หมู่นกนางนวล", leader: "นางสาวศรัญญา ศรีชุมพร", score: 10, members: [
+                { id: "20326", name: "เด็กหญิงกชพร ทักษิณ", classRoom: "ม.1/3", no: 7, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20327", name: "เด็กหญิงปิยนุช สิงห์หล้า", classRoom: "ม.1/1", no: 32, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20328", name: "เด็กหญิงดรุณี โรมพันธ์", classRoom: "ม.1/5", no: 16, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20329", name: "เด็กหญิงกรรณิกา เติมภูเขียว", classRoom: "ม.1/2", no: 18, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20330", name: "เด็กหญิงนัฐธิชา เขาไตร", classRoom: "ม.1/3", no: 18, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20331", name: "เด็กหญิงจิรนันท์ ภักดียา", classRoom: "ม.1/2", no: 22, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20332", name: "เด็กหญิงธัญสุดา ผ่องผา", classRoom: "ม.1/3", no: 17, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20333", name: "เด็กหญิงนิภาพร เพ็งวงษา", classRoom: "ม.1/2", no: 26, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20334", name: "เด็กหญิงศิรัญญา วงศ์เมือง", classRoom: "ม.1/3", no: 29, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20335", name: "เด็กหญิงณัฐชาวรินทร์ จันดาบุตร", classRoom: "ม.1/1", no: 28, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           }
@@ -489,41 +740,42 @@
     let attendanceHistoryData = [];
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedDb = localStorage.getItem('scout_db_v5');
-      if (savedDb) {
-        try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(initialDatabase)); }
-      } else {
-        db = JSON.parse(JSON.stringify(initialDatabase));
-      }
+      // โหลดฐานข้อมูลโรงเรียน
+      db = JSON.parse(JSON.stringify(schoolOfficialDatabase));
       sortAllPatrols();
 
       const today = new Date().toISOString().split('T')[0];
-      document.getElementById('checkDate').value = today;
-      document.getElementById('repFilterDate').value = today;
-      document.getElementById('repFilterMonth').value = today.substring(0, 7);
+      const checkDateInput = document.getElementById('checkDate');
+      if (checkDateInput) checkDateInput.value = today;
+
+      const repFilterDate = document.getElementById('repFilterDate');
+      if (repFilterDate) repFilterDate.value = today;
+
+      const repFilterMonth = document.getElementById('repFilterMonth');
+      if (repFilterMonth) repFilterMonth.value = today.substring(0, 7);
 
       const savedUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      document.getElementById('scriptUrlInput').value = savedUrl;
+      const scriptUrlInput = document.getElementById('scriptUrlInput');
+      if (scriptUrlInput) scriptUrlInput.value = savedUrl;
 
       const savedRecorder = localStorage.getItem('scout_recorded_by') || '';
-      if (savedRecorder) document.getElementById('recordedByInput').value = savedRecorder;
+      const recordedByInput = document.getElementById('recordedByInput');
+      if (recordedByInput && savedRecorder) recordedByInput.value = savedRecorder;
 
       const savedToken = localStorage.getItem('scout_line_token') || '';
-      if (savedToken) document.getElementById('lineTokenInput').value = savedToken;
+      const lineTokenInput = document.getElementById('lineTokenInput');
+      if (lineTokenInput && savedToken) lineTokenInput.value = savedToken;
 
       applyTheme();
       renderCurrentUnit();
-      lucide.createIcons();
+      if (window.lucide && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
     });
 
     function applyActivityPreset(val) {
-      if (val) {
-        document.getElementById('activityTitleInput').value = val;
-      }
-    }
-
-    function saveDatabaseState() {
-      localStorage.setItem('scout_db_v5', JSON.stringify(db));
+      const actInput = document.getElementById('activityTitleInput');
+      if (val && actInput) actInput.value = val;
     }
 
     function sortPatrolMembers(members) {
@@ -546,59 +798,6 @@
           });
         }
       });
-    }
-
-    async function syncRosterFromSheets() {
-      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      try {
-        const res = await fetch(scriptUrl + "?action=roster");
-        const json = await res.json();
-        if (json.status === "success" && json.data && json.data.length > 0) {
-          buildDatabaseFromRoster(json.data);
-          saveDatabaseState();
-          renderCurrentUnit();
-          alert(`✅ ซิงค์รายชื่อสำเร็จ! ดึงข้อมูลนักเรียนจำนวน ${json.data.length} คน จาก Sheets เรียบร้อยแล้ว`);
-        } else {
-          alert("ℹ️ ไม่พบข้อมูลในแท็บ Students_Roster");
-        }
-      } catch (e) {
-        alert("⚠️ เกิดข้อผิดพลาดในการดึงรายชื่อ: " + e.toString());
-      }
-    }
-
-    function buildDatabaseFromRoster(rosterList) {
-      ['scout', 'guide'].forEach(cat => {
-        if (!db[cat]) db[cat] = { units: {} };
-        [1, 2, 3].forEach(u => {
-          if (!db[cat].units[u]) db[cat].units[u] = { name: `กอง ${u}`, patrols: [] };
-          else db[cat].units[u].patrols = [];
-        });
-      });
-
-      rosterList.forEach(item => {
-        const catKey = (item.category === "เนตรนารี") ? "guide" : "scout";
-        let unitNum = 1;
-        if (item.unit && item.unit.includes("2")) unitNum = 2;
-        if (item.unit && item.unit.includes("3")) unitNum = 3;
-
-        let unitObj = db[catKey].units[unitNum];
-        let patrolObj = unitObj.patrols.find(p => p.patrolName === item.patrol);
-        if (!patrolObj) {
-          patrolObj = { patrolName: item.patrol, score: 10, members: [] };
-          unitObj.patrols.push(patrolObj);
-        }
-
-        patrolObj.members.push({
-          id: item.id,
-          name: item.name,
-          role: item.role || "สมาชิก",
-          status: "มา",
-          uniform: "ครบ",
-          missing: []
-        });
-      });
-
-      sortAllPatrols();
     }
 
     function switchMainTab(tab) {
@@ -630,6 +829,7 @@
 
     function switchCategory(cat) {
       currentCategory = cat;
+      currentUnitId = 1;
       applyTheme();
       renderCurrentUnit();
     }
@@ -652,34 +852,67 @@
         btnGuide.className = "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-emerald-800 text-white";
         btnSave.className = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-emerald-800 hover:bg-emerald-900";
       }
-      updateUnitButtonsUI();
+      renderUnitButtonsUI();
     }
 
     function selectUnit(unitId) {
       currentUnitId = unitId;
-      updateUnitButtonsUI();
+      renderUnitButtonsUI();
       renderCurrentUnit();
     }
 
-    function updateUnitButtonsUI() {
+    function renderUnitButtonsUI() {
+      const container = document.getElementById('unitButtonsContainer');
       const isScout = currentCategory === 'scout';
-      const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800" : "bg-emerald-800 text-white border-emerald-800";
-      [1, 2, 3].forEach(id => {
-        const btn = document.getElementById(`btnUnit${id}`);
-        if (id === currentUnitId) {
-          btn.className = `px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition ${activeColorClass}`;
-        } else {
-          btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition bg-white text-slate-600 border-slate-200 hover:border-slate-300";
-        }
+      const availableUnits = Object.keys(db[currentCategory].units).map(Number);
+      const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800 shadow" : "bg-emerald-800 text-white border-emerald-800 shadow";
+
+      let html = `<span class="text-xs font-semibold text-slate-500 whitespace-nowrap">เลือกกอง:</span>`;
+      availableUnits.forEach(uId => {
+        const isActive = (uId === currentUnitId);
+        html += `
+          <button onclick="selectUnit(${uId})" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition ${isActive ? activeColorClass : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
+            กอง ${uId}
+          </button>
+        `;
       });
+      container.innerHTML = html;
     }
 
+    // แสดงการ์ดผู้บังคับบัญชา + รายชื่อนักเรียนในกอง
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
       const unitData = db[currentCategory].units[currentUnitId];
-      const categoryLabel = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+      if (!unitData) return;
 
-      document.getElementById('currentUnitTitle').innerText = `${unitData.name} (${categoryLabel})`;
+      const categoryLabel = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+      document.getElementById('currentUnitTitle').innerHTML = `
+        <span>${unitData.name} (${categoryLabel})</span>
+      `;
+
+      // แสดงการ์ดผู้บังคับบัญชาประจำกองตามผัง
+      const cmdCard = document.getElementById('unitCommanderCard');
+      const assistantsList = unitData.assistants ? unitData.assistants.join(", ") : "-";
+      cmdCard.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 text-xs font-bold ${currentCategory === 'scout' ? 'text-amber-900' : 'text-emerald-900'}">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              <span>ผู้กำกับกอง:</span>
+              <span class="text-sm font-black text-slate-800 underline decoration-amber-400 decoration-2">${unitData.leader || '-'}</span>
+            </div>
+            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-1.5">
+              <span class="font-semibold text-slate-700">รองผู้กำกับกอง:</span>
+              <span class="text-slate-800 font-medium">${assistantsList}</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-500 bg-white/80 px-3 py-1.5 rounded-xl border border-slate-200/80 shrink-0">
+            <div>ผู้กำกับกลุ่มลูกเสือ: <b class="text-slate-700">${schoolCommanders.groupLeader}</b></div>
+            <div>รองผู้กำกับกลุ่ม: <b class="text-slate-700">${schoolCommanders.deputyGroupLeader}</b></div>
+          </div>
+        </div>
+      `;
+
       let totalMembers = 0;
       let html = '';
 
@@ -693,10 +926,13 @@
         html += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
-                <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
-                <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
+                  <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
+                  <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">ผู้กำกับประจำหมู่: <b class="text-slate-700">${patrol.leader || '-'}</b></p>
               </div>
 
               <!-- คะแนนประจำหมู่ -->
@@ -744,11 +980,12 @@
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="font-bold text-sm text-slate-800">${student.name}</span>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono">${student.classRoom || ''} เลขที่ ${student.no || '-'}</span>
                     <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none">
                       ${roleOptionsHtml}
                     </select>
                   </div>
-                  <div class="text-xs text-slate-400 mt-0.5">รหัสประจำตัว: ${student.id}</div>
+                  <div class="text-[11px] text-slate-400 mt-0.5">รหัส: ${student.id}</div>
                 </div>
               </div>
 
@@ -792,14 +1029,15 @@
       document.getElementById('totalUnitMembers').innerText = `${totalMembers} นาย`;
       container.innerHTML = html;
       updateBottomStats();
-      lucide.createIcons();
+      if (window.lucide && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
     }
 
     function toggleUniformStatus(pIndex, sIndex) {
       const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
       student.uniform = (student.uniform === "ครบ") ? "ไม่ครบ" : "ครบ";
       if (student.uniform === "ครบ") student.missing = [];
-      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -809,7 +1047,6 @@
       const idx = student.missing.indexOf(item);
       if (idx > -1) student.missing.splice(idx, 1);
       else student.missing.push(item);
-      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -818,7 +1055,6 @@
         m.uniform = "ครบ";
         m.missing = [];
       });
-      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -829,20 +1065,17 @@
           if (isOk) m.missing = [];
         });
       });
-      saveDatabaseState();
       renderCurrentUnit();
     }
 
     function updatePatrolScore(pIndex, score) {
       db[currentCategory].units[currentUnitId].patrols[pIndex].score = Number(score);
-      saveDatabaseState();
     }
 
     function changeMemberRole(patrolIndex, studentIndex, newRole) {
       const patrol = db[currentCategory].units[currentUnitId].patrols[patrolIndex];
       patrol.members[studentIndex].role = newRole;
       patrol.members = sortPatrolMembers(patrol.members);
-      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -866,6 +1099,7 @@
     function updateBottomStats() {
       let present = 0, absent = 0, leave = 0, late = 0, uniformOk = 0;
       const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
 
       unitData.patrols.forEach(p => {
         p.members.forEach(m => {
@@ -886,14 +1120,16 @@
 
     async function saveToGoogleSheets() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
-      const checkDate = document.getElementById('checkDate').value;
-      const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
-      const recordedBy = document.getElementById('recordedByInput').value.trim();
+      const checkDate = document.getElementById('checkDate') ? document.getElementById('checkDate').value : new Date().toISOString().split('T')[0];
+      const actInput = document.getElementById('activityTitleInput');
+      const activityTitle = (actInput && actInput.value.trim()) ? actInput.value.trim() : 'พิธีเปิดประชุมกองและระเบียบแถว';
+      const recorderInput = document.getElementById('recordedByInput');
+      const recordedBy = recorderInput ? recorderInput.value.trim() : '';
       const lineToken = localStorage.getItem('scout_line_token') || '';
 
       if (!recordedBy) {
         alert('กรุณาระบุชื่อผู้บันทึกก่อนทำการส่งข้อมูล');
-        document.getElementById('recordedByInput').focus();
+        if (recorderInput) recorderInput.focus();
         return;
       }
       localStorage.setItem('scout_recorded_by', recordedBy);
@@ -938,7 +1174,7 @@
       const originalText = btnSave.innerHTML;
       btnSave.disabled = true;
       btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก & ส่ง LINE...</span>`;
-      lucide.createIcons();
+      if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
 
       try {
         const response = await fetch(scriptUrl, {
@@ -959,24 +1195,26 @@
       } finally {
         btnSave.disabled = false;
         btnSave.innerHTML = originalText;
-        lucide.createIcons();
+        if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
       }
     }
 
     function exportToCSV() {
-      const checkDate = document.getElementById('checkDate').value;
-      const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'กิจกรรมประจำสัปดาห์';
-      const recordedBy = document.getElementById('recordedByInput').value.trim() || 'ผู้กำกับลูกเสือ';
+      const checkDate = document.getElementById('checkDate') ? document.getElementById('checkDate').value : new Date().toISOString().split('T')[0];
+      const actInput = document.getElementById('activityTitleInput');
+      const activityTitle = (actInput && actInput.value.trim()) ? actInput.value.trim() : 'กิจกรรมประจำสัปดาห์';
+      const recordedBy = (document.getElementById('recordedByInput') && document.getElementById('recordedByInput').value.trim()) || 'ผู้กำกับลูกเสือ';
       const unitData = db[currentCategory].units[currentUnitId];
       const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
 
       let csvContent = "\uFEFF";
-      csvContent += "วันที่,กิจกรรม,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,ผู้บันทึก\n";
+      csvContent += "วันที่,กิจกรรม,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,ชั้น/เลขที่,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,ผู้บันทึก\n";
 
       unitData.patrols.forEach(p => {
         p.members.forEach(m => {
           const missingStr = (m.missing && m.missing.length > 0) ? m.missing.join("; ") : "-";
-          csvContent += `"${checkDate}","${activityTitle}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${recordedBy}"\n`;
+          const classNo = `${m.classRoom || ''} เลขที่ ${m.no || ''}`.trim();
+          csvContent += `"${checkDate}","${activityTitle}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${classNo}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${recordedBy}"\n`;
         });
       });
 
@@ -996,11 +1234,11 @@
         const btn = document.getElementById(`repTab${p.charAt(0).toUpperCase() + p.slice(1)}`);
         const sub = document.getElementById(`subFilter${p.charAt(0).toUpperCase() + p.slice(1)}`);
         if (p === period) {
-          btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow";
-          sub.classList.remove('hidden');
+          if (btn) btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow";
+          if (sub) sub.classList.remove('hidden');
         } else {
-          btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900";
-          sub.classList.add('hidden');
+          if (btn) btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900";
+          if (sub) sub.classList.add('hidden');
         }
       });
       renderActiveReport();
@@ -1026,8 +1264,8 @@
     }
 
     function renderActiveReport() {
-      const cat = document.getElementById('repFilterCategory').value;
-      const unit = document.getElementById('repFilterUnit').value;
+      const cat = document.getElementById('repFilterCategory') ? document.getElementById('repFilterCategory').value : 'all';
+      const unit = document.getElementById('repFilterUnit') ? document.getElementById('repFilterUnit').value : 'all';
 
       let filtered = attendanceHistoryData.filter(row => {
         const matchCat = (cat === 'all') || (row.category === cat);
@@ -1038,19 +1276,23 @@
       if (currentReportPeriod === 'daily') renderDailyReport(filtered);
       else if (currentReportPeriod === 'monthly') renderMonthlyReport(filtered);
       else if (currentReportPeriod === 'semester') renderSemesterReport(filtered);
-      lucide.createIcons();
+      if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
     }
 
     function renderDailyReport(data) {
-      const targetDate = document.getElementById('repFilterDate').value;
+      const targetDate = document.getElementById('repFilterDate') ? document.getElementById('repFilterDate').value : '';
       const dayData = data.filter(r => r.date === targetDate);
       const activityName = (dayData.length > 0 && dayData[0].activity) ? dayData[0].activity : "กิจกรรมประจำสัปดาห์";
       
-      document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
+      const printSub = document.getElementById('printReportSubtitle');
+      if (printSub) printSub.innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
       updateKpis(dayData);
 
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
       if (dayData.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
+        area.innerHTML = `
           <div class="p-10 text-center text-slate-400">
             <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
             <p>ไม่พบข้อมูลการเช็คชื่อในวันที่ ${targetDate}</p>
@@ -1115,17 +1357,21 @@
       });
 
       html += `</tbody></table></div>`;
-      document.getElementById('reportContentArea').innerHTML = html;
+      area.innerHTML = html;
     }
 
     function renderMonthlyReport(data) {
-      const targetMonth = document.getElementById('repFilterMonth').value;
-      document.getElementById('printReportSubtitle').innerText = `รายงานสรุปการมาเรียนประจำเดือน: ${targetMonth}`;
-      const monthData = data.filter(r => r.date && r.date.startsWith(targetMonth));
+      const targetMonth = document.getElementById('repFilterMonth') ? document.getElementById('repFilterMonth').value : '';
+      const printSub = document.getElementById('printReportSubtitle');
+      if (printSub) printSub.innerText = `รายงานสรุปการมาเรียนประจำเดือน: ${targetMonth}`;
       updateKpis(monthData);
 
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
+      const monthData = data.filter(r => r.date && r.date.startsWith(targetMonth));
       if (monthData.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
+        area.innerHTML = `
           <div class="p-10 text-center text-slate-400">
             <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
             <p>ไม่พบข้อมูลการเช็คชื่อในเดือน ${targetMonth}</p>
@@ -1201,16 +1447,20 @@
       });
 
       html += `</tbody></table></div>`;
-      document.getElementById('reportContentArea').innerHTML = html;
+      area.innerHTML = html;
     }
 
     function renderSemesterReport(data) {
-      const sem = document.getElementById('repFilterSemester').value;
-      document.getElementById('printReportSubtitle').innerText = `รายงานผลการประเมินเวลาเรียน กิจกรรมลูกเสือ-เนตรนารี ม.1 (ภาคเรียนที่ ${sem})`;
+      const sem = document.getElementById('repFilterSemester') ? document.getElementById('repFilterSemester').value : '1';
+      const printSub = document.getElementById('printReportSubtitle');
+      if (printSub) printSub.innerText = `รายงานผลการประเมินเวลาเรียน กิจกรรมลูกเสือ-เนตรนารี ม.1 (ภาคเรียนที่ ${sem})`;
       updateKpis(data);
 
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
       if (data.length === 0) {
-        document.getElementById('reportContentArea').innerHTML = `
+        area.innerHTML = `
           <div class="p-10 text-center text-slate-400">
             <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
             <p>ยังไม่มีบันทึกข้อมูลในภาคเรียนนี้</p>
@@ -1283,7 +1533,7 @@
       });
 
       html += `</tbody></table></div>`;
-      document.getElementById('reportContentArea').innerHTML = html;
+      area.innerHTML = html;
     }
 
     function updateKpis(records) {
@@ -1297,21 +1547,36 @@
       const total = records.length;
       const rate = total > 0 ? Math.round((p / total) * 100) : 0;
 
-      document.getElementById('kpiRate').innerText = `${rate}%`;
-      document.getElementById('kpiTotal').innerText = `จาก ${total} รายการ`;
-      document.getElementById('kpiPresent').innerText = p;
-      document.getElementById('kpiAbsent').innerText = a;
-      document.getElementById('kpiLeave').innerText = l;
-      document.getElementById('kpiLate').innerText = lt;
+      const kpiRate = document.getElementById('kpiRate');
+      if (kpiRate) kpiRate.innerText = `${rate}%`;
+
+      const kpiTotal = document.getElementById('kpiTotal');
+      if (kpiTotal) kpiTotal.innerText = `จาก ${total} รายการ`;
+
+      const kpiPresent = document.getElementById('kpiPresent');
+      if (kpiPresent) kpiPresent.innerText = p;
+
+      const kpiAbsent = document.getElementById('kpiAbsent');
+      if (kpiAbsent) kpiAbsent.innerText = a;
+
+      const kpiLeave = document.getElementById('kpiLeave');
+      if (kpiLeave) kpiLeave.innerText = l;
+
+      const kpiLate = document.getElementById('kpiLate');
+      if (kpiLate) kpiLate.innerText = lt;
     }
 
     function toggleConfigModal() {
-      document.getElementById('configModal').classList.toggle('hidden');
+      const modal = document.getElementById('configModal');
+      if (modal) modal.classList.toggle('hidden');
     }
 
     function saveConfig() {
-      const url = document.getElementById('scriptUrlInput').value.trim();
-      const token = document.getElementById('lineTokenInput').value.trim();
+      const urlInput = document.getElementById('scriptUrlInput');
+      const tokenInput = document.getElementById('lineTokenInput');
+      const url = urlInput ? urlInput.value.trim() : '';
+      const token = tokenInput ? tokenInput.value.trim() : '';
+
       if (url) localStorage.setItem('scout_script_url', url);
       localStorage.setItem('scout_line_token', token);
       alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
