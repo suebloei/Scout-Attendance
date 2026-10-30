@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,9 +12,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Sarabun', sans-serif; }
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    }
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    
+    /* Touch Target & Smooth Transition */
+    button, select, input {
+      touch-action: manipulation;
+    }
+    
     @media print {
       body { background: #ffffff !important; padding-bottom: 0 !important; }
       .no-print { display: none !important; }
@@ -23,72 +38,75 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col">
 
-  <!-- Header -->
-  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+  <!-- Header: Responsive for portrait & landscape -->
+  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print safe-top" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3.5 flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
       
       <!-- โลโก้และชื่อโรงเรียน -->
-      <div class="flex items-center gap-3 w-full md:w-auto">
-        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
+      <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+        <div class="w-11 h-11 sm:w-14 sm:h-14 bg-white rounded-full p-0.5 sm:p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
           <img src="logo.png" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
         </div>
-        <div>
-          <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
-          <p class="text-xs sm:text-sm text-amber-100 opacity-90">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold tracking-tight leading-tight truncate">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
+          <p class="text-[11px] sm:text-xs md:text-sm text-amber-100 opacity-90 truncate">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
         </div>
       </div>
 
-      <!-- เมนูสลับโหมด: เช็คชื่อหน้าแถว / สรุปรายงาน -->
-      <div class="flex items-center gap-2 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold">
-        <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-3.5 py-1.5 rounded-lg transition bg-white text-slate-900 shadow">
-          <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i>เช็คชื่อหน้าแถว
-        </button>
-        <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-3.5 py-1.5 rounded-lg transition text-white hover:text-amber-200">
-          <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1"></i>สรุปรายงาน
-        </button>
-      </div>
+      <!-- สลับโหมด + แถบเครื่องมือ (ปรับให้ยืดหยุ่นในแนวนอน/มือถือ) -->
+      <div class="flex flex-wrap items-center justify-between md:justify-end gap-1.5 sm:gap-2 w-full md:w-auto">
+        <!-- สลับโหมด เช็คชื่อ / รายงาน -->
+        <div class="flex items-center bg-black/25 p-0.5 sm:p-1 rounded-xl border border-white/20 text-xs font-semibold">
+          <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-2.5 sm:px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow text-[11px] sm:text-xs">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 inline-block mr-1"></i>เช็คชื่อ
+          </button>
+          <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-2.5 sm:px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200 text-[11px] sm:text-xs">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 inline-block mr-1"></i>รายงาน
+          </button>
+        </div>
 
-      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ตั้งค่า -->
-      <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
-          <input type="date" id="checkDate" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs sm:text-sm">
+        <!-- วันที่, ชื่อผู้บันทึก, ตั้งค่า -->
+        <div id="checkinHeaderTools" class="flex items-center gap-1.5 sm:gap-2">
+          <div class="bg-black/20 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 text-[11px] sm:text-xs border border-white/20">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-200"></i>
+            <input type="date" id="checkDate" class="bg-transparent text-white focus:outline-none cursor-pointer w-24 sm:w-auto text-[11px] sm:text-xs">
+          </div>
+          <div class="bg-black/20 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 text-[11px] sm:text-xs border border-white/20">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-300"></i>
+            <input type="text" id="recordedByInput" placeholder="ผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none w-20 sm:w-28 text-[11px] sm:text-xs">
+          </div>
+          <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 p-1.5 rounded-lg flex items-center justify-center text-xs" title="ตั้งค่าเชื่อมต่อ">
+            <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
+          </button>
         </div>
-        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
-          <input type="text" id="recordedByInput" placeholder="ชื่อผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-28 sm:w-36">
-        </div>
-        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium" title="ตั้งค่าเชื่อมต่อ">
-          <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
-        </button>
       </div>
 
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
+  <main class="max-w-6xl mx-auto px-2.5 sm:px-4 py-3 sm:py-5 w-full flex-1">
 
     <!-- ==================== โหมด 1: เช็คชื่อหน้าแถว ==================== -->
-    <section id="sectionCheckin" class="space-y-4">
+    <section id="sectionCheckin" class="space-y-3 sm:space-y-4">
       
       <!-- การ์ดเลือกกิจกรรมประจำสัปดาห์ -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 sm:p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
           <div class="flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
-              <i data-lucide="target" class="w-4 h-4"></i>
+            <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+              <i data-lucide="target" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
             </span>
             <div>
               <label class="block text-xs font-bold text-slate-700">กิจกรรมประจำสัปดาห์ / ฐานการเรียนรู้</label>
-              <p class="text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติ</p>
+              <p class="text-[10px] sm:text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติ</p>
             </div>
           </div>
 
-          <div class="flex flex-1 sm:max-w-md items-center gap-2">
-            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
+          <div class="flex flex-col sm:flex-row flex-1 sm:max-w-lg items-stretch sm:items-center gap-2">
+            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="w-full sm:w-48 text-[11px] sm:text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium truncate">
               <option value="">-- เลือกหัวข้อด่วน --</option>
               <option value="พิธีเปิดประชุมกองและระเบียบแถว">พิธีเปิดประชุมกองและระเบียบแถว</option>
               <option value="การผูกเงื่อนเชือกและการนำไปใช้">การผูกเงื่อนเชือกและการนำไปใช้</option>
@@ -101,60 +119,62 @@
               <option value="การเดินทางไกลและสำรวจ">การเดินทางไกลและสำรวจ</option>
               <option value="การบริการชุมชนและจิตอาสา">การบริการชุมชนและจิตอาสา</option>
             </select>
-            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
+            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="flex-1 text-[11px] sm:text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
           </div>
         </div>
       </div>
 
       <!-- ตัวเลือกประเภทและกอง -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 sm:p-4">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          
+          <!-- สลับลูกเสือ / เนตรนารี -->
           <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
-            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white">
-              <i data-lucide="compass" class="w-4 h-4"></i>
+            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition shadow bg-amber-800 text-white">
+              <i data-lucide="compass" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
               <span>ลูกเสือ ม.1 (สีกากี)</span>
             </button>
-            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900">
-              <i data-lucide="clover" class="w-4 h-4"></i>
+            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900">
+              <i data-lucide="clover" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
               <span>เนตรนารี ม.1 (สีเขียว)</span>
             </button>
           </div>
 
-          <!-- ปุ่มเลือกกอง (Dynamic: ลูกเสือ 4 กอง / เนตรนารี 3 กอง) -->
-          <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar">
+          <!-- ปุ่มเลือกกอง (เลื่อนแนวนอนได้ลื่นไหลในมือถือ) -->
+          <div id="unitButtonsContainer" class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 md:pb-0 custom-scrollbar w-full md:w-auto">
             <!-- เรนเดอร์ด้วย JavaScript -->
           </div>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
           <div class="flex items-center gap-2">
-            <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
-            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">0 นาย</span>
+            <span id="currentUnitTitle" class="font-bold text-slate-800 text-xs sm:text-sm md:text-base">กอง 1 (ลูกเสือ ม.1)</span>
+            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-medium">0 นาย</span>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="markAllCurrentUnitUniform(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
+          <div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end">
+            <button onclick="markAllCurrentUnitUniform(true)" class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center justify-center gap-1 transition">
               <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
               <span>เครื่องแบบครบทั้งกอง</span>
             </button>
-            <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
+            <button onclick="markAllCurrentUnitPresent()" class="flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center justify-center gap-1 transition">
               <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
-              <span>มาครบทุกคนทั้งกอง</span>
+              <span>มาครบทั้งกอง</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- การ์ดแสดงข้อมูลผู้บังคับบัญชาประจำกอง (Commander Info Card) -->
-      <div id="unitCommanderCard" class="bg-gradient-to-r from-amber-50/80 via-white to-amber-50/40 rounded-2xl p-4 border border-amber-200/80 shadow-xs">
+      <!-- การ์ดแสดงข้อมูลผู้บังคับบัญชาประจำกอง -->
+      <div id="unitCommanderCard" class="bg-gradient-to-r from-amber-50/80 via-white to-amber-50/40 rounded-2xl p-3 sm:p-4 border border-amber-200/80 shadow-xs">
         <!-- Rendered by JavaScript -->
       </div>
 
       <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
-      <div id="patrolsContainer" class="space-y-5"></div>
+      <div id="patrolsContainer" class="space-y-3 sm:space-y-4"></div>
     </section>
 
     <!-- ==================== โหมด 2: หน้ารายงานสรุป ==================== -->
-    <section id="sectionReport" class="hidden space-y-5">
+    <section id="sectionReport" class="hidden space-y-3 sm:space-y-4">
       <div class="hidden print-only mb-6 text-center border-b pb-4">
         <div class="flex items-center justify-center gap-3 mb-2">
           <img src="logo.png" alt="Logo" class="w-16 h-16 object-contain">
@@ -166,44 +186,44 @@
         <p id="printReportSubtitle" class="text-xs font-semibold text-slate-700"></p>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 no-print space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
-            <button onclick="switchReportPeriod('daily')" id="repTabDaily" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow">
-              <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1"></i>รายวัน
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 sm:p-4 no-print space-y-3">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div class="flex p-0.5 sm:p-1 bg-slate-100 rounded-xl border border-slate-200 overflow-x-auto custom-scrollbar">
+            <button onclick="switchReportPeriod('daily')" id="repTabDaily" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-bold bg-white text-slate-800 shadow whitespace-nowrap">
+              <i data-lucide="calendar-days" class="w-3.5 h-3.5 inline-block mr-1"></i>รายวัน
             </button>
-            <button onclick="switchReportPeriod('monthly')" id="repTabMonthly" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
-              <i data-lucide="calendar" class="w-4 h-4 inline-block mr-1"></i>รายเดือน
+            <button onclick="switchReportPeriod('monthly')" id="repTabMonthly" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 whitespace-nowrap">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 inline-block mr-1"></i>รายเดือน
             </button>
-            <button onclick="switchReportPeriod('semester')" id="repTabSemester" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
-              <i data-lucide="award" class="w-4 h-4 inline-block mr-1"></i>รายภาคเรียน (ประเมิน มผ.)
+            <button onclick="switchReportPeriod('semester')" id="repTabSemester" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 whitespace-nowrap">
+              <i data-lucide="award" class="w-3.5 h-3.5 inline-block mr-1"></i>รายภาคเรียน
             </button>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button onclick="fetchSheetDataForReports()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5 transition">
-              <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
-              <span>ดึงข้อมูลจากชีต</span>
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            <button onclick="fetchSheetDataForReports()" class="px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5 transition">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
+              <span>ดึงข้อมูลชีต</span>
             </button>
-            <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow">
-              <i data-lucide="printer" class="w-4 h-4"></i>
-              <span>พิมพ์รายงาน A4</span>
+            <button onclick="window.print()" class="px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>พิมพ์ A4</span>
             </button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 pt-2.5 border-t border-slate-100">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภท</label>
-            <select id="repFilterCategory" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+            <label class="block text-[11px] sm:text-xs font-semibold text-slate-500 mb-1">ประเภท</label>
+            <select id="repFilterCategory" onchange="renderActiveReport()" class="w-full text-xs p-1.5 sm:p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
               <option value="all">ทั้งหมด (ลูกเสือ + เนตรนารี)</option>
               <option value="ลูกเสือ">ลูกเสือ ม.1</option>
               <option value="เนตรนารี">เนตรนารี ม.1</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">กอง</label>
-            <select id="repFilterUnit" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+            <label class="block text-[11px] sm:text-xs font-semibold text-slate-500 mb-1">กอง</label>
+            <select id="repFilterUnit" onchange="renderActiveReport()" class="w-full text-xs p-1.5 sm:p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
               <option value="all">ทุกกอง</option>
               <option value="กอง 1">กอง 1</option>
               <option value="กอง 2">กอง 2</option>
@@ -212,47 +232,47 @@
             </select>
           </div>
           <div id="subFilterDaily">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกวันที่</label>
-            <input type="date" id="repFilterDate" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+            <label class="block text-[11px] sm:text-xs font-semibold text-slate-500 mb-1">เลือกวันที่</label>
+            <input type="date" id="repFilterDate" onchange="renderActiveReport()" class="w-full text-xs p-1.5 sm:p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
           </div>
           <div id="subFilterMonthly" class="hidden">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกเดือน</label>
-            <input type="month" id="repFilterMonth" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+            <label class="block text-[11px] sm:text-xs font-semibold text-slate-500 mb-1">เลือกเดือน</label>
+            <input type="month" id="repFilterMonth" onchange="renderActiveReport()" class="w-full text-xs p-1.5 sm:p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
           </div>
           <div id="subFilterSemester" class="hidden">
-            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
-            <select id="repFilterSemester" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
-              <option value="1">ภาคเรียนที่ 1 (พ.ค. - ต.ค.)</option>
-              <option value="2">ภาคเรียนที่ 2 (พ.ย. - มี.ค.)</option>
+            <label class="block text-[11px] sm:text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+            <select id="repFilterSemester" onchange="renderActiveReport()" class="w-full text-xs p-1.5 sm:p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+              <option value="1">ภาคเรียนที่ 1</option>
+              <option value="2">ภาคเรียนที่ 2</option>
             </select>
           </div>
         </div>
       </div>
 
-      <!-- บัตรสรุป KPI -->
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-semibold text-slate-500">อัตราการมาเรียน</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span id="kpiRate" class="text-3xl font-extrabold text-slate-800">0%</span>
-            <span id="kpiTotal" class="text-xs text-slate-500">จาก 0 คน</span>
+      <!-- บัตรสรุป KPI (Grid 5 ช่อง รองรับแนวตั้งและแนวนอน) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        <div class="col-span-2 sm:col-span-1 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-[11px] font-semibold text-slate-500">อัตราการมาเรียน</span>
+          <div class="mt-1 flex items-baseline gap-1.5">
+            <span id="kpiRate" class="text-2xl sm:text-3xl font-extrabold text-slate-800">0%</span>
+            <span id="kpiTotal" class="text-[10px] text-slate-400">จาก 0 คน</span>
           </div>
         </div>
-        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-emerald-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา</span>
-          <span id="kpiPresent" class="text-2xl font-black text-emerald-700 mt-2">0</span>
+        <div class="bg-emerald-50 border border-emerald-200 p-2.5 sm:p-3 rounded-2xl flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-emerald-800 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>มา</span>
+          <span id="kpiPresent" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0</span>
         </div>
-        <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-rose-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด</span>
-          <span id="kpiAbsent" class="text-2xl font-black text-rose-700 mt-2">0</span>
+        <div class="bg-rose-50 border border-rose-200 p-2.5 sm:p-3 rounded-2xl flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-rose-800 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>ขาด</span>
+          <span id="kpiAbsent" class="text-xl sm:text-2xl font-black text-rose-700 mt-1">0</span>
         </div>
-        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-amber-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา</span>
-          <span id="kpiLeave" class="text-2xl font-black text-amber-700 mt-2">0</span>
+        <div class="bg-amber-50 border border-amber-200 p-2.5 sm:p-3 rounded-2xl flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-amber-800 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span>ลา</span>
+          <span id="kpiLeave" class="text-xl sm:text-2xl font-black text-amber-700 mt-1">0</span>
         </div>
-        <div class="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex flex-col justify-between">
-          <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย</span>
-          <span id="kpiLate" class="text-2xl font-black text-blue-700 mt-2">0</span>
+        <div class="bg-blue-50 border border-blue-200 p-2.5 sm:p-3 rounded-2xl flex flex-col justify-between">
+          <span class="text-[11px] font-bold text-blue-800 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span>สาย</span>
+          <span id="kpiLate" class="text-xl sm:text-2xl font-black text-blue-700 mt-1">0</span>
         </div>
       </div>
 
@@ -273,42 +293,45 @@
       </div>
     </section>
 
-    <!-- เครดิตผู้พัฒนา -->
-    <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
-      <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
+    <!-- เครดิตผู้พัฒนา (จบในบรรทัดเดียวเสมอ) -->
+    <div class="mt-6 mb-2 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
+      <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
         <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
       </div>
-      <span>พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
+      <span class="truncate">พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
     </div>
   </main>
 
-  <!-- Bottom Floating Bar -->
-  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
-        <div class="flex items-center gap-1.5 text-emerald-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
+  <!-- Bottom Floating Bar (Fluid for Portrait & Landscape) -->
+  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 sm:py-3 px-3 sm:px-4 shadow-xl z-30 no-print safe-bottom">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
+      
+      <!-- สรุปสถิติสด -->
+      <div class="flex items-center justify-around sm:justify-start gap-2.5 sm:gap-4 text-[11px] sm:text-xs md:text-sm font-bold w-full sm:w-auto">
+        <div class="flex items-center gap-1 text-emerald-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-rose-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
+        <div class="flex items-center gap-1 text-rose-700">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-amber-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
+        <div class="flex items-center gap-1 text-amber-700">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-blue-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
+        <div class="flex items-center gap-1 text-blue-700">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
         </div>
-        <div class="hidden md:flex items-center gap-1.5 text-indigo-700 border-l border-slate-200 pl-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
+        <div class="hidden sm:flex items-center gap-1 text-indigo-700 border-l border-slate-200 pl-2.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>เครื่องแบบ: <span id="statUniformOk">0</span>
         </div>
       </div>
 
+      <!-- ปุ่มส่งออก CSV และ บันทึกลงชีต -->
       <div class="flex items-center gap-2 w-full sm:w-auto">
-        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="download" class="w-4 h-4"></i>
-          <span>ส่งออก CSV</span>
+        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>CSV</span>
         </button>
-        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 whitespace-nowrap">
           <i data-lucide="cloud-upload" class="w-4 h-4"></i>
           <span>บันทึกลงชีต & ส่ง LINE</span>
         </button>
@@ -317,30 +340,30 @@
   </footer>
 
   <!-- Modal ตั้งค่า -->
-  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-        <div class="flex items-center gap-2 text-slate-800 font-bold">
-          <i data-lucide="settings" class="w-5 h-5 text-emerald-600"></i>
+  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div class="flex items-center gap-2 text-slate-800 font-bold text-sm sm:text-base">
+          <i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600"></i>
           <span>ตั้งค่าระบบและการเชื่อมต่อ</span>
         </div>
         <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div class="space-y-4">
+      <div class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL</label>
-          <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
+          <input type="text" id="scriptUrlInput" class="w-full text-xs p-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">LINE Notify Token</label>
-          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token..." class="w-full text-xs p-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
         </div>
       </div>
-      <div class="mt-5 flex justify-end gap-2">
-        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
-        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึกการตั้งค่า</button>
+      <div class="mt-4 flex justify-end gap-2">
+        <button onclick="toggleConfigModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+        <button onclick="saveConfig()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึก</button>
       </div>
     </div>
   </div>
@@ -894,20 +917,20 @@
       const cmdCard = document.getElementById('unitCommanderCard');
       const assistantsList = unitData.assistants ? unitData.assistants.join(", ") : "-";
       cmdCard.innerHTML = `
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2 text-xs font-bold ${currentCategory === 'scout' ? 'text-amber-900' : 'text-emerald-900'}">
-              <i data-lucide="award" class="w-4 h-4"></i>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3 text-xs">
+          <div class="space-y-0.5 sm:space-y-1">
+            <div class="flex flex-wrap items-center gap-1.5 font-bold ${currentCategory === 'scout' ? 'text-amber-900' : 'text-emerald-900'}">
+              <i data-lucide="award" class="w-3.5 h-3.5"></i>
               <span>ผู้กำกับกอง:</span>
-              <span class="text-sm font-black text-slate-800 underline decoration-amber-400 decoration-2">${unitData.leader || '-'}</span>
+              <span class="text-xs sm:text-sm font-black text-slate-800 underline decoration-amber-400 decoration-2">${unitData.leader || '-'}</span>
             </div>
-            <div class="text-xs text-slate-600 flex flex-wrap items-center gap-1.5">
+            <div class="text-[11px] sm:text-xs text-slate-600 flex flex-wrap items-center gap-1">
               <span class="font-semibold text-slate-700">รองผู้กำกับกอง:</span>
               <span class="text-slate-800 font-medium">${assistantsList}</span>
             </div>
           </div>
-          <div class="text-[11px] text-slate-500 bg-white/80 px-3 py-1.5 rounded-xl border border-slate-200/80 shrink-0">
-            <div>ผู้กำกับกลุ่มลูกเสือ: <b class="text-slate-700">${schoolCommanders.groupLeader}</b></div>
+          <div class="text-[10px] sm:text-[11px] text-slate-500 bg-white/80 px-2.5 py-1.5 rounded-xl border border-slate-200/80 shrink-0">
+            <div>ผู้กำกับกลุ่ม: <b class="text-slate-700">${schoolCommanders.groupLeader}</b></div>
             <div>รองผู้กำกับกลุ่ม: <b class="text-slate-700">${schoolCommanders.deputyGroupLeader}</b></div>
           </div>
         </div>
@@ -925,32 +948,32 @@
 
         html += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="bg-slate-50 border-b border-slate-200 px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
               <div>
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
-                  <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
-                  <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                  <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
+                  <h3 class="font-bold text-slate-800 text-xs sm:text-sm md:text-base">${patrol.patrolName}</h3>
+                  <span class="text-[10px] sm:text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">ผู้กำกับประจำหมู่: <b class="text-slate-700">${patrol.leader || '-'}</b></p>
+                <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">ผู้กำกับประจำหมู่: <b class="text-slate-700">${patrol.leader || '-'}</b></p>
               </div>
 
               <!-- คะแนนประจำหมู่ -->
-              <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-slate-200 shadow-sm text-xs">
-                <span class="font-bold text-amber-800 flex items-center gap-1">
-                  <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i> คะแนนหมู่:
+              <div class="flex items-center gap-1.5 sm:gap-2 bg-white px-2.5 py-1 rounded-xl border border-slate-200 shadow-xs text-xs">
+                <span class="font-bold text-amber-800 flex items-center gap-1 text-[11px] sm:text-xs">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i> คะแนน:
                 </span>
                 <input type="number" min="0" max="10" value="${patrol.score !== undefined ? patrol.score : 10}" 
                   onchange="updatePatrolScore(${pIndex}, this.value)" 
-                  class="w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none">
-                <span class="text-slate-400">/ 10</span>
+                  class="w-10 sm:w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none text-xs">
+                <span class="text-slate-400 text-[10px] sm:text-xs">/ 10</span>
               </div>
 
-              <div class="flex items-center gap-2">
-                <button onclick="markPatrolUniformOk(${pIndex})" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
-                  เครื่องแบบครบหมู่นี้
+              <div class="flex items-center gap-1.5">
+                <button onclick="markPatrolUniformOk(${pIndex})" class="px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
+                  เครื่องแบบครบ
                 </button>
-                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
+                <button onclick="markPatrolPresent(${pIndex})" class="px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
                   มาครบหมู่นี้
                 </button>
               </div>
@@ -972,37 +995,40 @@
           const isUniformComplete = (student.uniform === "ครบ");
 
           html += `
-            <div class="px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition">
-              <div class="flex items-center gap-3">
-                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
+            <div class="px-2.5 sm:px-4 py-2 sm:py-3 flex flex-col md:flex-row md:items-center justify-between gap-2.5 hover:bg-slate-50/70 transition">
+              
+              <!-- ข้อมูลนักเรียน -->
+              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 border border-slate-200">
                   ${sIndex + 1}
                 </div>
-                <div>
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-bold text-sm text-slate-800">${student.name}</span>
-                    <span class="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono">${student.classRoom || ''} เลขที่ ${student.no || '-'}</span>
-                    <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-bold text-xs sm:text-sm text-slate-800 truncate">${student.name}</span>
+                    <span class="text-[10px] sm:text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono shrink-0">${student.classRoom || ''} เลขที่ ${student.no || '-'}</span>
+                    <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[10px] sm:text-[11px] py-0.5 px-1.5 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none shrink-0">
                       ${roleOptionsHtml}
                     </select>
                   </div>
-                  <div class="text-[11px] text-slate-400 mt-0.5">รหัส: ${student.id}</div>
+                  <div class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">รหัส: ${student.id}</div>
                 </div>
               </div>
 
-              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-end lg:self-center w-full lg:w-auto justify-between lg:justify-end">
+              <!-- เครื่องมือตรวจเครื่องแบบ & กลุ่ม 4 ปุ่ม (Responsive Flex-wrap) -->
+              <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 self-stretch md:self-auto justify-between md:justify-end">
                 
                 <!-- เครื่องแบบ -->
-                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs">
-                  <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 ${isUniformComplete ? 'bg-indigo-600 text-white shadow' : 'bg-rose-100 text-rose-700'}">
+                <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs shrink-0">
+                  <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2 py-1 rounded-lg font-bold transition flex items-center gap-1 text-[11px] sm:text-xs ${isUniformComplete ? 'bg-indigo-600 text-white shadow-xs' : 'bg-rose-100 text-rose-700'}">
                     <i data-lucide="${isUniformComplete ? 'shield-check' : 'shield-alert'}" class="w-3.5 h-3.5"></i>
                     <span>${isUniformComplete ? 'เครื่องแบบครบ' : 'ไม่ครบ'}</span>
                   </button>
 
                   ${!isUniformComplete ? `
-                    <div class="flex items-center gap-1 px-1">
+                    <div class="flex flex-wrap items-center gap-1 px-1">
                       ${UNIFORM_ITEMS.map(item => `
-                        <label class="flex items-center gap-0.5 text-[10px] text-slate-600 cursor-pointer">
-                          <input type="checkbox" onchange="toggleMissingItem(${pIndex}, ${sIndex}, '${item}')" ${(student.missing || []).includes(item) ? 'checked' : ''} class="rounded text-rose-600 focus:ring-0">
+                        <label class="flex items-center gap-0.5 text-[9px] sm:text-[10px] text-slate-600 cursor-pointer">
+                          <input type="checkbox" onchange="toggleMissingItem(${pIndex}, ${sIndex}, '${item}')" ${(student.missing || []).includes(item) ? 'checked' : ''} class="rounded text-rose-600 focus:ring-0 w-3 h-3">
                           <span>${item}</span>
                         </label>
                       `).join('')}
@@ -1010,12 +1036,12 @@
                   ` : ''}
                 </div>
 
-                <!-- เช็คสถานะ 4 ปุ่ม -->
-                <div class="grid grid-cols-4 gap-1 w-56 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
-                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
-                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
-                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
+                <!-- 4 ปุ่มเช็คชื่อ (Grid ขยายเต็มบนมือถือ หรือความกว้างคงที่บนจอใหญ่) -->
+                <div class="grid grid-cols-4 gap-1 w-full sm:w-52 md:w-56 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1.5 sm:py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">มา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1.5 sm:py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1.5 sm:py-1 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1.5 sm:py-1 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
                 </div>
 
               </div>
