@@ -4,7 +4,2337 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
+  <!-- Tailwind CSS & Lucide Icons -<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
   <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Sarabun', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    @media print {
+      body { background: #ffffff !important; padding-bottom: 0 !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
+
+  <!-- Header -->
+  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- โลโก้และชื่อโรงเรียน -->
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
+          <img src="logo.png" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
+          <p class="text-xs sm:text-sm text-amber-100 opacity-90">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
+        </div>
+      </div>
+
+      <!-- เมนูสลับ 3 โหมด: เช็คชื่อหน้าแถว / ภาพรวม ม.1 / สรุปรายงาน -->
+      <div class="flex items-center gap-1.5 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
+        <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow whitespace-nowrap">
+          <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i>เช็คชื่อหน้าแถว
+        </button>
+        <button onclick="switchMainTab('overview')" id="tabBtnOverview" class="px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200 whitespace-nowrap">
+          <i data-lucide="layout-grid" class="w-4 h-4 inline-block mr-1"></i>ภาพรวม ม.1
+        </button>
+        <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200 whitespace-nowrap">
+          <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1"></i>สรุปรายงาน
+        </button>
+      </div>
+
+      <!-- เครื่องมือ Header: วันที่, ผู้บันทึก (Auto Selector), ตั้งค่า -->
+      <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
+          <input type="date" id="checkDate" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs sm:text-sm">
+        </div>
+
+        <!-- ระบบเลือกผู้บันทึกอัตโนมัติตามกอง + พิมพ์ชื่อคนอื่นได้ -->
+        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
+          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
+          <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs font-semibold cursor-pointer max-w-[130px] sm:max-w-[160px]">
+            <!-- อัปเดตรายชื่อตามกองอัตโนมัติด้วย JavaScript -->
+          </select>
+          <input type="text" id="recordedByCustomInput" placeholder="พิมพ์ชื่อผู้บันทึก..." class="hidden bg-white/20 text-white placeholder-white/70 px-2 py-0.5 rounded text-xs focus:outline-none w-28">
+        </div>
+
+        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium" title="ตั้งค่าเชื่อมต่อชีต & LINE">
+          <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
+
+    <!-- ==================== โหมด 1: หน้าเช็คชื่อหน้าแถว ==================== -->
+    <section id="sectionCheckin" class="space-y-4">
+      
+      <!-- การ์ดผังผู้บังคับบัญชาประจำกอง (Commander Card) -->
+      <div id="commanderInfoCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4 transition">
+        <!-- เรนเดอร์ด้วย JavaScript -->
+      </div>
+
+      <!-- การ์ดกิจกรรมประจำสัปดาห์ & ค้นหาด่วน (Quick Search) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+              <i data-lucide="target" class="w-4 h-4"></i>
+            </span>
+            <div>
+              <label class="block text-xs font-bold text-slate-700">กิจกรรมประจำสัปดาห์ / ฐานการเรียนรู้</label>
+              <p class="text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติ</p>
+            </div>
+          </div>
+
+          <div class="flex flex-1 sm:max-w-md items-center gap-2">
+            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
+              <option value="">-- เลือกหัวข้อด่วน --</option>
+              <option value="พิธีเปิดประชุมกองและระเบียบแถว">พิธีเปิดประชุมกองและระเบียบแถว</option>
+              <option value="การผูกเงื่อนเชือกและการนำไปใช้">การผูกเงื่อนเชือกและการนำไปใช้</option>
+              <option value="การอ่านแผนที่และใช้เข็มทิศ">การอ่านแผนที่และใช้เข็มทิศ</option>
+              <option value="สัญญาณมือ นกหวีด และรหัสมอส">สัญญาณมือ นกหวีด และรหัสมอส</option>
+              <option value="การปฐมพยาบาลเบื้องต้น">การปฐมพยาบาลเบื้องต้น</option>
+              <option value="การประกอบอาหารและการกางเต็นท์">การประกอบอาหารและการกางเต็นท์</option>
+              <option value="บุกเบิกและสร้างค่ายพักแรม">บุกเบิกและสร้างค่ายพักแรม</option>
+              <option value="กิจกรรมรอบกองไฟและการแสดง">กิจกรรมรอบกองไฟและการแสดง</option>
+              <option value="การเดินทางไกลและสำรวจ">การเดินทางไกลและสำรวจ</option>
+              <option value="การบริการชุมชนและจิตอาสา">การบริการชุมชนและจิตอาสา</option>
+            </select>
+            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
+          </div>
+        </div>
+
+        <!-- ช่องค้นหาชื่อ/รหัส/เลขที่แบบเรียลไทม์ (Quick Search) -->
+        <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+            <input type="text" id="quickSearchInput" oninput="handleQuickSearch(this.value)" placeholder="ค้นหาชื่อนักเรียน, รหัส, เลขที่ หรือชื่อหมู่ในกองนี้..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <button onclick="clearQuickSearch()" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200">ล้าง</button>
+        </div>
+      </div>
+
+      <!-- แถบเลือกประเภทและกอง (แสดงภาพ scout.jpg และ GirlScout.jpeg) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
+            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white">
+              <span class="w-6 h-6 rounded-full bg-white/20 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                <img src="scout.jpg" alt="ตราลูกเสือ" class="w-full h-full object-contain" onerror="handleScoutImgError(this)">
+              </span>
+              <span>ลูกเสือ ม.1 (สีกากี)</span>
+            </button>
+            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900">
+              <span class="w-6 h-6 rounded-full bg-white/20 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                <img src="GirlScout.jpeg" alt="ตราเนตรนารี" class="w-full h-full object-contain" onerror="handleGirlScoutImgError(this)">
+              </span>
+              <span>เนตรนารี ม.1 (สีเขียว)</span>
+            </button>
+          </div>
+
+          <!-- ปุ่มเลือกกอง (Dynamic: ลูกเสือ 4 กอง / เนตรนารี 3 กอง) -->
+          <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar"></div>
+        </div>
+
+        <!-- แถบสรุปด่วนประจำกอง + เครื่องมือพิเศษ (เพิ่มปุ่มคัดลอกสรุปสำหรับ LINE) -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
+            <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">0 นาย</span>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- ปุ่มคัดลอกข้อความสรุปสำหรับ LINE ประจำกอง -->
+            <button onclick="copyUnitSummaryForLine()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 flex items-center gap-1.5 transition shadow-xs" title="คัดลอกข้อความสรุปพร้อมส่งใน LINE">
+              <i data-lucide="clipboard-copy" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>📋 คัดลอกสรุปส่ง LINE</span>
+            </button>
+            
+            <button onclick="openLeaderboardModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200 flex items-center gap-1.5 transition" title="จัดอันดับคะแนนหมู่">
+              <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>อันดับหมู่ดีเด่น</span>
+            </button>
+            <button onclick="printBlankRoster()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 flex items-center gap-1.5 transition" title="พิมพ์ตารางเปล่าตรวจภาคสนาม">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>พิมพ์ใบตรวจกระดาษ A4</span>
+            </button>
+            <button onclick="markAllCurrentUnitUniform(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>เครื่องแบบครบทั้งกอง</span>
+            </button>
+            <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
+              <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+              <span>มาครบทุกคนทั้งกอง</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
+      <div id="patrolsContainer" class="space-y-5"></div>
+    </section>
+
+    <!-- ==================== โหมด 2: ภาพรวม ม.1 ทั้งระดับชั้น ==================== -->
+    <section id="sectionOverview" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="layout-grid" class="w-5 h-5 text-amber-600"></i>
+              <span>แดชบอร์ดภาพรวมการเช็คชื่อ ระดับชั้น ม.1 ทั้งหมด</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">สรุปยอดลูกเสือ 4 กอง (18 หมู่) และเนตรนารี 3 กอง (12 หมู่) โรงเรียนสีชมพูศึกษา</p>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <!-- ปุ่มคัดลอกสรุปภาพรวม ม.1 ทั้งระดับส่ง LINE -->
+            <button onclick="copyGradeOverviewForLine()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+              <i data-lucide="clipboard-copy" class="w-4 h-4"></i>
+              <span>📋 คัดลอกสรุปภาพรวม ม.1 ส่ง LINE</span>
+            </button>
+            <div class="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-200" id="overviewDateBadge">
+              วันที่: -
+            </div>
+          </div>
+        </div>
+
+        <!-- กล่องการ์ดสถานะของทั้ง 7 กอง -->
+        <div id="gradeOverviewGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
+          <!-- เรนเดอร์ด้วย JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== โหมด 3: หน้ารายงานสรุป (Dashboard) ==================== -->
+    <section id="sectionReport" class="hidden space-y-5">
+      <div class="hidden print-only mb-6 text-center border-b pb-4">
+        <div class="flex items-center justify-center gap-3 mb-2">
+          <img src="logo.png" alt="Logo" class="w-16 h-16 object-contain">
+          <div>
+            <h2 class="text-xl font-bold">โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</h2>
+            <p class="text-sm text-slate-600">รายงานสรุปการเข้าร่วมกิจกรรมลูกเสือ - เนตรนารี ชั้นมัธยมศึกษาปีที่ 1</p>
+          </div>
+        </div>
+        <p id="printReportSubtitle" class="text-xs font-semibold text-slate-700"></p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 no-print space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+            <button onclick="switchReportPeriod('daily')" id="repTabDaily" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow">
+              <i data-lucide="calendar-days" class="w-4 h-4 inline-block mr-1"></i>รายวัน
+            </button>
+            <button onclick="switchReportPeriod('monthly')" id="repTabMonthly" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
+              <i data-lucide="calendar" class="w-4 h-4 inline-block mr-1"></i>รายเดือน
+            </button>
+            <button onclick="switchReportPeriod('semester')" id="repTabSemester" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900">
+              <i data-lucide="award" class="w-4 h-4 inline-block mr-1"></i>รายภาคเรียน (ประเมิน มผ.)
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="fetchSheetDataForReports()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5 transition">
+              <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
+              <span>ดึงข้อมูลจากชีต</span>
+            </button>
+            <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-900 text-white flex items-center gap-1.5 transition shadow">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>พิมพ์รายงาน A4</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภท</label>
+            <select id="repFilterCategory" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+              <option value="all">ทั้งหมด (ลูกเสือ + เนตรนารี)</option>
+              <option value="ลูกเสือ">ลูกเสือ ม.1</option>
+              <option value="เนตรนารี">เนตรนารี ม.1</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">กอง</label>
+            <select id="repFilterUnit" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+              <option value="all">ทุกกอง</option>
+              <option value="กอง 1">กอง 1</option>
+              <option value="กอง 2">กอง 2</option>
+              <option value="กอง 3">กอง 3</option>
+              <option value="กอง 4">กอง 4</option>
+            </select>
+          </div>
+          <div id="subFilterDaily">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกวันที่</label>
+            <input type="date" id="repFilterDate" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+          </div>
+          <div id="subFilterMonthly" class="hidden">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">เลือกเดือน</label>
+            <input type="month" id="repFilterMonth" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+          </div>
+          <div id="subFilterSemester" class="hidden">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">ภาคเรียน</label>
+            <select id="repFilterSemester" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+              <option value="1">ภาคเรียนที่ 1 (พ.ค. - ต.ค.)</option>
+              <option value="2">ภาคเรียนที่ 2 (พ.ย. - มี.ค.)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- บัตรสรุป KPI -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-semibold text-slate-500">อัตราการมาเรียน</span>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiRate" class="text-3xl font-extrabold text-slate-800">0%</span>
+            <span id="kpiTotal" class="text-xs text-slate-500">จาก 0 คน</span>
+          </div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-bold text-emerald-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา</span>
+          <span id="kpiPresent" class="text-2xl font-black text-emerald-700 mt-2">0</span>
+        </div>
+        <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-bold text-rose-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด</span>
+          <span id="kpiAbsent" class="text-2xl font-black text-rose-700 mt-2">0</span>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-bold text-amber-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา</span>
+          <span id="kpiLeave" class="text-2xl font-black text-amber-700 mt-2">0</span>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-bold text-blue-800 flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย</span>
+          <span id="kpiLate" class="text-2xl font-black text-blue-700 mt-2">0</span>
+        </div>
+      </div>
+
+      <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"></div>
+
+      <!-- ส่วนลงนามท้ายรายงาน A4 -->
+      <div class="hidden print-only pt-12 mt-8 grid grid-cols-2 text-center text-xs">
+        <div>
+          <p>ลงชื่อ......................................................ผู้กำกับกองลูกเสือ</p>
+          <p class="mt-1">(......................................................)</p>
+          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
+        </div>
+        <div>
+          <p>ลงชื่อ......................................................รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</p>
+          <p class="mt-1">(นางสุภาวดี ภาระดี)</p>
+          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- เครดิตผู้พัฒนา (จบในบรรทัดเดียว) -->
+    <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
+      <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
+        <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
+      </div>
+      <span>พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
+    </div>
+  </main>
+
+  <!-- Bottom Floating Bar -->
+  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20 no-print" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
+        <div class="flex items-center gap-1.5 text-emerald-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-rose-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-amber-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-blue-700">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
+        </div>
+        <div class="hidden md:flex items-center gap-1.5 text-indigo-700 border-l border-slate-200 pl-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>ส่งออก CSV</span>
+        </button>
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
+          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+          <span>บันทึกลงชีต & ส่ง LINE</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: ระบุหมายเหตุรายคน (Quick Remarks Modal) -->
+  <div id="remarksModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div class="flex items-center gap-2 text-slate-800 font-bold text-sm">
+          <i data-lucide="file-text" class="w-4 h-4 text-amber-600"></i>
+          <span id="remarksModalTitle">ระบุหมายเหตุ</span>
+        </div>
+        <button onclick="closeRemarksModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-slate-500 mb-2">เลือกหมายเหตุด่วน:</p>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <button onclick="setQuickRemark('ลาป่วยมีใบรับรอง')" class="px-2 py-1 bg-slate-100 hover:bg-amber-50 text-[11px] rounded-lg border border-slate-200">ลาป่วยมีใบรับรอง</button>
+        <button onclick="setQuickRemark('แข่งขันทักษะวิชาการ')" class="px-2 py-1 bg-slate-100 hover:bg-amber-50 text-[11px] rounded-lg border border-slate-200">แข่งขันทักษะวิชาการ</button>
+        <button onclick="setQuickRemark('ติดภารกิจ อบจ./โรงเรียน')" class="px-2 py-1 bg-slate-100 hover:bg-amber-50 text-[11px] rounded-lg border border-slate-200">ติดภารกิจ อบจ.</button>
+        <button onclick="setQuickRemark('ลืมเครื่องแบบไว้ที่บ้าน')" class="px-2 py-1 bg-slate-100 hover:bg-amber-50 text-[11px] rounded-lg border border-slate-200">ลืมเครื่องแบบ</button>
+        <button onclick="setQuickRemark('ไปห้องพยาบาล')" class="px-2 py-1 bg-slate-100 hover:bg-amber-50 text-[11px] rounded-lg border border-slate-200">ไปห้องพยาบาล</button>
+      </div>
+
+      <textarea id="remarksTextInput" rows="2" placeholder="หรือพิมพ์เหตุผลเพิ่มเติมที่นี่..." class="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+
+      <div class="mt-4 flex justify-end gap-2">
+        <button onclick="closeRemarksModal()" class="px-3.5 py-1.5 text-xs rounded-lg text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+        <button onclick="saveStudentRemark()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-800 text-white hover:bg-amber-900">บันทึกหมายเหตุ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: อันดับหมู่ดีเด่น (Leaderboard Modal) -->
+  <div id="leaderboardModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <div class="flex items-center gap-2 text-slate-800 font-bold text-base">
+          <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i>
+          <span>จัดอันดับหมู่ดีเด่นประจำกอง</span>
+        </div>
+        <button onclick="closeLeaderboardModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="leaderboardContentList" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeLeaderboardModal()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ตั้งค่า -->
+  <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+        <div class="flex items-center gap-2 text-slate-800 font-bold">
+          <i data-lucide="settings" class="w-5 h-5 text-emerald-600"></i>
+          <span>ตั้งค่าระบบและการเชื่อมต่อ</span>
+        </div>
+        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL</label>
+          <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">LINE Notify Token</label>
+          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVepnUK3pI6HlJCwfYZOUX9obBpQlq47YvB-RhqmMH1QBegRxgbRWNoR3hIKt5pfiV/exec";
+    const SCOUT_ROLES = ["นายหมู่", "รองนายหมู่", "พลาธิการ", "คนครัว", "ผู้ช่วยคนครัว", "คนหาฟืน", "คนหาน้ำ", "ผู้ช่วยเหลือทั่วไป"];
+    const UNIFORM_ITEMS = ["หมวก", "ผ้าผูกคอ", "วอกเกิ้ล", "ป้ายชื่อ", "รองเท้า/ถุงเท้า"];
+
+    // ผู้บังคับบัญชากลุ่มโรงเรียน
+    const schoolCommanders = {
+      groupLeader: "นายพงศ์ธรรม ปลัดศรีช่วย",
+      deputyGroupLeader: "นายปัญญา คำสะไมล์"
+    };
+
+    // ฟังก์ชันคัดลอกข้อความลงคลิปบอร์ดอย่างปลอดภัย รองรับทุกเบราว์เซอร์และ iframe
+    function copyTextToClipboard(text, successMsg) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (err) {
+        copied = false;
+      }
+      document.body.removeChild(textarea);
+
+      if (copied) {
+        alert(successMsg || "✅ คัดลอกข้อความสรุปสำหรับ LINE เรียบร้อยแล้ว!\nสามารถนำไปวาง (Paste) ส่งในแชทได้ทันที");
+      } else {
+        alert("⚠️ ไม่สามารถคัดลอกอัตโนมัติได้ กรุณาคัดลอกข้อความด้านล่างนี้ด้วยตนเอง:\n\n" + text);
+      }
+    }
+
+    // แปลง YYYY-MM-DD เป็น วันที่ภาษาไทย (เช่น 30 ต.ค. 2569)
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const y = parseInt(parts[0], 10) + 543;
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      const months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      return `${d} ${months[m] || ''} ${y}`;
+    }
+
+    // ฟังก์ชันคัดลอกข้อความสรุปสำหรับ LINE ประจำกอง (ตามฟอร์แมตในรูปภาพ)
+    function copyUnitSummaryForLine() {
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
+
+      const isScout = currentCategory === 'scout';
+      const categoryLabel = isScout ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+      const unitTitle = `${unitData.name}`;
+      const checkDateRaw = document.getElementById('checkDate')?.value || new Date().toISOString().split('T')[0];
+      const thaiDate = formatThaiDate(checkDateRaw);
+      const activityTitle = document.getElementById('activityTitleInput')?.value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
+      const recorderName = getActiveRecorderName();
+
+      let total = 0, pres = 0, abs = 0, lev = 0, lat = 0, uniformOk = 0;
+      const absentDetails = [];
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          total++;
+          if (m.status === 'มา') pres++;
+          else if (m.status === 'ขาด') {
+            abs++;
+            const rmk = m.remark ? ` – ${m.remark}` : '';
+            absentDetails.push(`${m.name}${rmk}`);
+          } else if (m.status === 'ลา') {
+            lev++;
+            const rmk = m.remark ? ` – ${m.remark}` : ' – ลา';
+            absentDetails.push(`${m.name}${rmk}`);
+          } else if (m.status === 'สาย') {
+            lat++;
+          }
+
+          if (m.uniform === 'ครบ') uniformOk++;
+        });
+      });
+
+      // จัดการบรรทัดยอดรวม / มา / ขาด
+      let statusLine = `👥 ยอดรวม: ${total} นาย | มา: ${pres}`;
+      if (abs > 0 || lev > 0) {
+        const notPresentTotal = abs + lev;
+        const detailsStr = absentDetails.length > 0 ? ` (${absentDetails.join(', ')})` : '';
+        statusLine += ` | ขาด/ลา: ${notPresentTotal}${detailsStr}`;
+      } else {
+        statusLine += ` | ขาด: 0`;
+      }
+      if (lat > 0) {
+        statusLine += ` | สาย: ${lat}`;
+      }
+
+      const assistantsStr = (unitData.assistants && unitData.assistants.length > 0)
+        ? unitData.assistants.join(', ')
+        : '-';
+
+      const lineMessage = 
+`${isScout ? '🏕️' : '🍀'} รายงานยอด${categoryLabel} ${unitTitle}
+📅 ประจำวันที่: ${thaiDate}
+🎯 กิจกรรม: ${activityTitle}
+${statusLine}
+🎖️ เครื่องแบบเรียบร้อย: ${uniformOk} นาย
+👤 ผู้กำกับกอง: ${unitData.leader}
+👥 รองผู้กำกับกอง: ${assistantsStr}
+📝 ผู้บันทึก: ${recorderName}`;
+
+      copyTextToClipboard(lineMessage, `✅ คัดลอกสรุป ${categoryLabel} ${unitTitle} เรียบร้อยแล้ว!\nพร้อมวางส่งในกลุ่ม LINE ได้ทันที`);
+    }
+
+    // ฟังก์ชันคัดลอกสรุปภาพรวม ม.1 ทั้งระดับชั้นส่ง LINE
+    function copyGradeOverviewForLine() {
+      const checkDateRaw = document.getElementById('checkDate')?.value || new Date().toISOString().split('T')[0];
+      const thaiDate = formatThaiDate(checkDateRaw);
+      const activityTitle = document.getElementById('activityTitleInput')?.value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
+
+      let grandTotal = 0, grandPres = 0, grandAbs = 0, grandLev = 0, grandLat = 0, grandUniform = 0;
+      let unitsReport = '';
+
+      ['scout', 'guide'].forEach(cat => {
+        const isScout = cat === 'scout';
+        const catLabel = isScout ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+
+        Object.keys(db[cat].units).forEach(uKey => {
+          const unit = db[cat].units[uKey];
+          let uTotal = 0, uPres = 0, uAbs = 0, uLev = 0, uLat = 0, uUniform = 0;
+          const uNotPresentNames = [];
+
+          unit.patrols.forEach(p => {
+            p.members.forEach(m => {
+              uTotal++;
+              if (m.status === 'มา') uPres++;
+              else if (m.status === 'ขาด') {
+                uAbs++;
+                const rmk = m.remark ? ` (${m.remark})` : '';
+                uNotPresentNames.push(`${m.name}${rmk}`);
+              } else if (m.status === 'ลา') {
+                uLev++;
+                const rmk = m.remark ? ` (${m.remark})` : ' (ลา)';
+                uNotPresentNames.push(`${m.name}${rmk}`);
+              } else if (m.status === 'สาย') {
+                uLat++;
+              }
+
+              if (m.uniform === 'ครบ') uUniform++;
+            });
+          });
+
+          grandTotal += uTotal;
+          grandPres += uPres;
+          grandAbs += uAbs;
+          grandLev += uLev;
+          grandLat += uLat;
+          grandUniform += uUniform;
+
+          const pct = uTotal > 0 ? Math.round((uPres / uTotal) * 100) : 0;
+          const assistants = (unit.assistants && unit.assistants.length > 0) ? unit.assistants.join(', ') : '-';
+          const absentInfo = uNotPresentNames.length > 0 ? ` (ไม่มา: ${uNotPresentNames.join(', ')})` : '';
+
+          unitsReport += 
+`\n🔹 ${unit.name} (${catLabel}):
+  • ยอด ${uTotal} | มา ${uPres} | ขาด/ลา ${uAbs + uLev}${absentInfo} | ร้อยละ ${pct}%
+  • ผู้กำกับกอง: ${unit.leader}
+  • รองผู้กำกับ: ${assistants}`;
+        });
+      });
+
+      const grandPct = grandTotal > 0 ? Math.round((grandPres / grandTotal) * 100) : 0;
+
+      const fullMessage = 
+`🏕️ รายงานสรุปภาพรวมกิจกรรมลูกเสือ-เนตรนารี ม.1
+🏫 โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น
+📅 ประจำวันที่: ${thaiDate}
+🎯 กิจกรรม: ${activityTitle}
+----------------------------------------
+📊 สรุปยอดรวมทั้งระดับชั้น ม.1:
+👥 นักเรียนทั้งหมด: ${grandTotal} นาย
+✅ มาเรียน: ${grandPres} นาย (${grandPct}%)
+❌ ขาด/ลา: ${grandAbs + grandLev} นาย
+⏰ สาย: ${grandLat} นาย
+🎖️ เครื่องแบบเรียบร้อย: ${grandUniform} นาย
+----------------------------------------
+📋 สรุปแยกรายกอง (ลูกเสือ 4 กอง + เนตรนารี 3 กอง):${unitsReport}
+----------------------------------------
+ผู้กำกับกลุ่มโรงเรียน: ${schoolCommanders.groupLeader}
+รองผู้กำกับกลุ่มโรงเรียน: ${schoolCommanders.deputyGroupLeader}`;
+
+      copyTextToClipboard(fullMessage, "✅ คัดลอกสรุปภาพรวม ม.1 ทั้ง 7 กอง เรียบร้อยแล้ว!\nสามารถนำไปส่งรายงานในกลุ่ม LINE ได้ทันที");
+    }
+
+    // ฟังก์ชันจัดการรูปภาพ Fallback อัตโนมัติ ป้องกันภาพไม่แสดง
+    function handleScoutImgError(img) {
+      if (!img.dataset.retry) {
+        img.dataset.retry = "1";
+        img.src = "scout.png";
+      } else if (img.dataset.retry === "1") {
+        img.dataset.retry = "2";
+        img.src = "scout.jpeg";
+      } else if (img.dataset.retry === "2") {
+        img.dataset.retry = "3";
+        img.src = "scout.JPG";
+      } else {
+        img.onerror = null;
+        img.parentElement.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full text-amber-500 fill-current">
+            <path d="M50 5 L63 35 L95 38 L70 60 L78 92 L50 74 L22 92 L30 60 L5 38 L37 35 Z" fill="#F59E0B" stroke="#B45309" stroke-width="3"/>
+            <circle cx="50" cy="50" r="16" fill="#FDE68A" stroke="#B45309" stroke-width="2"/>
+          </svg>
+        `;
+      }
+    }
+
+    function handleGirlScoutImgError(img) {
+      if (!img.dataset.retry) {
+        img.dataset.retry = "1";
+        img.src = "GirlScout.jpg";
+      } else if (img.dataset.retry === "1") {
+        img.dataset.retry = "2";
+        img.src = "GirlScout.png";
+      } else {
+        img.onerror = null;
+        img.parentElement.innerHTML = `
+          <svg viewBox="0 0 100 100" class="w-full h-full text-emerald-500 fill-current">
+            <circle cx="50" cy="50" r="45" fill="#10B981" stroke="#047857" stroke-width="4"/>
+            <path d="M50 20 L58 45 L85 45 L62 60 L70 85 L50 68 L30 85 L38 60 L15 45 L42 45 Z" fill="#A7F3D0"/>
+          </svg>
+        `;
+      }
+    }
+
+    // ฐานข้อมูลรายชื่อจริงและโครงสร้างผู้กำกับตามเอกสารโรงเรียนสีชมพูศึกษา ปีการศึกษา 2569
+    const schoolOfficialDatabase = {
+      scout: {
+        units: {
+          1: {
+            name: "กอง 1",
+            leader: "นายวีระยุทธ์ ปู่เพ็ง",
+            assistants: ["นายนพคุณ สืบเลย", "นายสุภีรชัย ภิญโญดม", "นายอลงกรณ์ ชมพูแดง"],
+            patrols: [
+              { patrolName: "หมู่ศรีอินทราทิตย์", leader: "นายนพคุณ สืบเลย", score: 10, members: [
+                { id: "10101", name: "เด็กชายคุณนภัส ทับแช่ม", classRoom: "ม.1/4", no: 1, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10102", name: "เด็กชายภานุพงษ์ เข้าใจการ", classRoom: "ม.1/4", no: 10, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10103", name: "เด็กชายนาวา หวังเชิดกลาง", classRoom: "ม.1/4", no: 8, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10104", name: "เด็กชายภูชิต ประโลมนาม", classRoom: "ม.1/4", no: 11, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10105", name: "เด็กชายภูผา ทองรัก", classRoom: "ม.1/4", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10106", name: "เด็กชายศุภกลวิชญ์ สถิตย์", classRoom: "ม.1/4", no: 14, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10107", name: "เด็กชายชิติพัฒน์ แถมนา", classRoom: "ม.1/4", no: 5, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10108", name: "เด็กชายกมลภพ โมคา", classRoom: "ม.1/1", no: 1, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่รามคำแหง", leader: "นายสุภีรชัย ภิญโญดม", score: 10, members: [
+                { id: "10109", name: "เด็กชายคุณากร กองหาโคตร", classRoom: "ม.1/4", no: 2, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10110", name: "เด็กชายจักรพรรด์ ภูมิพัฒน์", classRoom: "ม.1/4", no: 3, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10111", name: "เด็กชายณิชคุณ สอนกอง", classRoom: "ม.1/4", no: 7, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10112", name: "เด็กชายจิราธร ธนะกลม", classRoom: "ม.1/4", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10113", name: "เด็กชายณัฎฐวัฒน์ มะโรงฤทธิ์", classRoom: "ม.1/4", no: 6, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10114", name: "เด็กชายภูมิพัฒน์ แก้วบับภา", classRoom: "ม.1/4", no: 13, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10115", name: "เด็กชายพลากร ดวงจันทร์", classRoom: "ม.1/4", no: 9, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10116", name: "เด็กชายอนุศร ยุติธรรม", classRoom: "ม.1/4", no: 15, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่อู่ทอง", leader: "นายสุภีรชัย ภิญโญดม", score: 10, members: [
+                { id: "10117", name: "เด็กชายธนินท์รัฐ ธนบูลย์เมธี", classRoom: "ม.1/3", no: 36, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10118", name: "เด็กชายธนภัทร จันทาขุ่ม", classRoom: "ม.1/1", no: 8, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10119", name: "เด็กชายสาระเวย์ ชัยจีน", classRoom: "ม.1/1", no: 19, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10120", name: "เด็กชายธนาเดช ราชวงค์", classRoom: "ม.1/1", no: 10, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10121", name: "เด็กชายธนัชชนม์ บุตรนวน", classRoom: "ม.1/1", no: 9, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10122", name: "เด็กชายวรพิพัฒน์ ศรีนา", classRoom: "ม.1/1", no: 17, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10123", name: "เด็กชายพุฒิพัฒน์ ชัยบุตร", classRoom: "ม.1/1", no: 13, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10124", name: "เด็กชายกิตติพัศ พืชสิงห์", classRoom: "ม.1/1", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10125", name: "เด็กชายจตุรวิชญ์ สมสี", classRoom: "ม.1/1", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่บรมไตรโลกนาถ", leader: "นายอลงกรณ์ ชมพูแดง", score: 10, members: [
+                { id: "10126", name: "เด็กชายเจนวิทย์ มาทน", classRoom: "ม.1/1", no: 5, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10127", name: "เด็กชายวิทวัส คำหล่อ", classRoom: "ม.1/3", no: 6, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10128", name: "เด็กชายปรัชญา เกลี้ยงโท้", classRoom: "ม.1/3", no: 4, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10129", name: "เด็กชายพิทยุตม์ แก้วกระจ่าง", classRoom: "ม.1/3", no: 5, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10130", name: "เด็กชายทนวินท์ โตภูเขียว", classRoom: "ม.1/3", no: 2, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10131", name: "เด็กชายกันต์กวี อินตะโคตร", classRoom: "ม.1/3", no: 1, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10132", name: "เด็กชายกวินกานต์ ทาแก้ง", classRoom: "ม.1/3", no: 35, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10133", name: "เด็กชายทองแท้ บุตรปัญญา", classRoom: "ม.1/3", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่มหาจักรพรรดิ", leader: "นายอลงกรณ์ ชมพูแดง", score: 10, members: [
+                { id: "10134", name: "เด็กชายธราเทพ ตาปัน", classRoom: "ม.1/1", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10135", name: "เด็กชายกรวิชญ์ ชลพันธุ์", classRoom: "ม.1/1", no: 2, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10136", name: "เด็กชายภาคิน สำฤทธิ์ริน", classRoom: "ม.1/1", no: 14, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10137", name: "เด็กชายภูริภัทร บัวบน", classRoom: "ม.1/1", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10138", name: "เด็กชายพงศกร สุขยอด", classRoom: "ม.1/1", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10139", name: "เด็กชายสหรัตน์ แสนลา", classRoom: "ม.1/1", no: 18, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10140", name: "เด็กชายสิรินวัฒน์ ขุนสอน", classRoom: "ม.1/1", no: 20, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10141", name: "เด็กชายแทนไทย สุขสบาย", classRoom: "ม.1/1", no: 6, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10142", name: "เด็กชายธนกร พิมเร่าหนาด", classRoom: "ม.1/1", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          },
+          2: {
+            name: "กอง 2",
+            leader: "นายอนัน ขุนเดช",
+            assistants: ["นางวิยะดา หาจันดา", "นางธนิดา จันทะเดช", "นางสาวพิมพ์ณดา รวมลำภา"],
+            patrols: [
+              { patrolName: "หมู่สุริโยทัย", leader: "นางวิยะดา หาจันดา", score: 10, members: [
+                { id: "10201", name: "เด็กชายพูนทรัพย์ ชนะสิมมา", classRoom: "ม.1/2", no: 9, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10202", name: "เด็กชายภาคิน ยั่งยืน", classRoom: "ม.1/2", no: 10, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10203", name: "เด็กชายธนกฤต ธรรมขันธ์", classRoom: "ม.1/1", no: 6, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10204", name: "เด็กชายชิษณุพงศ์ ชัยเนตร", classRoom: "ม.1/2", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10205", name: "เด็กชายสิทธิกร วงศ์ยุ", classRoom: "ม.1/2", no: 15, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10206", name: "เด็กชายวรากร เชื้อสาวะถี", classRoom: "ม.1/2", no: 12, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10207", name: "เด็กชายปกรณ์ บุตรวงษ์", classRoom: "ม.1/2", no: 8, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10208", name: "เด็กชายภูบดินทร์ มณีวงษ์", classRoom: "ม.1/1", no: 15, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นเรศวร", leader: "นางวิยะดา หาจันดา", score: 10, members: [
+                { id: "10209", name: "เด็กชายรณพีร์ บุญผล", classRoom: "ม.1/2", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10210", name: "เด็กชายวิชภูมิ พันธ์ประทุม", classRoom: "ม.1/2", no: 13, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10211", name: "เด็กชายกิตติคุณ เย็นตุรัส", classRoom: "ม.1/2", no: 1, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10212", name: "เด็กชายสหรัฐ พิมพ์กลาง", classRoom: "ม.1/2", no: 14, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10213", name: "เด็กชายจอมทัพ อ่อนศิริ", classRoom: "ม.1/2", no: 2, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10214", name: "เด็กชายณฐกร ศรวิเศษ", classRoom: "ม.1/2", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10215", name: "เด็กชายสิรวิชญ์ บุพพิ", classRoom: "ม.1/2", no: 16, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10216", name: "เด็กชายนัธทวัฒน์ ผ่องแผ้ว", classRoom: "ม.1/2", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10217", name: "เด็กชายจิรายุ ชำนาญ", classRoom: "ม.1/2", no: 3, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่เอกาทศรถ", leader: "นางธนิดา จันทะเดช", score: 10, members: [
+                { id: "10218", name: "เด็กชายสิท์ธิปติ สีไชยหมื่อ", classRoom: "ม.1/5", no: 11, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10219", name: "เด็กชายชวกร ไชยพิมพ์", classRoom: "ม.1/5", no: 3, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10220", name: "เด็กชายชิษณุพงค์ ขุนเดช", classRoom: "ม.1/5", no: 5, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10221", name: "เด็กชายชินภัทร คำเชื้อ", classRoom: "ม.1/5", no: 4, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10222", name: "เด็กชายชัชวาล แสงนอก", classRoom: "ม.1/5", no: 3, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10223", name: "เด็กชายพีระพัฒน์ ศรีนาง", classRoom: "ม.1/5", no: 8, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10224", name: "เด็กชายธีรเดช อิธิตา", classRoom: "ม.1/5", no: 7, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10225", name: "เด็กชายวาเลนไทม์ อินทะชัย", classRoom: "ม.1/5", no: 9, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10226", name: "เด็กชายกฤตภาส เหล่าม่วง", classRoom: "ม.1/5", no: 1, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่ปราสาททอง", leader: "นางสาวพิมพ์ณดา รวมลำภา", score: 10, members: [
+                { id: "10227", name: "เด็กชายพีระกานต์ วงษาบุตร", classRoom: "ม.1/5", no: 0, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10228", name: "เด็กชายระพิพัฒน์ ขุนเดช", classRoom: "ม.1/5", no: 9, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10229", name: "เด็กชายพีรพงค์ แซงดานุช", classRoom: "ม.1/6", no: 12, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10230", name: "เด็กชายพัชรพล เกื้อกูลวงษ์", classRoom: "ม.1/6", no: 11, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10231", name: "เด็กชายปรมินทร์ สีหาคุณ", classRoom: "ม.1/6", no: 0, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10232", name: "เด็กชายธีระศักดิ์ แพงพิศาล", classRoom: "ม.1/6", no: 0, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10233", name: "เด็กชายมังกร ศรีเชียงสา", classRoom: "ม.1/6", no: 0, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10234", name: "เด็กชายณัฐพล จันดาเบ้า", classRoom: "ม.1/6", no: 0, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          },
+          3: {
+            name: "กอง 3",
+            leader: "นายสิทธิศักดิ์ สิงห์โสภา",
+            assistants: ["นางสาวสไบแพร จันทร์ต้น", "นางสาวพริมา ศรีดารา", "นายชาญยุทธ เร็วสา"],
+            patrols: [
+              { patrolName: "หมู่พระนารายณ์", leader: "นางสาวสไบแพร จันทร์ต้น", score: 10, members: [
+                { id: "10301", name: "เด็กชายกิตตินันท์ ศรีหาวงค์", classRoom: "ม.1/7", no: 1, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10302", name: "เด็กชายชนเมธ ศิริธรรมมา", classRoom: "ม.1/7", no: 4, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10303", name: "เด็กชายภานุภัทร ชาติศิริ", classRoom: "ม.1/7", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10304", name: "เด็กชายร่มเกล้า สุทธิญาณ", classRoom: "ม.1/7", no: 12, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10305", name: "เด็กชายจิรายุ เทือกเพีย", classRoom: "ม.1/7", no: 4, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10306", name: "เด็กชายพงศธร พรมแพง", classRoom: "ม.1/7", no: 8, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10307", name: "เด็กชายภูเมฆา พรมโสภา", classRoom: "ม.1/7", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10308", name: "เด็กชายผนินทร ไพรเขต", classRoom: "ม.1/7", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10309", name: "เด็กชายไกรวิชญ์ เผือกหอม", classRoom: "ม.1/7", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10310", name: "เด็กชายรัชชานนท์ โยค์ทาวัน", classRoom: "ม.1/9", no: 14, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่โกษาปาน", leader: "นางสาวสไบแพร จันทร์ต้น", score: 10, members: [
+                { id: "10311", name: "เด็กชายปวริศร ศรีสอาด", classRoom: "ม.1/7", no: 6, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10312", name: "เด็กชายภานุพงศ์ ชาติศิริ", classRoom: "ม.1/7", no: 9, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10313", name: "เด็กชายณัฐวุฒิ น้อยอุดม", classRoom: "ม.1/7", no: 5, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10314", name: "เด็กชายทัตพงศ์ มีชัย", classRoom: "ม.1/8", no: 9, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10315", name: "เด็กชายทักษ์ดนัย เพ็ชรทอง", classRoom: "ม.1/8", no: 8, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10316", name: "เด็กชายชนะพล พงษ์สระพัง", classRoom: "ม.1/8", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10317", name: "เด็กชายกัลณภัทร สีหาวัต", classRoom: "ม.1/8", no: 1, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10318", name: "เด็กชายธนทรัพย์ ทองมี", classRoom: "ม.1/8", no: 12, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10319", name: "เด็กชายพงศภัค โกยทา", classRoom: "ม.1/8", no: 14, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่โกษาเหล็ก", leader: "นางสาวพริมา ศรีดารา", score: 10, members: [
+                { id: "10320", name: "เด็กชายเจษฎาพร จำเริญ", classRoom: "ม.1/8", no: 4, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10321", name: "เด็กชายภูรี โพธิสาราช", classRoom: "ม.1/8", no: 16, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10322", name: "เด็กชายธนโชติ คงเจริญ", classRoom: "ม.1/8", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10323", name: "เด็กชายชาคริต อ้วนวงษ์", classRoom: "ม.1/9", no: 6, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10324", name: "เด็กชายชวนากร อุณาพรหม", classRoom: "ม.1/9", no: 5, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10325", name: "เด็กชายจิรายุทธ ทับขุนทด", classRoom: "ม.1/9", no: 3, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10326", name: "เด็กชายธันวา สามารถ", classRoom: "ม.1/9", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10327", name: "เด็กชายณัฐวุฒิ นันต๊ะ", classRoom: "ม.1/9", no: 8, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่พันท้ายนรสิงห์", leader: "นายชาญยุทธ เร็วสา", score: 10, members: [
+                { id: "10328", name: "เด็กชายเตชพัฒน์ แสนสิงห์", classRoom: "ม.1/9", no: 4, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10329", name: "เด็กชายอภิชาติ ปัญทา", classRoom: "ม.1/10", no: 16, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10330", name: "เด็กชายพุฒิพงศ์ ยมสีดำ", classRoom: "ม.1/10", no: 10, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10331", name: "เด็กชายธวัชชัย อินรส", classRoom: "ม.1/10", no: 6, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10332", name: "เด็กชายภานุวัชร เท่าบุตรศรี", classRoom: "ม.1/10", no: 14, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10333", name: "เด็กชายภัทรนันท์ สร้อยคำ", classRoom: "ม.1/10", no: 5, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10334", name: "เด็กชายเบญจมินทร์ แดนศรีแก้ว", classRoom: "ม.1/10", no: 3, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10335", name: "เด็กชายธนภัทร พรมภักดี", classRoom: "ม.1/10", no: 11, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10336", name: "เด็กชายเขตต์ ชินเพ็ง", classRoom: "ม.1/9", no: 8, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          },
+          4: {
+            name: "กอง 4",
+            leader: "นายภูมินทร์ รุ่งศรี",
+            assistants: ["นายสุวิทย์ สังสีแก้ว", "นางระพีพร โสสวัสดิ์"],
+            patrols: [
+              { patrolName: "หมู่พระเจ้าตาก", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10401", name: "เด็กชายณัฐวุฒิ จันทร์ใส", classRoom: "ม.1/8", no: 7, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10402", name: "เด็กชายธีรธัช พิลโยพันธ์", classRoom: "ม.1/8", no: 13, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10403", name: "เด็กชายพีรพงศ์ ลาปะ", classRoom: "ม.1/8", no: 15, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10404", name: "เด็กชายจิรพงษ์ ไชยผา", classRoom: "ม.1/8", no: 3, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10405", name: "เด็กชายรัชชานนท์ ปัญญาโส", classRoom: "ม.1/8", no: 17, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10406", name: "เด็กชายชินดนัย เนาว์จำรัส", classRoom: "ม.1/8", no: 6, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10407", name: "เด็กชายธนกร เถื่อนลือชัย", classRoom: "ม.1/8", no: 10, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10408", name: "เด็กชายสหรัฐ ราชรินทร์", classRoom: "ม.1/8", no: 18, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10409", name: "เด็กชายกุณพัฒน์ ภาพันธุ์", classRoom: "ม.1/8", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10410", name: "เด็กชายสุทธิภัร จามะรี", classRoom: "ม.1/10", no: 20, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่พระพุทธยอดฟ้า", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10411", name: "เด็กชายธนวัฒน์ ไชยนา", classRoom: "ม.1/9", no: 10, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10412", name: "เด็กชายสงกรานต์ พันมิตร", classRoom: "ม.1/9", no: 17, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10413", name: "เด็กชายณัฐกิตศ์ สวัสดิ์", classRoom: "ม.1/9", no: 7, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10414", name: "เด็กชายภูมิพัฒน์ คงเด็ด", classRoom: "ม.1/9", no: 13, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10415", name: "เด็กชายปรมัตถ์ ดอนโคตร", classRoom: "ม.1/9", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10416", name: "เด็กชายเจษฎา โจมทา", classRoom: "ม.1/9", no: 4, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10417", name: "เด็กชายจิรภัทร ชัยบุตร", classRoom: "ม.1/9", no: 2, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10418", name: "เด็กชายวงศธร เอกรักษา", classRoom: "ม.1/9", no: 0, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่เทพกษัตริย์", leader: "นายสุวิทย์ สังสีแก้ว", score: 10, members: [
+                { id: "10419", name: "เด็กชายอัษฎาวุฒิ ศรวิเศษ", classRoom: "ม.1/10", no: 24, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10420", name: "เด็กชายวีรชัย จันทรี", classRoom: "ม.1/10", no: 18, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10421", name: "เด็กชายปริชญา ตั้งถิ่น", classRoom: "ม.1/10", no: 9, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10422", name: "เด็กชายวายุ ญาณประเสริฐ", classRoom: "ม.1/10", no: 17, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10423", name: "เด็กชายศิวพงษ์ เพชรศรี", classRoom: "ม.1/10", no: 19, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10424", name: "เด็กชายสุรพงษ์ ผิวอ่อน", classRoom: "ม.1/10", no: 21, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10425", name: "เด็กชายปิยะวัฒน์ ชิตพงศ์ไชย", classRoom: "ม.1/10", no: 11, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10426", name: "เด็กชายนัทชานนท์ แก้วสง่า", classRoom: "ม.1/10", no: 7, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10427", name: "เด็กชายธนภัทร พรมภักดี", classRoom: "ม.1/10", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่ศรีสุนทร", leader: "นางระพีพร โสสวัสดิ์", score: 10, members: [
+                { id: "10428", name: "เด็กชายพีรภัทร สีหาดี", classRoom: "ม.1/10", no: 13, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10429", name: "เด็กชายวีรชัย จันทร์ทรี", classRoom: "ม.1/10", no: 20, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10430", name: "เด็กชายชัชวาล นามรักษา", classRoom: "ม.1/10", no: 3, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10431", name: "เด็กชายจิรภัทร ประตังยาสัง", classRoom: "ม.1/10", no: 1, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10432", name: "เด็กชายปัณณวัฒน์ วงศ์ศรีรัตน์", classRoom: "ม.1/10", no: 10, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10433", name: "เด็กชายนครินทร์ ปรามาตย์", classRoom: "ม.1/10", no: 6, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10434", name: "เด็กชายพลภัทร์ ชิณสงกา", classRoom: "ม.1/10", no: 12, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10435", name: "เด็กชายวศิน ผุยตาด", classRoom: "ม.1/10", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10436", name: "เด็กชายฐิติกรกฤต แจ้งจันทร์", classRoom: "ม.1/10", no: 2, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่พญาเสือ", leader: "นางระพีพร โสสวัสดิ์", score: 10, members: [
+                { id: "10437", name: "เด็กชายฉัตรนิรุธ สีพัฒน์เมือง", classRoom: "ม.1/6", no: 3, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10438", name: "เด็กชายกฤษต์จินต์ พรมเขียว", classRoom: "ม.1/6", no: 2, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10439", name: "เด็กชายธีรวัต บวโนนแดง", classRoom: "ม.1/6", no: 6, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10440", name: "เด็กชายธันวา ลาหลง", classRoom: "ม.1/6", no: 7, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10441", name: "เด็กชายเอกสิทธิ์ กองเกิด", classRoom: "ม.1/6", no: 16, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10442", name: "เด็กชายรัชชานนท์ ไสภาจว", classRoom: "ม.1/6", no: 15, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10443", name: "เด็กชายรัชชานนท์ พันธุ์ชื่น", classRoom: "ม.1/6", no: 14, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10444", name: "เด็กชายชิษณุพงศ์ อินนอก", classRoom: "ม.1/6", no: 4, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "10445", name: "เด็กชายกมลพิภัทร ธิตะปัญ", classRoom: "ม.1/6", no: 9, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          }
+        }
+      },
+      guide: {
+        units: {
+          1: {
+            name: "กอง 1",
+            leader: "นางสาวบุศลาวัลย์ ชูภักดี",
+            assistants: ["นางวาสนา เหลาธรรม", "นางสาวอ้อยทิพย์ เพียทา", "นางสาวเพ็ญภัสสร อุดมธนโรจน์"],
+            patrols: [
+              { patrolName: "หมู่นกกระทุง", leader: "นางวาสนา เหลาธรรม", score: 10, members: [
+                { id: "20101", name: "เด็กหญิงพีรยา อินทุมาร", classRoom: "ม.1/9", no: 24, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20102", name: "เด็กหญิงกนกวรรณ พุทธกัง", classRoom: "ม.1/8", no: 19, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20103", name: "เด็กหญิงกันต์ฤทัย จิตตะธรรม", classRoom: "ม.1/6", no: 17, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20104", name: "เด็กหญิงหนึ่งธิดา สะโสดา", classRoom: "ม.1/7", no: 31, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20105", name: "เด็กหญิงปัณฑิตา จิตพิทัก", classRoom: "ม.1/3", no: 21, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20106", name: "เด็กหญิงจรรยพร คงเชียงชา", classRoom: "ม.1/5", no: 11, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20107", name: "เด็กหญิงพิมพ์ลภัส โคตมุงคุล", classRoom: "ม.1/7", no: 24, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกแก้ว", leader: "นางวาสนา เหลาธรรม", score: 10, members: [
+                { id: "20108", name: "เด็กหญิงนภาพร ผุยลา", classRoom: "ม.1/9", no: 20, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20109", name: "เด็กหญิงพรชนก ชัยเนตร", classRoom: "ม.1/8", no: 27, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20110", name: "เด็กหญิงนารารินทร์ ทะนงค์", classRoom: "ม.1/7", no: 20, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20111", name: "เด็กหญิงพิชญา วงษ์สกุล", classRoom: "ม.1/6", no: 24, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20112", name: "เด็กหญิงอริดา เจียมภูเขียว", classRoom: "ม.1/5", no: 36, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20113", name: "เด็กหญิงชญานี อนุสนธิ์", classRoom: "ม.1/4", no: 20, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20114", name: "เด็กหญิงพัชรี บัวชุม", classRoom: "ม.1/3", no: 24, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20115", name: "เด็กหญิงกัลยารัตน์ เบ็ญขุนทด", classRoom: "ม.1/2", no: 19, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกพิราบ", leader: "นางสาวอ้อยทิพย์ เพียทา", score: 10, members: [
+                { id: "20116", name: "เด็กหญิงอินธิรา จำปาชาติ", classRoom: "ม.1/6", no: 34, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20117", name: "เด็กหญิงจรรยมณฑน์ ฝ้ายป่าน", classRoom: "ม.1/7", no: 34, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20118", name: "เด็กหญิงคณาพร มาหนองโดน", classRoom: "ม.1/8", no: 20, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20119", name: "เด็กหญิงธิดารัตน์ บุตดี", classRoom: "ม.1/9", no: 19, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20120", name: "เด็กหญิงสุพิชญา นาจันทัด", classRoom: "ม.1/5", no: 34, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20121", name: "เด็กหญิงปิยะพร กำแซง", classRoom: "ม.1/4", no: 28, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20122", name: "เด็กหญิงอมลวรรณ กองโพธิ์", classRoom: "ม.1/3", no: 31, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20123", name: "เด็กหญิงกาญจนา อาจกล้า", classRoom: "ม.1/2", no: 20, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกขมิ้น", leader: "นางสาวเพ็ญภัสสร อุดมธนโรจน์", score: 10, members: [
+                { id: "20124", name: "เด็กหญิงสิริวิมล แก้วเวียง", classRoom: "ม.1/9", no: 31, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20125", name: "เด็กหญิงนภัสรา ดวงคำ", classRoom: "ม.1/8", no: 26, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20126", name: "เด็กหญิงอริสา ผิวอ่อน", classRoom: "ม.1/7", no: 32, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20127", name: "เด็กหญิงกัณญาวี คลังระหัด", classRoom: "ม.1/6", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20128", name: "เด็กหญิงอรัญญา ช่วยศิริ", classRoom: "ม.1/5", no: 35, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20129", name: "เด็กหญิงวรัญญา แฟมไธสง", classRoom: "ม.1/4", no: 34, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20130", name: "เด็กหญิงสิริยากร ขวาแซ่น", classRoom: "ม.1/2", no: 34, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20131", name: "เด็กหญิงยุวธิดา จันวัน", classRoom: "ม.1/1", no: 36, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          },
+          2: {
+            name: "กอง 2",
+            leader: "นางพิสมัย สืบเลย",
+            assistants: ["นางจันทิมา สิงห์ฝ่าย", "นางปิยะวรรณ ศรีธร"],
+            patrols: [
+              { patrolName: "หมู่นกเค้าแมว", leader: "นางจันทิมา สิงห์ฝ่าย", score: 10, members: [
+                { id: "20201", name: "เด็กหญิงกนกทิพย์ แก้วมหาวงษ์", classRoom: "ม.1/9", no: 17, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20202", name: "เด็กหญิงธนัชญา พิมพันธ์", classRoom: "ม.1/8", no: 25, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20203", name: "เด็กหญิงกันยกร โนนทิง", classRoom: "ม.1/6", no: 18, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20204", name: "เด็กหญิงธัญญารัตน์ หันยะ", classRoom: "ม.1/5", no: 17, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20205", name: "เด็กหญิงนันท์นภัส ดลโสภณ", classRoom: "ม.1/7", no: 18, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20206", name: "เด็กหญิงนิตยา อรรถจักร์", classRoom: "ม.1/4", no: 26, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20207", name: "เด็กหญิงบุษบา ใจอารีย์", classRoom: "ม.1/3", no: 19, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20208", name: "เด็กหญิงวิราพร สระขาม", classRoom: "ม.1/5", no: 29, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกแซงแซว", leader: "นางจันทิมา สิงห์ฝ่าย", score: 10, members: [
+                { id: "20209", name: "เด็กหญิงสุพรรษา ทองมาก", classRoom: "ม.1/9", no: 32, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20210", name: "เด็กหญิงวิรงรอง สีอวน", classRoom: "ม.1/8", no: 31, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20211", name: "เด็กหญิงอรัญญา ขนแดง", classRoom: "ม.1/7", no: 31, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20212", name: "เด็กหญิงณัฐธิดา โดนสุข", classRoom: "ม.1/6", no: 21, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20213", name: "เด็กหญิงชญาน์นันท์ ทองสุข", classRoom: "ม.1/4", no: 19, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20214", name: "เด็กหญิงนุศรา ล้านสา", classRoom: "ม.1/5", no: 19, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20215", name: "เด็กหญิงเพียงวาฒม์ ไทยยิ้ม", classRoom: "ม.1/7", no: 25, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20216", name: "เด็กหญิงเพียงขวัญ อ้อนอุบล", classRoom: "ม.1/6", no: 26, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกเขา", leader: "นางปิยะวรรณ ศรีธร", score: 10, members: [
+                { id: "20217", name: "เด็กหญิงนันท์นภัส ทรัพย์สมบัติ", classRoom: "ม.1/7", no: 19, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20218", name: "เด็กหญิงกัลยา ขวาแซ้น", classRoom: "ม.1/6", no: 19, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20219", name: "เด็กหญิงนัทปภา พงษาเวียง", classRoom: "ม.1/5", no: 18, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20220", name: "เด็กหญิงกนิษฐา วงค์ธรรม", classRoom: "ม.1/4", no: 16, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20221", name: "เด็กหญิงขวัญสุดา พรมนิล", classRoom: "ม.1/3", no: 12, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20222", name: "เด็กหญิงณัฐณิชา ทองมา", classRoom: "ม.1/2", no: 35, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20223", name: "เด็กหญิงชัชฎาภรณ์ ศรีคำภา", classRoom: "ม.1/1", no: 27, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20224", name: "เด็กหญิงพิมพ์ชนก สิงห์ทองทราย", classRoom: "ม.1/5", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกกางเขน", leader: "นางปิยะวรรณ ศรีธร", score: 10, members: [
+                { id: "20225", name: "เด็กหญิงพลอย โชติฉันท์", classRoom: "ม.1/8", no: 28, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20226", name: "เด็กหญิงญาณิศา หนูฤกษ์", classRoom: "ม.1/8", no: 22, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20227", name: "เด็กหญิงลิณลดา วงศา", classRoom: "ม.1/7", no: 27, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20228", name: "เด็กหญิงเสาวลักษณ์ สุดพังยาง", classRoom: "ม.1/6", no: 32, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20229", name: "เด็กหญิงณัฐชานันท์ อ่อนอ่างคำ", classRoom: "ม.1/5", no: 15, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20230", name: "เด็กหญิงภัทรธิดา หาดคำ", classRoom: "ม.1/1", no: 34, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20231", name: "เด็กหญิงพีรดา ไขแสง", classRoom: "ม.1/5", no: 25, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20232", name: "เด็กหญิงปุณญานุช ตรงใจ", classRoom: "ม.1/3", no: 23, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          },
+          3: {
+            name: "กอง 3",
+            leader: "นางสุพัตรา ขวัญบุญจันทร์",
+            assistants: ["นางสาวสุภณิดา ทองอ่าง", "นางสาวศรัญญา ศรีชุมพร"],
+            patrols: [
+              { patrolName: "หมู่นกอินทรี", leader: "นางสาวสุภณิดา ทองอ่าง", score: 10, members: [
+                { id: "20301", name: "เด็กหญิงเณศรา กรไชยา", classRoom: "ม.1/2", no: 25, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20302", name: "เด็กหญิงพิมพ์นดา เท่าบุรี", classRoom: "ม.1/3", no: 25, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20303", name: "เด็กหญิงพิมพ์ชนก วรรณใส", classRoom: "ม.1/5", no: 23, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20304", name: "เด็กหญิงปฏิมาภรณ์ ก่อสุวรรณ", classRoom: "ม.1/1", no: 30, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20305", name: "เด็กหญิงมรกต ตรีเนตร", classRoom: "ม.1/1", no: 35, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20306", name: "เด็กหญิงโศภิชนัณฐ์ พละกาพย์", classRoom: "ม.1/5", no: 32, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20307", name: "เด็กหญิงภัทรปภา มงคลแก้ว", classRoom: "ม.1/6", no: 27, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20308", name: "เด็กหญิงณัฐนิชา ทีภูเขียว", classRoom: "ม.1/4", no: 23, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกหัวขวาน", leader: "นางสาวสุภณิดา ทองอ่าง", score: 10, members: [
+                { id: "20309", name: "เด็กหญิงกมลชนก ปัญจะภักดี", classRoom: "ม.1/3", no: 8, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20310", name: "เด็กหญิงพิมพ์ดาว ธิตะปัญ", classRoom: "ม.1/1", no: 33, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20311", name: "เด็กหญิงขนิษฐา เชื้อทอง", classRoom: "ม.1/1", no: 25, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20312", name: "เด็กหญิงวีราพร แสนอาจ", classRoom: "ม.1/2", no: 33, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20313", name: "เด็กหญิงพิชามญชุ์ ทองปด", classRoom: "ม.1/2", no: 30, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20314", name: "เด็กหญิงภัคจิรา จีจันทร์", classRoom: "ม.1/3", no: 26, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20315", name: "เด็กหญิงณัฎธิดาภร สมานชัย", classRoom: "ม.1/5", no: 14, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20316", name: "เด็กหญิงอรินรดา ขำประถม", classRoom: "ม.1/1", no: 39, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกกระยาง", leader: "นางสาวศรัญญา ศรีชุมพร", score: 10, members: [
+                { id: "20317", name: "เด็กหญิงจรรยาพร โพธิ์ชัย", classRoom: "ม.1/1", no: 26, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20318", name: "เด็กหญิงกานต์ธิดา สีม่วง", classRoom: "ม.1/3", no: 11, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20319", name: "เด็กหญิงวิภูษณี ทุมมา", classRoom: "ม.1/5", no: 28, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20320", name: "เด็กหญิงกรรณิการ์ แรงดี", classRoom: "ม.1/1", no: 22, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20321", name: "เด็กหญิงรมย์รดา บุดดาเวียง", classRoom: "ม.1/2", no: 31, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20322", name: "เด็กหญิงณิชาดา เลิศนอก", classRoom: "ม.1/2", no: 24, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20323", name: "เด็กหญิงวีริญญา ดวงคำ", classRoom: "ม.1/5", no: 30, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20324", name: "เด็กหญิงภัชชราพร ปัดสำราญ", classRoom: "ม.1/9", no: 24, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20325", name: "เด็กหญิงสิรยาทร วรรณวิชิต", classRoom: "ม.1/6", no: 31, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]},
+              { patrolName: "หมู่นกนางนวล", leader: "นางสาวศรัญญา ศรีชุมพร", score: 10, members: [
+                { id: "20326", name: "เด็กหญิงกชพร ทักษิณ", classRoom: "ม.1/3", no: 7, role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20327", name: "เด็กหญิงปิยนุช สิงห์หล้า", classRoom: "ม.1/1", no: 32, role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20328", name: "เด็กหญิงดรุณี โรมพันธ์", classRoom: "ม.1/5", no: 16, role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20329", name: "เด็กหญิงกรรณิกา เติมภูเขียว", classRoom: "ม.1/2", no: 18, role: "คนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20330", name: "เด็กหญิงนัฐธิชา เขาไตร", classRoom: "ม.1/3", no: 18, role: "ผู้ช่วยคนครัว", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20331", name: "เด็กหญิงจิรนันท์ ภักดียา", classRoom: "ม.1/2", no: 22, role: "คนหาฟืน", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20332", name: "เด็กหญิงธัญสุดา ผ่องผา", classRoom: "ม.1/3", no: 17, role: "คนหาน้ำ", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20333", name: "เด็กหญิงนิภาพร เพ็งวงษา", classRoom: "ม.1/2", no: 26, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20334", name: "เด็กหญิงศิรัญญา วงศ์เมือง", classRoom: "ม.1/3", no: 29, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" },
+                { id: "20335", name: "เด็กหญิงณัฐชาวรินทร์ จันดาบุตร", classRoom: "ม.1/1", no: 28, role: "ผู้ช่วยเหลือทั่วไป", status: "มา", uniform: "ครบ", missing: [], remark: "" }
+              ]}
+            ]
+          }
+        }
+      }
+    };
+
+    let currentCategory = 'scout';
+    let currentUnitId = 1;
+    let db = {};
+    let currentMainTab = 'checkin';
+    let currentReportPeriod = 'daily';
+    let attendanceHistoryData = [];
+    let currentSearchQuery = '';
+    let currentEditingStudent = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedDb = localStorage.getItem('scout_official_db_v3');
+      if (savedDb) {
+        try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(schoolOfficialDatabase)); }
+      } else {
+        db = JSON.parse(JSON.stringify(schoolOfficialDatabase));
+      }
+      sortAllPatrols();
+
+      const today = new Date().toISOString().split('T')[0];
+      const dateEl = document.getElementById('checkDate');
+      if (dateEl) dateEl.value = today;
+      const repDateEl = document.getElementById('repFilterDate');
+      if (repDateEl) repDateEl.value = today;
+      const repMonthEl = document.getElementById('repFilterMonth');
+      if (repMonthEl) repMonthEl.value = today.substring(0, 7);
+
+      const savedUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      const scriptUrlEl = document.getElementById('scriptUrlInput');
+      if (scriptUrlEl) scriptUrlEl.value = savedUrl;
+
+      const savedToken = localStorage.getItem('scout_line_token') || '';
+      const lineTokenEl = document.getElementById('lineTokenInput');
+      if (lineTokenEl) lineTokenEl.value = savedToken;
+
+      applyTheme();
+      updateRecorderOptions();
+      renderCurrentUnit();
+      if (window.lucide) lucide.createIcons();
+    });
+
+    function saveDatabaseState() {
+      localStorage.setItem('scout_official_db_v3', JSON.stringify(db));
+    }
+
+    function sortPatrolMembers(members) {
+      return members.sort((a, b) => {
+        let rankA = SCOUT_ROLES.indexOf(a.role);
+        let rankB = SCOUT_ROLES.indexOf(b.role);
+        if (rankA === -1) rankA = 99;
+        if (rankB === -1) rankB = 99;
+        return rankA - rankB;
+      });
+    }
+
+    function sortAllPatrols() {
+      ['scout', 'guide'].forEach(cat => {
+        if (db[cat] && db[cat].units) {
+          Object.values(db[cat].units).forEach(unit => {
+            unit.patrols.forEach(patrol => {
+              patrol.members = sortPatrolMembers(patrol.members);
+            });
+          });
+        }
+      });
+    }
+
+    function applyActivityPreset(val) {
+      const titleInput = document.getElementById('activityTitleInput');
+      if (titleInput && val) titleInput.value = val;
+    }
+
+    function updateRecorderOptions() {
+      const select = document.getElementById('recorderSelect');
+      const customInput = document.getElementById('recordedByCustomInput');
+      if (!select) return;
+
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
+
+      const leaders = [unitData.leader];
+      if (unitData.assistants && Array.isArray(unitData.assistants)) {
+        unitData.assistants.forEach(a => {
+          if (!leaders.includes(a)) leaders.push(a);
+        });
+      }
+
+      let html = '';
+      leaders.forEach((ldr, idx) => {
+        const titleSuffix = idx === 0 ? " (ผกก.กอง)" : " (รอง ผกก.)";
+        html += `<option value="${ldr}">${ldr}${titleSuffix}</option>`;
+      });
+      html += `<option value="__custom__">✏️ ระบุชื่ออื่น...</option>`;
+
+      select.innerHTML = html;
+      select.value = leaders[0];
+      if (customInput) customInput.classList.add('hidden');
+    }
+
+    function handleRecorderChange(val) {
+      const customInput = document.getElementById('recordedByCustomInput');
+      if (val === '__custom__') {
+        if (customInput) {
+          customInput.classList.remove('hidden');
+          customInput.focus();
+        }
+      } else {
+        if (customInput) customInput.classList.add('hidden');
+      }
+    }
+
+    function getActiveRecorderName() {
+      const select = document.getElementById('recorderSelect');
+      const customInput = document.getElementById('recordedByCustomInput');
+      if (select && select.value === '__custom__') {
+        return customInput && customInput.value.trim() ? customInput.value.trim() : "ผู้กำกับลูกเสือ";
+      }
+      return select ? select.value : "ผู้กำกับลูกเสือ";
+    }
+
+    function switchMainTab(tab) {
+      currentMainTab = tab;
+      const secCheckin = document.getElementById('sectionCheckin');
+      const secOverview = document.getElementById('sectionOverview');
+      const secReport = document.getElementById('sectionReport');
+      const bottomBar = document.getElementById('bottomCheckinBar');
+      const btnCheckin = document.getElementById('tabBtnCheckin');
+      const btnOverview = document.getElementById('tabBtnOverview');
+      const btnReport = document.getElementById('tabBtnReport');
+      const headerTools = document.getElementById('checkinHeaderTools');
+
+      [secCheckin, secOverview, secReport].forEach(el => el && el.classList.add('hidden'));
+      [btnCheckin, btnOverview, btnReport].forEach(el => {
+        if (el) el.className = "px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200 whitespace-nowrap";
+      });
+
+      if (tab === 'checkin') {
+        if (secCheckin) secCheckin.classList.remove('hidden');
+        if (bottomBar) bottomBar.classList.remove('hidden');
+        if (headerTools) headerTools.classList.remove('hidden');
+        if (btnCheckin) btnCheckin.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow whitespace-nowrap";
+      } else if (tab === 'overview') {
+        if (secOverview) secOverview.classList.remove('hidden');
+        if (bottomBar) bottomBar.classList.add('hidden');
+        if (headerTools) headerTools.classList.add('hidden');
+        if (btnOverview) btnOverview.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow whitespace-nowrap";
+        renderWholeGradeOverview();
+      } else if (tab === 'report') {
+        if (secReport) secReport.classList.remove('hidden');
+        if (bottomBar) bottomBar.classList.add('hidden');
+        if (headerTools) headerTools.classList.add('hidden');
+        if (btnReport) btnReport.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow whitespace-nowrap";
+        fetchSheetDataForReports();
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function switchCategory(cat) {
+      currentCategory = cat;
+      currentUnitId = 1;
+      currentSearchQuery = '';
+      const searchEl = document.getElementById('quickSearchInput');
+      if (searchEl) searchEl.value = '';
+
+      applyTheme();
+      updateRecorderOptions();
+      renderCurrentUnit();
+    }
+
+    function applyTheme() {
+      const isScout = currentCategory === 'scout';
+      const nav = document.getElementById('navbarHeader');
+      const btnScout = document.getElementById('btnCatScout');
+      const btnGuide = document.getElementById('btnCatGuide');
+      const btnSave = document.getElementById('btnSaveSheets');
+
+      if (nav) nav.style.background = isScout ? "linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)" : "linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)";
+      if (btnScout) btnScout.className = isScout ? "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white" : "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
+      if (btnGuide) btnGuide.className = !isScout ? "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-emerald-800 text-white" : "flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900";
+      if (btnSave) btnSave.className = isScout ? "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900" : "flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-emerald-800 hover:bg-emerald-900";
+
+      renderUnitButtonsUI();
+    }
+
+    function selectUnit(unitId) {
+      currentUnitId = unitId;
+      currentSearchQuery = '';
+      const searchEl = document.getElementById('quickSearchInput');
+      if (searchEl) searchEl.value = '';
+
+      renderUnitButtonsUI();
+      updateRecorderOptions();
+      renderCurrentUnit();
+    }
+
+    function renderUnitButtonsUI() {
+      const container = document.getElementById('unitButtonsContainer');
+      if (!container) return;
+
+      const isScout = currentCategory === 'scout';
+      const availableUnits = Object.keys(db[currentCategory].units).map(Number);
+      const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800 shadow" : "bg-emerald-800 text-white border-emerald-800 shadow";
+
+      let html = `<span class="text-xs font-semibold text-slate-500 whitespace-nowrap">เลือกกอง:</span>`;
+      availableUnits.forEach(uId => {
+        const isActive = (uId === currentUnitId);
+        html += `
+          <button onclick="selectUnit(${uId})" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border transition ${isActive ? activeColorClass : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}">
+            กอง ${uId}
+          </button>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderCommanderCard(unitData, categoryLabel) {
+      const card = document.getElementById('commanderInfoCard');
+      if (!card) return;
+
+      const isScout = currentCategory === 'scout';
+      const themeColor = isScout ? "text-amber-800" : "text-emerald-800";
+      const badgeBg = isScout ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-900";
+
+      let assistantBadges = '';
+      if (unitData.assistants && unitData.assistants.length > 0) {
+        assistantBadges = unitData.assistants.map(a => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium border border-slate-200">${a}</span>`).join(' ');
+      }
+
+      card.innerHTML = `
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider ${badgeBg} px-2.5 py-0.5 rounded-md">${unitData.name} (${categoryLabel})</span>
+              <span class="text-xs text-slate-500 font-semibold">ผังแต่งตั้งผู้บังคับบัญชา</span>
+            </div>
+            <div class="mt-1 flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+              <div class="font-bold text-slate-800">
+                <i data-lucide="award" class="w-4 h-4 inline-block ${themeColor} mr-1"></i>ผู้กำกับกอง: <span class="${themeColor}">${unitData.leader}</span>
+              </div>
+              <div class="text-slate-400 hidden sm:inline">|</div>
+              <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-600">
+                <span class="font-semibold text-slate-500">รองผู้กำกับกอง:</span>
+                ${assistantBadges || '-'}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-right text-[11px] text-slate-400 border-t md:border-t-0 pt-2 md:pt-0 w-full md:w-auto">
+            <div>ผู้กำกับกลุ่ม: <strong class="text-slate-700">${schoolCommanders.groupLeader}</strong></div>
+            <div>รองผู้กำกับกลุ่ม: <strong class="text-slate-700">${schoolCommanders.deputyGroupLeader}</strong></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCurrentUnit() {
+      const container = document.getElementById('patrolsContainer');
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData || !container) return;
+
+      const categoryLabel = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+      renderCommanderCard(unitData, categoryLabel);
+
+      const titleEl = document.getElementById('currentUnitTitle');
+      if (titleEl) {
+        titleEl.innerHTML = `
+          <span>${unitData.name} (${categoryLabel})</span>
+          <span class="text-xs text-slate-500 font-normal ml-2">ผู้กำกับกอง: ${unitData.leader || '-'}</span>
+        `;
+      }
+
+      let totalMembers = 0;
+      let html = '';
+
+      unitData.patrols.forEach((patrol, pIndex) => {
+        totalMembers += patrol.members.length;
+        const pPresent = patrol.members.filter(m => m.status === 'มา').length;
+        const pAbsent = patrol.members.filter(m => m.status === 'ขาด').length;
+        const pLeave = patrol.members.filter(m => m.status === 'ลา').length;
+        const pLate = patrol.members.filter(m => m.status === 'สาย').length;
+
+        const filteredMembers = patrol.members.filter(student => {
+          if (!currentSearchQuery) return true;
+          const q = currentSearchQuery.toLowerCase();
+          const matchName = student.name.toLowerCase().includes(q);
+          const matchId = student.id.toLowerCase().includes(q);
+          const matchNo = String(student.no || '').includes(q);
+          const matchPatrol = patrol.patrolName.toLowerCase().includes(q);
+          return matchName || matchId || matchNo || matchPatrol;
+        });
+
+        if (currentSearchQuery && filteredMembers.length === 0) {
+          return;
+        }
+
+        const isScout = currentCategory === 'scout';
+        const patrolLogoImg = isScout 
+          ? `<img src="scout.jpg" alt="ตราลูกเสือ" class="w-full h-full object-contain" onerror="handleScoutImgError(this)">`
+          : `<img src="GirlScout.jpeg" alt="ตราเนตรนารี" class="w-full h-full object-contain" onerror="handleGirlScoutImgError(this)">`;
+
+        html += `
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-white p-0.5 shadow-xs border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                    ${patrolLogoImg}
+                  </div>
+                  <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
+                  <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">ผู้กำกับประจำหมู่: <strong>${patrol.leader || '-'}</strong></p>
+              </div>
+
+              <!-- คะแนนประจำหมู่ -->
+              <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-slate-200 shadow-sm text-xs">
+                <span class="font-bold text-amber-800 flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i> คะแนนหมู่:
+                </span>
+                <input type="number" min="0" max="10" value="${patrol.score !== undefined ? patrol.score : 10}" 
+                  onchange="updatePatrolScore(${pIndex}, this.value)" 
+                  class="w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none">
+                <span class="text-slate-400">/ 10</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="markPatrolUniformOk(${pIndex})" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
+                  เครื่องแบบครบหมู่นี้
+                </button>
+                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
+                  มาครบหมู่นี้
+                </button>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+        `;
+
+        patrol.members.forEach((student, sIndex) => {
+          if (currentSearchQuery) {
+            const q = currentSearchQuery.toLowerCase();
+            const matchName = student.name.toLowerCase().includes(q);
+            const matchId = student.id.toLowerCase().includes(q);
+            const matchNo = String(student.no || '').includes(q);
+            const matchPatrol = patrol.patrolName.toLowerCase().includes(q);
+            if (!matchName && !matchId && !matchNo && !matchPatrol) return;
+          }
+
+          let roleBadgeBg = "bg-slate-100 text-slate-700 border-slate-200";
+          if (student.role === "นายหมู่") roleBadgeBg = "bg-amber-100 text-amber-900 border-amber-300 font-bold";
+          else if (student.role === "รองนายหมู่") roleBadgeBg = "bg-blue-100 text-blue-900 border-blue-300 font-bold";
+          else if (student.role === "พลาธิการ") roleBadgeBg = "bg-purple-100 text-purple-900 border-purple-200";
+
+          let roleOptionsHtml = SCOUT_ROLES.map(r => 
+            `<option value="${r}" ${student.role === r ? 'selected' : ''}>${r}</option>`
+          ).join('');
+
+          const isUniformComplete = (student.uniform === "ครบ");
+
+          html += `
+            <div class="px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
+                  ${sIndex + 1}
+                </div>
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-bold text-sm text-slate-800">${student.name}</span>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-mono">${student.classRoom || ''} เลขที่ ${student.no || '-'}</span>
+                    <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none">
+                      ${roleOptionsHtml}
+                    </select>
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                    <span>รหัส: ${student.id}</span>
+                    ${student.remark ? `<span class="bg-amber-50 text-amber-800 px-1.5 py-0.2 rounded border border-amber-200 font-medium">หมายเหตุ: ${student.remark}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-end lg:self-center w-full lg:w-auto justify-between lg:justify-end">
+                
+                <!-- ปุ่มระบุหมายเหตุรายคน (Quick Remarks) -->
+                <button onclick="openRemarksModal(${pIndex}, ${sIndex})" class="px-2.5 py-1 text-xs rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1 shadow-xs" title="ระบุเหตุผล/หมายเหตุ">
+                  <i data-lucide="message-square-plus" class="w-3.5 h-3.5 text-amber-600"></i>
+                  <span>หมายเหตุ</span>
+                </button>
+
+                <!-- เครื่องแบบ -->
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs">
+                  <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 ${isUniformComplete ? 'bg-indigo-600 text-white shadow' : 'bg-rose-100 text-rose-700'}">
+                    <i data-lucide="${isUniformComplete ? 'shield-check' : 'shield-alert'}" class="w-3.5 h-3.5"></i>
+                    <span>${isUniformComplete ? 'เครื่องแบบครบ' : 'ไม่ครบ'}</span>
+                  </button>
+
+                  ${!isUniformComplete ? `
+                    <div class="flex items-center gap-1 px-1">
+                      ${UNIFORM_ITEMS.map(item => `
+                        <label class="flex items-center gap-0.5 text-[10px] text-slate-600 cursor-pointer">
+                          <input type="checkbox" onchange="toggleMissingItem(${pIndex}, ${sIndex}, '${item}')" ${(student.missing || []).includes(item) ? 'checked' : ''} class="rounded text-rose-600 focus:ring-0">
+                          <span>${item}</span>
+                        </label>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+
+                <!-- เช็คสถานะ 4 ปุ่ม (มา, ขาด, ลา, สาย) -->
+                <div class="grid grid-cols-4 gap-1 w-56 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
+                </div>
+
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div></div>`;
+      });
+
+      const totalEl = document.getElementById('totalUnitMembers');
+      if (totalEl) totalEl.innerText = `${totalMembers} นาย`;
+
+      container.innerHTML = html;
+      updateBottomStats();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleQuickSearch(q) {
+      currentSearchQuery = q.trim();
+      renderCurrentUnit();
+    }
+
+    function clearQuickSearch() {
+      currentSearchQuery = '';
+      const searchEl = document.getElementById('quickSearchInput');
+      if (searchEl) searchEl.value = '';
+      renderCurrentUnit();
+    }
+
+    // Modal หมายเหตุรายบุคคล
+    function openRemarksModal(pIndex, sIndex) {
+      currentEditingStudent = { pIndex, sIndex };
+      const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
+      const titleEl = document.getElementById('remarksModalTitle');
+      if (titleEl) titleEl.innerText = `หมายเหตุ: ${student.name}`;
+      const inputEl = document.getElementById('remarksTextInput');
+      if (inputEl) inputEl.value = student.remark || '';
+
+      const modal = document.getElementById('remarksModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeRemarksModal() {
+      const modal = document.getElementById('remarksModal');
+      if (modal) modal.classList.add('hidden');
+      currentEditingStudent = null;
+    }
+
+    function setQuickRemark(text) {
+      const inputEl = document.getElementById('remarksTextInput');
+      if (inputEl) inputEl.value = text;
+    }
+
+    function saveStudentRemark() {
+      if (!currentEditingStudent) return;
+      const { pIndex, sIndex } = currentEditingStudent;
+      const inputEl = document.getElementById('remarksTextInput');
+      const remarkText = inputEl ? inputEl.value.trim() : '';
+
+      db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex].remark = remarkText;
+      saveDatabaseState();
+      closeRemarksModal();
+      renderCurrentUnit();
+    }
+
+    // Modal จัดอันดับหมู่ดีเด่น (Leaderboard)
+    function openLeaderboardModal() {
+      const modal = document.getElementById('leaderboardModal');
+      const listContainer = document.getElementById('leaderboardContentList');
+      if (!modal || !listContainer) return;
+
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
+
+      const leaderboard = unitData.patrols.map(p => {
+        const total = p.members.length;
+        const present = p.members.filter(m => m.status === 'มา').length;
+        const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+        const actScore = p.score !== undefined ? p.score : 10;
+        const totalScore = (actScore * 10) + (rate * 0.5);
+        return {
+          patrolName: p.patrolName,
+          leader: p.leader,
+          actScore: actScore,
+          rate: rate,
+          totalScore: Math.round(totalScore)
+        };
+      }).sort((a, b) => b.totalScore - a.totalScore);
+
+      let html = '';
+      leaderboard.forEach((item, idx) => {
+        let badgeIcon = `<span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center">${idx + 1}</span>`;
+        if (idx === 0) badgeIcon = `<span class="text-xl">🥇</span>`;
+        else if (idx === 1) badgeIcon = `<span class="text-xl">🥈</span>`;
+        else if (idx === 2) badgeIcon = `<span class="text-xl">🥉</span>`;
+
+        html += `
+          <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+              ${badgeIcon}
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">${item.patrolName}</h4>
+                <p class="text-[11px] text-slate-500">ผู้กำกับ: ${item.leader || '-'}</p>
+              </div>
+            </div>
+            <div class="text-right text-xs">
+              <span class="font-bold text-amber-800 text-sm">${item.totalScore} คะแนน</span>
+              <p class="text-[10px] text-slate-500">กิจกรรม ${item.actScore}/10 · มา ${item.rate}%</p>
+            </div>
+          </div>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+      modal.classList.remove('hidden');
+    }
+
+    function closeLeaderboardModal() {
+      const modal = document.getElementById('leaderboardModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // แดชบอร์ดภาพรวมทั้งระดับชั้น ม.1
+    function renderWholeGradeOverview() {
+      const grid = document.getElementById('gradeOverviewGrid');
+      const dateBadge = document.getElementById('overviewDateBadge');
+      if (!grid) return;
+
+      const checkDate = document.getElementById('checkDate')?.value || new Date().toISOString().split('T')[0];
+      if (dateBadge) dateBadge.innerText = `วันที่: ${checkDate}`;
+
+      let cardsHtml = '';
+
+      ['scout', 'guide'].forEach(cat => {
+        const isScout = cat === 'scout';
+        const catName = isScout ? "ลูกเสือ ม.1" : "เนตรนารี ม.1";
+        const themeBg = isScout ? "bg-amber-800 text-white" : "bg-emerald-800 text-white";
+        const logoImg = isScout 
+          ? `<img src="scout.jpg" alt="ตราลูกเสือ" class="w-full h-full object-contain" onerror="handleScoutImgError(this)">`
+          : `<img src="GirlScout.jpeg" alt="ตราเนตรนารี" class="w-full h-full object-contain" onerror="handleGirlScoutImgError(this)">`;
+
+        Object.keys(db[cat].units).forEach(uKey => {
+          const unit = db[cat].units[uKey];
+          let total = 0, pres = 0, abs = 0, lev = 0, lat = 0;
+
+          unit.patrols.forEach(p => {
+            total += p.members.length;
+            p.members.forEach(m => {
+              if (m.status === 'มา') pres++;
+              else if (m.status === 'ขาด') abs++;
+              else if (m.status === 'ลา') lev++;
+              else if (m.status === 'สาย') lat++;
+            });
+          });
+
+          const pct = total > 0 ? Math.round((pres / total) * 100) : 0;
+
+          cardsHtml += `
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="${themeBg} px-4 py-2.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-white p-0.5 shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+                    ${logoImg}
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-sm">${unit.name} (${catName})</h3>
+                    <p class="text-[11px] text-white/80">ผู้กำกับกอง: ${unit.leader}</p>
+                  </div>
+                </div>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/20">${total} นาย</span>
+              </div>
+              <div class="p-3.5 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-500">อัตราการมา:</span>
+                  <span class="font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</span>
+                </div>
+                <div class="grid grid-cols-4 gap-1 text-center text-xs font-bold">
+                  <div class="bg-emerald-50 text-emerald-800 py-1.5 rounded-lg border border-emerald-100">มา ${pres}</div>
+                  <div class="bg-rose-50 text-rose-800 py-1.5 rounded-lg border border-rose-100">ขาด ${abs}</div>
+                  <div class="bg-amber-50 text-amber-800 py-1.5 rounded-lg border border-amber-100">ลา ${lev}</div>
+                  <div class="bg-blue-50 text-blue-800 py-1.5 rounded-lg border border-blue-100">สาย ${lat}</div>
+                </div>
+                <button onclick="goToUnitFromOverview('${cat}', ${uKey})" class="w-full mt-2 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition">
+                  เข้าเช็คชื่อกองนี้ &rarr;
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+
+      grid.innerHTML = cardsHtml;
+    }
+
+    function goToUnitFromOverview(cat, uId) {
+      currentCategory = cat;
+      currentUnitId = uId;
+      applyTheme();
+      updateRecorderOptions();
+      renderCurrentUnit();
+      switchMainTab('checkin');
+    }
+
+    // พิมพ์ใบรายชื่อกระดาษเปล่า A4 สำหรับเช็คภาคสนาม
+    function printBlankRoster() {
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
+      const catTitle = currentCategory === 'scout' ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+
+      const printWin = window.open('', '_blank');
+      let tableRows = '';
+      let num = 1;
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          tableRows += `
+            <tr style="height: 28px; text-align: center;">
+              <td>${num++}</td>
+              <td style="text-align: left; padding-left: 6px;">${m.name}</td>
+              <td>${m.classRoom || '-'} เลขที่ ${m.no || '-'}</td>
+              <td>${p.patrolName}</td>
+              <td>${m.role}</td>
+              <td>[ &nbsp; ]</td>
+              <td>[ &nbsp; ]</td>
+              <td>[ &nbsp; ]</td>
+              <td>[ &nbsp; ]</td>
+              <td>[ &nbsp; ]</td>
+              <td></td>
+            </tr>
+          `;
+        });
+      });
+
+      const scriptCloseTag = '</' + 'script>';
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>ใบเช็คชื่อ ${unitData.name} (${catTitle})</title>
+          <style>
+            body { font-family: 'Sarabun', sans-serif; font-size: 12px; margin: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #333; padding: 4px; font-size: 11px; }
+            th { background: #f0f0f0; }
+            .header { text-align: center; margin-bottom: 15px; }
+            @media print { @page { size: A4 portrait; margin: 15mm; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h3 style="margin:0;">โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</h3>
+            <h4 style="margin:4px 0;">ใบเช็คชื่อกิจกรรม${catTitle} ${unitData.name} ประจำภาคสนาม</h4>
+            <p style="margin:0; font-size:11px;">ผู้กำกับกอง: ${unitData.leader} | วันที่ ........................................ กิจกรรม ......................................................</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th width="5%">ที่</th>
+                <th width="28%">ชื่อ - นามสกุล</th>
+                <th width="12%">ชั้น/เลขที่</th>
+                <th width="14%">หมู่</th>
+                <th width="11%">ตำแหน่ง</th>
+                <th width="5%">มา</th>
+                <th width="5%">ขาด</th>
+                <th width="5%">ลา</th>
+                <th width="5%">สาย</th>
+                <th width="5%">เครื่องแบบ</th>
+                <th width="10%">หมายเหตุ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+          <div style="margin-top: 30px; display: flex; justify-content: space-between; text-align: center; font-size: 11px;">
+            <div style="width: 45%;">
+              <p>ลงชื่อ......................................................ผู้ตรวจเช็ค</p>
+              <p>(......................................................)</p>
+            </div>
+            <div style="width: 45%;">
+              <p>ลงชื่อ......................................................ผู้กำกับกอง</p>
+              <p>(${unitData.leader})</p>
+            </div>
+          </div>
+          <script>window.onload = function() { window.print(); }${scriptCloseTag}
+        </body>
+        </html>
+      `);
+      printWin.document.close();
+    }
+
+    function toggleUniformStatus(pIndex, sIndex) {
+      const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
+      student.uniform = (student.uniform === "ครบ") ? "ไม่ครบ" : "ครบ";
+      if (student.uniform === "ครบ") student.missing = [];
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function toggleMissingItem(pIndex, sIndex, item) {
+      const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
+      if (!student.missing) student.missing = [];
+      const idx = student.missing.indexOf(item);
+      if (idx > -1) student.missing.splice(idx, 1);
+      else student.missing.push(item);
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function markPatrolUniformOk(pIndex) {
+      db[currentCategory].units[currentUnitId].patrols[pIndex].members.forEach(m => {
+        m.uniform = "ครบ";
+        m.missing = [];
+      });
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function markAllCurrentUnitUniform(isOk) {
+      db[currentCategory].units[currentUnitId].patrols.forEach(p => {
+        p.members.forEach(m => {
+          m.uniform = isOk ? "ครบ" : "ไม่ครบ";
+          if (isOk) m.missing = [];
+        });
+      });
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function updatePatrolScore(pIndex, score) {
+      db[currentCategory].units[currentUnitId].patrols[pIndex].score = Number(score);
+      saveDatabaseState();
+    }
+
+    function changeMemberRole(patrolIndex, studentIndex, newRole) {
+      const patrol = db[currentCategory].units[currentUnitId].patrols[patrolIndex];
+      patrol.members[studentIndex].role = newRole;
+      patrol.members = sortPatrolMembers(patrol.members);
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function setStatus(patrolIndex, studentIndex, status) {
+      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members[studentIndex].status = status;
+      renderCurrentUnit();
+    }
+
+    function markPatrolPresent(patrolIndex) {
+      db[currentCategory].units[currentUnitId].patrols[patrolIndex].members.forEach(m => m.status = 'มา');
+      renderCurrentUnit();
+    }
+
+    function markAllCurrentUnitPresent() {
+      db[currentCategory].units[currentUnitId].patrols.forEach(p => {
+        p.members.forEach(m => m.status = 'มา');
+      });
+      renderCurrentUnit();
+    }
+
+    function updateBottomStats() {
+      let present = 0, absent = 0, leave = 0, late = 0, uniformOk = 0;
+      const unitData = db[currentCategory].units[currentUnitId];
+      if (!unitData) return;
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          if (m.status === 'มา') present++;
+          else if (m.status === 'ขาด') absent++;
+          else if (m.status === 'ลา') leave++;
+          else if (m.status === 'สาย') late++;
+          if (m.uniform === 'ครบ') uniformOk++;
+        });
+      });
+
+      const pEl = document.getElementById('statPresent');
+      if (pEl) pEl.innerText = present;
+      const aEl = document.getElementById('statAbsent');
+      if (aEl) aEl.innerText = absent;
+      const lEl = document.getElementById('statLeave');
+      if (lEl) lEl.innerText = leave;
+      const ltEl = document.getElementById('statLate');
+      if (ltEl) ltEl.innerText = late;
+      const uEl = document.getElementById('statUniformOk');
+      if (uEl) uEl.innerText = uniformOk;
+    }
+
+    async function saveToGoogleSheets() {
+      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      const checkDate = document.getElementById('checkDate')?.value || new Date().toISOString().split('T')[0];
+      const activityTitle = document.getElementById('activityTitleInput')?.value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
+      const recordedBy = getActiveRecorderName();
+      const lineToken = localStorage.getItem('scout_line_token') || '';
+
+      const unitData = db[currentCategory].units[currentUnitId];
+      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
+
+      const studentsPayload = [];
+      const patrolScoresPayload = [];
+
+      unitData.patrols.forEach(patrol => {
+        patrolScoresPayload.push({
+          patrolName: patrol.patrolName,
+          score: patrol.score !== undefined ? patrol.score : 10
+        });
+
+        patrol.members.forEach(member => {
+          studentsPayload.push({
+            patrol: patrol.patrolName,
+            id: member.id,
+            name: member.name,
+            role: member.role,
+            status: member.status,
+            uniformStatus: member.uniform || "ครบ",
+            missingUniform: member.missing || [],
+            remark: member.remark || ""
+          });
+        });
+      });
+
+      const payload = {
+        date: checkDate,
+        activity: activityTitle,
+        category: categoryText,
+        unit: unitData.name,
+        recordedBy: recordedBy,
+        lineToken: lineToken,
+        students: studentsPayload,
+        patrolScores: patrolScoresPayload
+      };
+
+      const btnSave = document.getElementById('btnSaveSheets');
+      const originalText = btnSave ? btnSave.innerHTML : '';
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก & ส่ง LINE...</span>`;
+      }
+      if (window.lucide) lucide.createIcons();
+
+      try {
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- ผู้บันทึก: ${recordedBy}\n- กิจกรรม: ${activityTitle}\n- อัปเดตข้อมูล: ${result.updated || 0} คน\n- บันทึกใหม่: ${result.inserted || 0} คน\n${lineToken ? '- ส่งแจ้งเตือนสรุปเข้า LINE เรียบร้อยแล้ว' : ''}`);
+        } else {
+          alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'เกิดข้อผิดพลาด'));
+        }
+      } catch (error) {
+        console.warn('Network Notice:', error);
+        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบใน Google Sheets`);
+      } finally {
+        if (btnSave) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = originalText;
+        }
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function exportToCSV() {
+      const checkDate = document.getElementById('checkDate')?.value || new Date().toISOString().split('T')[0];
+      const activityTitle = document.getElementById('activityTitleInput')?.value.trim() || 'กิจกรรมประจำสัปดาห์';
+      const recordedBy = getActiveRecorderName();
+      const unitData = db[currentCategory].units[currentUnitId];
+      const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
+
+      let csvContent = "\uFEFF";
+      csvContent += "วันที่,กิจกรรม,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,ชั้น/เลขที่,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,หมายเหตุ,ผู้บันทึก\n";
+
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          const missingStr = (m.missing && m.missing.length > 0) ? m.missing.join("; ") : "-";
+          const classNo = `${m.classRoom || ''} เลขที่ ${m.no || ''}`.trim();
+          const rmk = m.remark || "-";
+          csvContent += `"${checkDate}","${activityTitle}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${classNo}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${rmk}","${recordedBy}"\n`;
+        });
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `เช็คชื่อ_${categoryText}_${unitData.name}_${checkDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function switchReportPeriod(period) {
+      currentReportPeriod = period;
+      ['daily', 'monthly', 'semester'].forEach(p => {
+        const btn = document.getElementById(`repTab${p.charAt(0).toUpperCase() + p.slice(1)}`);
+        const sub = document.getElementById(`subFilter${p.charAt(0).toUpperCase() + p.slice(1)}`);
+        if (p === period) {
+          if (btn) btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-slate-800 shadow";
+          if (sub) sub.classList.remove('hidden');
+        } else {
+          if (btn) btn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900";
+          if (sub) sub.classList.add('hidden');
+        }
+      });
+      renderActiveReport();
+    }
+
+    async function fetchSheetDataForReports() {
+      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      const refIcon = document.getElementById('refreshIcon');
+      if (refIcon) refIcon.classList.add('animate-spin');
+
+      try {
+        const res = await fetch(scriptUrl);
+        const json = await res.json();
+        if (json.status === 'success' && Array.isArray(json.data)) {
+          attendanceHistoryData = json.data;
+        }
+      } catch (err) {
+        console.warn('โหลดประวัติไม่สำเร็จ:', err);
+      } finally {
+        if (refIcon) refIcon.classList.remove('animate-spin');
+        renderActiveReport();
+      }
+    }
+
+    function renderActiveReport() {
+      const cat = document.getElementById('repFilterCategory')?.value || 'all';
+      const unit = document.getElementById('repFilterUnit')?.value || 'all';
+
+      let filtered = attendanceHistoryData.filter(row => {
+        const matchCat = (cat === 'all') || (row.category === cat);
+        const matchUnit = (unit === 'all') || (row.unit === unit);
+        return matchCat && matchUnit;
+      });
+
+      if (currentReportPeriod === 'daily') renderDailyReport(filtered);
+      else if (currentReportPeriod === 'monthly') renderMonthlyReport(filtered);
+      else if (currentReportPeriod === 'semester') renderSemesterReport(filtered);
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderDailyReport(data) {
+      const targetDate = document.getElementById('repFilterDate')?.value || new Date().toISOString().split('T')[0];
+      const dayData = data.filter(r => r.date === targetDate);
+      const activityName = (dayData.length > 0 && dayData[0].activity) ? dayData[0].activity : "กิจกรรมประจำสัปดาห์";
+      
+      const subTitleEl = document.getElementById('printReportSubtitle');
+      if (subTitleEl) subTitleEl.innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
+      updateKpis(dayData);
+
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
+      if (dayData.length === 0) {
+        area.innerHTML = `
+          <div class="p-10 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p>ไม่พบข้อมูลการเช็คชื่อในวันที่ ${targetDate}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const patrolMap = {};
+      dayData.forEach(r => {
+        const key = `${r.category} ${r.unit} - ${r.patrol}`;
+        if (!patrolMap[key]) {
+          patrolMap[key] = { name: key, total: 0, present: 0, absent: 0, leave: 0, late: 0, uniformOk: 0 };
+        }
+        patrolMap[key].total++;
+        if (r.status === 'มา') patrolMap[key].present++;
+        else if (r.status === 'ขาด') patrolMap[key].absent++;
+        else if (r.status === 'ลา') patrolMap[key].leave++;
+        else if (r.status === 'สาย') patrolMap[key].late++;
+        if (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ') patrolMap[key].uniformOk++;
+      });
+
+      let html = `
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปสถิติประจำวันที่ ${targetDate}</h3>
+            <p class="text-xs text-amber-800 font-semibold mt-0.5">กิจกรรม: ${activityName}</p>
+          </div>
+          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">บันทึกทั้งหมด ${dayData.length} คน</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-3">กอง / หมู่</th>
+                <th class="p-3 text-center">จำนวนสมาชิก</th>
+                <th class="p-3 text-center text-emerald-700">มา</th>
+                <th class="p-3 text-center text-rose-700">ขาด</th>
+                <th class="p-3 text-center text-amber-700">ลา</th>
+                <th class="p-3 text-center text-blue-700">สาย</th>
+                <th class="p-3 text-center text-indigo-700">เครื่องแบบครบ</th>
+                <th class="p-3 text-center font-bold">ร้อยละการมา</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+      `;
+
+      Object.values(patrolMap).forEach(p => {
+        const pct = Math.round((p.present / p.total) * 100);
+        html += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-semibold text-slate-800">${p.name}</td>
+            <td class="p-3 text-center font-medium">${p.total}</td>
+            <td class="p-3 text-center font-bold text-emerald-600">${p.present}</td>
+            <td class="p-3 text-center font-bold text-rose-600">${p.absent}</td>
+            <td class="p-3 text-center font-bold text-amber-600">${p.leave}</td>
+            <td class="p-3 text-center font-bold text-blue-600">${p.late}</td>
+            <td class="p-3 text-center font-bold text-indigo-600">${p.uniformOk}</td>
+            <td class="p-3 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table></div>`;
+      area.innerHTML = html;
+    }
+
+    function renderMonthlyReport(data) {
+      const targetMonth = document.getElementById('repFilterMonth')?.value || new Date().toISOString().substring(0, 7);
+      const subTitleEl = document.getElementById('printReportSubtitle');
+      if (subTitleEl) subTitleEl.innerText = `รายงานสรุปการมาเรียนประจำเดือน: ${targetMonth}`;
+      const monthData = data.filter(r => r.date && r.date.startsWith(targetMonth));
+      updateKpis(monthData);
+
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
+      if (monthData.length === 0) {
+        area.innerHTML = `
+          <div class="p-10 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p>ไม่พบข้อมูลการเช็คชื่อในเดือน ${targetMonth}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const activeDates = [...new Set(monthData.map(r => r.date))].sort();
+      const studentMap = {};
+      monthData.forEach(r => {
+        if (!studentMap[r.id]) {
+          studentMap[r.id] = { id: r.id, name: r.name, patrol: r.patrol, role: r.role, dates: {}, presentCount: 0, total: 0 };
+        }
+        studentMap[r.id].dates[r.date] = r.status;
+        studentMap[r.id].total++;
+        if (r.status === 'มา') studentMap[r.id].presentCount++;
+      });
+
+      let html = `
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-slate-800 text-sm sm:text-base">ตารางประวัติการเข้าแถว ประจำเดือน ${targetMonth}</h3>
+          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">มีกิจกรรม ${activeDates.length} สัปดาห์/วัน</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-2.5">รหัส</th>
+                <th class="p-2.5">ชื่อ - นามสกุล</th>
+                <th class="p-2.5">หมู่</th>
+                <th class="p-2.5">ตำแหน่ง</th>
+      `;
+
+      activeDates.forEach(d => {
+        const shortD = d.substring(8, 10);
+        html += `<th class="p-2 text-center whitespace-nowrap">${shortD}</th>`;
+      });
+
+      html += `
+                <th class="p-2.5 text-center font-bold text-emerald-700">มา</th>
+                <th class="p-2.5 text-center font-bold">% การมา</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+      `;
+
+      Object.values(studentMap).forEach(s => {
+        const pct = Math.round((s.presentCount / activeDates.length) * 100);
+        html += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono text-slate-500">${s.id}</td>
+            <td class="p-2.5 font-semibold text-slate-800 whitespace-nowrap">${s.name}</td>
+            <td class="p-2.5 text-slate-500 whitespace-nowrap">${s.patrol}</td>
+            <td class="p-2.5 text-slate-500 whitespace-nowrap">${s.role || '-'}</td>
+        `;
+
+        activeDates.forEach(d => {
+          const st = s.dates[d] || '-';
+          let stIcon = `<span class="text-slate-300">-</span>`;
+          if (st === 'มา') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold text-center leading-4">ม</span>`;
+          else if (st === 'ขาด') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold text-center leading-4">ข</span>`;
+          else if (st === 'ลา') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold text-center leading-4">ล</span>`;
+          else if (st === 'สาย') stIcon = `<span class="inline-block w-4 h-4 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold text-center leading-4">ส</span>`;
+          html += `<td class="p-2 text-center">${stIcon}</td>`;
+        });
+
+        html += `
+            <td class="p-2.5 text-center font-bold text-emerald-700">${s.presentCount}</td>
+            <td class="p-2.5 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table></div>`;
+      area.innerHTML = html;
+    }
+
+    function renderSemesterReport(data) {
+      const sem = document.getElementById('repFilterSemester')?.value || '1';
+      const subTitleEl = document.getElementById('printReportSubtitle');
+      if (subTitleEl) subTitleEl.innerText = `รายงานผลการประเมินเวลาเรียน กิจกรรมลูกเสือ-เนตรนารี ม.1 (ภาคเรียนที่ ${sem})`;
+      updateKpis(data);
+
+      const area = document.getElementById('reportContentArea');
+      if (!area) return;
+
+      if (data.length === 0) {
+        area.innerHTML = `
+          <div class="p-10 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p>ยังไม่มีบันทึกข้อมูลในภาคเรียนนี้</p>
+          </div>
+        `;
+        return;
+      }
+
+      const totalSessions = [...new Set(data.map(r => r.date))].length;
+      const studentSummary = {};
+      data.forEach(r => {
+        if (!studentSummary[r.id]) {
+          studentSummary[r.id] = { id: r.id, name: r.name, patrol: r.patrol, unit: r.unit, role: r.role, present: 0, absent: 0, leave: 0, late: 0, total: 0 };
+        }
+        studentSummary[r.id].total++;
+        if (r.status === 'มา') studentSummary[r.id].present++;
+        else if (r.status === 'ขาด') studentSummary[r.id].absent++;
+        else if (r.status === 'ลา') studentSummary[r.id].leave++;
+        else if (r.status === 'สาย') studentSummary[r.id].late++;
+      });
+
+      let html = `
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปผลการประเมินเวลาเรียนเพื่อตัดสินผลการเรียน (เกณฑ์ 80%)</h3>
+            <p class="text-xs text-slate-500">จำนวนครั้งที่มีการจัดกิจกรรมทั้งหมด: ${totalSessions} ครั้ง</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+              <tr>
+                <th class="p-3">รหัส</th>
+                <th class="p-3">ชื่อ - นามสกุล</th>
+                <th class="p-3">กอง / หมู่</th>
+                <th class="p-3">ตำแหน่ง</th>
+                <th class="p-3 text-center text-emerald-700">มา</th>
+                <th class="p-3 text-center text-rose-700">ขาด</th>
+                <th class="p-3 text-center text-amber-700">ลา</th>
+                <th class="p-3 text-center text-blue-700">สาย</th>
+                <th class="p-3 text-center font-bold">เวลาเรียน (%)</th>
+                <th class="p-3 text-center font-bold">ผลการประเมิน</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+      `;
+
+      Object.values(studentSummary).forEach(s => {
+        const pct = totalSessions > 0 ? Math.round((s.present / totalSessions) * 100) : 0;
+        const isPass = pct >= 80;
+
+        html += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono text-slate-500">${s.id}</td>
+            <td class="p-3 font-semibold text-slate-800">${s.name}</td>
+            <td class="p-3 text-slate-500">${s.unit} - ${s.patrol}</td>
+            <td class="p-3 text-slate-500">${s.role || '-'}</td>
+            <td class="p-3 text-center font-bold text-emerald-600">${s.present}</td>
+            <td class="p-3 text-center font-bold text-rose-600">${s.absent}</td>
+            <td class="p-3 text-center font-bold text-amber-600">${s.leave}</td>
+            <td class="p-3 text-center font-bold text-blue-600">${s.late}</td>
+            <td class="p-3 text-center font-extrabold ${isPass ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
+            <td class="p-3 text-center">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPass ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                ${isPass ? 'ผ่าน' : 'มผ.'}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table></div>`;
+      area.innerHTML = html;
+    }
+
+    function updateKpis(records) {
+      let p = 0, a = 0, l = 0, lt = 0;
+      records.forEach(r => {
+        if (r.status === 'มา') p++;
+        else if (r.status === 'ขาด') a++;
+        else if (r.status === 'ลา') l++;
+        else if (r.status === 'สาย') lt++;
+      });
+      const total = records.length;
+      const rate = total > 0 ? Math.round((p / total) * 100) : 0;
+
+      const rateEl = document.getElementById('kpiRate');
+      if (rateEl) rateEl.innerText = `${rate}%`;
+      const totEl = document.getElementById('kpiTotal');
+      if (totEl) totEl.innerText = `จาก ${total} รายการ`;
+      const presEl = document.getElementById('kpiPresent');
+      if (presEl) presEl.innerText = p;
+      const absEl = document.getElementById('kpiAbsent');
+      if (absEl) absEl.innerText = a;
+      const levEl = document.getElementById('kpiLeave');
+      if (levEl) levEl.innerText = l;
+      const latEl = document.getElementById('kpiLate');
+      if (latEl) latEl.innerText = lt;
+    }
+
+    function toggleConfigModal() {
+      const modal = document.getElementById('configModal');
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    function saveConfig() {
+      const url = document.getElementById('scriptUrlInput')?.value.trim();
+      const token = document.getElementById('lineTokenInput')?.value.trim();
+      if (url) localStorage.setItem('scout_script_url', url);
+      if (token !== undefined) localStorage.setItem('scout_line_token', token);
+      alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
+      toggleConfigModal();
+    }
+  </script>
+</body>
+</html>->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
