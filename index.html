@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
+  <title>ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body { font-family: 'Sarabun', sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { height: 6px; }
@@ -23,8 +25,11 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
 
+  <!-- Header -->
   <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
     <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- โลโก้และชื่อโรงเรียน -->
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
           <img src="logo.png" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
@@ -35,6 +40,7 @@
         </div>
       </div>
 
+      <!-- เมนูสลับโหมด: เช็คชื่อหน้าแถว / สรุปรายงาน -->
       <div class="flex items-center gap-2 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold">
         <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-3.5 py-1.5 rounded-lg transition bg-white text-slate-900 shadow">
           <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i>เช็คชื่อหน้าแถว
@@ -44,6 +50,7 @@
         </button>
       </div>
 
+      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ซิงค์ชีต, ตั้งค่า -->
       <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
         <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
           <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
@@ -53,14 +60,22 @@
           <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
           <input type="text" id="recordedByInput" placeholder="ชื่อผู้บันทึก..." class="bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-28 sm:w-36">
         </div>
-        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm font-medium transition" title="ตั้งค่าเชื่อมต่อ Google Sheets">
-          <i data-lucide="sheet" class="w-4 h-4 text-emerald-300"></i>
+        <button onclick="syncRosterFromSheets()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1 text-xs font-semibold" title="ซิงค์รายชื่อนักเรียนจาก Sheets">
+          <i data-lucide="users" class="w-4 h-4 text-cyan-300"></i>
+          <span class="hidden sm:inline">ดึงรายชื่อ</span>
+        </button>
+        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium" title="ตั้งค่าเชื่อมต่อ">
+          <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
         </button>
       </div>
+
     </div>
   </header>
 
+  <!-- Main Content -->
   <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
+
+    <!-- ==================== โหมด 1: เช็คชื่อหน้าแถว ==================== -->
     <section id="sectionCheckin" class="space-y-5">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -88,16 +103,24 @@
             <span id="currentUnitTitle" class="font-bold text-slate-800 text-sm sm:text-base">กอง 1 (ลูกเสือ ม.1)</span>
             <span id="totalUnitMembers" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">9 นาย</span>
           </div>
-          <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
-            <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
-            <span>มาครบทุกคนทั้งกอง</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="markAllCurrentUnitUniform(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>เครื่องแบบครบทั้งกอง</span>
+            </button>
+            <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
+              <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+              <span>มาครบทุกคนทั้งกอง</span>
+            </button>
+          </div>
         </div>
       </div>
 
+      <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
       <div id="patrolsContainer" class="space-y-5"></div>
     </section>
 
+    <!-- ==================== โหมด 2: หน้ารายงานสรุป ==================== -->
     <section id="sectionReport" class="hidden space-y-5">
       <div class="hidden print-only mb-6 text-center border-b pb-4">
         <div class="flex items-center justify-center gap-3 mb-2">
@@ -172,6 +195,7 @@
         </div>
       </div>
 
+      <!-- บัตรสรุป KPI -->
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-semibold text-slate-500">อัตราการมาเรียน</span>
@@ -200,6 +224,7 @@
 
       <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"></div>
 
+      <!-- ส่วนลงนามท้ายรายงาน -->
       <div class="hidden print-only pt-12 mt-8 grid grid-cols-2 text-center text-xs">
         <div>
           <p>ลงชื่อ......................................................ผู้กำกับกองลูกเสือ</p>
@@ -214,6 +239,7 @@
       </div>
     </section>
 
+    <!-- เครดิตผู้พัฒนา -->
     <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
       <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
         <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
@@ -222,6 +248,7 @@
     </div>
   </main>
 
+  <!-- Bottom Floating Bar -->
   <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20 no-print">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
@@ -237,6 +264,9 @@
         <div class="flex items-center gap-1.5 text-blue-700">
           <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
         </div>
+        <div class="hidden md:flex items-center gap-1.5 text-indigo-700 border-l border-slate-200 pl-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
+        </div>
       </div>
 
       <div class="flex items-center gap-2 w-full sm:w-auto">
@@ -246,32 +276,38 @@
         </button>
         <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
           <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-          <span>บันทึกลง Google Sheets</span>
+          <span>บันทึกลงชีต & ส่ง LINE</span>
         </button>
       </div>
     </div>
   </footer>
 
+  <!-- Modal ตั้งค่าชีตและ LINE Notify -->
   <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
         <div class="flex items-center gap-2 text-slate-800 font-bold">
           <i data-lucide="settings" class="w-5 h-5 text-emerald-600"></i>
-          <span>ตั้งค่าการเชื่อมต่อ Google Sheets</span>
+          <span>ตั้งค่าระบบและการเชื่อมต่อ</span>
         </div>
         <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div class="space-y-3">
+      <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL (ลงท้ายด้วย /exec)</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Google Apps Script Web App URL</label>
           <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">LINE Notify Token (สำหรับส่งสรุปเข้ากลุ่มครู)</label>
+          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token (ถ้ามี)..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+          <p class="text-[10px] text-slate-400 mt-1">* หากใส่ Token เมื่อกดบันทึกจะยิงสรุปยอดเข้ากลุ่ม LINE อัตโนมัติ</p>
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
         <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
-        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึก URL</button>
+        <button onclick="saveConfig()" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึกการตั้งค่า</button>
       </div>
     </div>
   </div>
@@ -279,72 +315,69 @@
   <script>
     const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVepnUK3pI6HlJCwfYZOUX9obBpQlq47YvB-RhqmMH1QBegRxgbRWNoR3hIKt5pfiV/exec";
     const SCOUT_ROLES = ["นายหมู่", "รองนายหมู่", "พลาธิการ", "คนครัว", "ผู้ช่วยคนครัว", "คนหาฟืน", "คนหาน้ำ", "ผู้ช่วยเหลือทั่วไป"];
+    const UNIFORM_ITEMS = ["หมวก", "ผ้าผูกคอ", "วอกเกิ้ล", "ป้ายชื่อ", "รองเท้า/ถุงเท้า"];
 
-    const rawDatabase = {
+    // ฐานข้อมูลเริ่มต้น
+    const initialDatabase = {
       scout: {
         units: {
           1: {
             name: "กอง 1",
             patrols: [
-              { patrolName: "หมู่จระเข้", members: [
-                { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา" },
-                { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา" },
-                { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "พลาธิการ", status: "มา" },
-                { id: "10104", name: "ด.ช. อรรถชัย สายชล", role: "คนครัว", status: "มา" },
-                { id: "10105", name: "ด.ช. ธีรเดช บัวเงิน", role: "ผู้ช่วยคนครัว", status: "มา" },
-                { id: "10106", name: "ด.ช. กฤษดา ศรีคำ", role: "คนหาฟืน", status: "มา" },
-                { id: "10107", name: "ด.ช. วงศธร ปรีชา", role: "คนหาน้ำ", status: "มา" },
-                { id: "10108", name: "ด.ช. ชลสิทธิ์ สุขใจ", role: "ผู้ช่วยเหลือทั่วไป", status: "มา" }
+              { patrolName: "หมู่จระเข้", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่สิงโต", members: [
-                { id: "10109", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา" },
-                { id: "10110", name: "ด.ช. พงศกร มุ่งดี", role: "รองนายหมู่", status: "มา" },
-                { id: "10111", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่สิงโต", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "10104", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10105", name: "ด.ช. พงศกร มุ่งดี", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10106", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เหยี่ยว", members: [
-                { id: "10117", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา" },
-                { id: "10118", name: "ด.ช. วรัญญู สว่างวงศ์", role: "รองนายหมู่", status: "มา" },
-                { id: "10119", name: "ด.ช. ภัทรดนัย บุญยัง", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่เหยี่ยว", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "10107", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10108", name: "ด.ช. วรัญญู สว่างวงศ์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10109", name: "ด.ช. ภัทรดนัย บุญยัง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           2: {
             name: "กอง 2",
             patrols: [
-              { patrolName: "หมู่กวาง", members: [
-                { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา" },
-                { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "รองนายหมู่", status: "มา" },
-                { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่กวาง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ช้าง", members: [
-                { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา" },
-                { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "รองนายหมู่", status: "มา" },
-                { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่ช้าง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เสือ", members: [
-                { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา" },
-                { id: "10208", name: "ด.ช. รชต มงคล", role: "รองนายหมู่", status: "มา" },
-                { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่เสือ", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10208", name: "ด.ช. รชต มงคล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           3: {
             name: "กอง 3",
             patrols: [
-              { patrolName: "หมู่หมี", members: [
-                { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา" },
-                { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "รองนายหมู่", status: "มา" },
-                { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่หมี", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่อินทรี", members: [
-                { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา" },
-                { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "รองนายหมู่", status: "มา" },
-                { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่อินทรี", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่นกเงือก", members: [
-                { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา" },
-                { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "รองนายหมู่", status: "มา" },
-                { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่นกเงือก", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           }
@@ -355,60 +388,60 @@
           1: {
             name: "กอง 1",
             patrols: [
-              { patrolName: "หมู่มะลิ", members: [
-                { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา" },
-                { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา" },
-                { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่มะลิ", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กุหลาบ", members: [
-                { id: "20109", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา" },
-                { id: "20110", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "รองนายหมู่", status: "มา" },
-                { id: "20111", name: "ด.ญ. นภัสสร สุริยา", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่กุหลาบ", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "20104", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20105", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20106", name: "ด.ญ. นภัสสร สุริยา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่บัวหลวง", members: [
-                { id: "20112", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา" },
-                { id: "20113", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "รองนายหมู่", status: "มา" },
-                { id: "20114", name: "ด.ญ. อารียา เพชรรัตน์", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่บัวหลวง", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+                { id: "20107", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20108", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20109", name: "ด.ญ. อารียา เพชรรัตน์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           2: {
             name: "กอง 2",
             patrols: [
-              { patrolName: "หมู่ชบา", members: [
-                { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา" },
-                { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "รองนายหมู่", status: "มา" },
-                { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่ชบา", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กล้วยไม้", members: [
-                { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา" },
-                { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "รองนายหมู่", status: "มา" },
-                { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่กล้วยไม้", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่พุทธรักษา", members: [
-                { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา" },
-                { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "รองนายหมู่", status: "มา" },
-                { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่พุทธรักษา", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           },
           3: {
             name: "กอง 3",
             patrols: [
-              { patrolName: "หมู่ทานตะวัน", members: [
-                { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา" },
-                { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "รองนายหมู่", status: "มา" },
-                { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่ทานตะวัน", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ดาวเรือง", members: [
-                { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา" },
-                { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "รองนายหมู่", status: "มา" },
-                { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่ดาวเรือง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่แก้ว", members: [
-                { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา" },
-                { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "รองนายหมู่", status: "มา" },
-                { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "พลาธิการ", status: "มา" }
+              { patrolName: "หมู่แก้ว", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+                { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
+                { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]}
             ]
           }
@@ -424,11 +457,11 @@
     let attendanceHistoryData = [];
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedDb = localStorage.getItem('scout_db_v3');
+      const savedDb = localStorage.getItem('scout_db_v4');
       if (savedDb) {
-        try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(rawDatabase)); }
+        try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(initialDatabase)); }
       } else {
-        db = JSON.parse(JSON.stringify(rawDatabase));
+        db = JSON.parse(JSON.stringify(initialDatabase));
       }
       sortAllPatrols();
 
@@ -441,9 +474,10 @@
       document.getElementById('scriptUrlInput').value = savedUrl;
 
       const savedRecorder = localStorage.getItem('scout_recorded_by') || '';
-      if (savedRecorder) {
-        document.getElementById('recordedByInput').value = savedRecorder;
-      }
+      if (savedRecorder) document.getElementById('recordedByInput').value = savedRecorder;
+
+      const savedToken = localStorage.getItem('scout_line_token') || '';
+      if (savedToken) document.getElementById('lineTokenInput').value = savedToken;
 
       applyTheme();
       renderCurrentUnit();
@@ -451,7 +485,7 @@
     });
 
     function saveDatabaseState() {
-      localStorage.setItem('scout_db_v3', JSON.stringify(db));
+      localStorage.setItem('scout_db_v4', JSON.stringify(db));
     }
 
     function sortPatrolMembers(members) {
@@ -474,6 +508,65 @@
           });
         }
       });
+    }
+
+    // 1. ดึงรายชื่อนักเรียนจาก Sheets (Dynamic Roster)
+    async function syncRosterFromSheets() {
+      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      try {
+        const res = await fetch(scriptUrl + "?action=roster");
+        const json = await res.json();
+        if (json.status === "success" && json.data && json.data.length > 0) {
+          // รีเซ็ตและสร้างโครงสร้างตามข้อมูลในชีต
+          buildDatabaseFromRoster(json.data);
+          saveDatabaseState();
+          renderCurrentUnit();
+          alert(`✅ ซิงค์รายชื่อสำเร็จ! ดึงข้อมูลนักเรียนจำนวน ${json.data.length} คน จาก Sheets เรียบร้อยแล้ว`);
+        } else {
+          alert("ℹ️ ไม่พบข้อมูลในแท็บ Students_Roster หรือยังไม่ได้เพิ่มรายชื่อ");
+        }
+      } catch (e) {
+        alert("⚠️ เกิดข้อผิดพลาดในการดึงรายชื่อ: " + e.toString());
+      }
+    }
+
+    function buildDatabaseFromRoster(rosterList) {
+      // สร้างโครงสร้างกอง 1, 2, 3 รอไว้
+      ['scout', 'guide'].forEach(cat => {
+        if (!db[cat]) db[cat] = { units: {} };
+        [1, 2, 3].forEach(u => {
+          if (!db[cat].units[u]) {
+            db[cat].units[u] = { name: `กอง ${u}`, patrols: [] };
+          } else {
+            db[cat].units[u].patrols = [];
+          }
+        });
+      });
+
+      rosterList.forEach(item => {
+        const catKey = (item.category === "เนตรนารี") ? "guide" : "scout";
+        let unitNum = 1;
+        if (item.unit && item.unit.includes("2")) unitNum = 2;
+        if (item.unit && item.unit.includes("3")) unitNum = 3;
+
+        let unitObj = db[catKey].units[unitNum];
+        let patrolObj = unitObj.patrols.find(p => p.patrolName === item.patrol);
+        if (!patrolObj) {
+          patrolObj = { patrolName: item.patrol, score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [] };
+          unitObj.patrols.push(patrolObj);
+        }
+
+        patrolObj.members.push({
+          id: item.id,
+          name: item.name,
+          role: item.role || "สมาชิก",
+          status: "มา",
+          uniform: "ครบ",
+          missing: []
+        });
+      });
+
+      sortAllPatrols();
     }
 
     function switchMainTab(tab) {
@@ -539,7 +632,6 @@
     function updateUnitButtonsUI() {
       const isScout = currentCategory === 'scout';
       const activeColorClass = isScout ? "bg-amber-800 text-white border-amber-800" : "bg-emerald-800 text-white border-emerald-800";
-
       [1, 2, 3].forEach(id => {
         const btn = document.getElementById(`btnUnit${id}`);
         if (id === currentUnitId) {
@@ -550,6 +642,7 @@
       });
     }
 
+    // แสดงการ์ดหมู่ (พร้อมคะแนนกิจกรรม & ตรวจเครื่องแบบ)
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
       const unitData = db[currentCategory].units[currentUnitId];
@@ -568,28 +661,37 @@
 
         html += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <!-- แถบหัวหมู่ และการกรอกคะแนนกิจกรรม -->
+            <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
                 <h3 class="font-bold text-slate-800 text-sm sm:text-base">${patrol.patrolName}</h3>
                 <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
               </div>
+
+              <!-- บันทึกคะแนนกิจกรรมประจำหมู่ (ข้อ 3) -->
+              <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-slate-200 shadow-sm text-xs">
+                <span class="font-bold text-amber-800 flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i> คะแนนหมู่:
+                </span>
+                <input type="number" min="0" max="10" value="${patrol.score !== undefined ? patrol.score : 10}" 
+                  onchange="updatePatrolScore(${pIndex}, this.value)" 
+                  class="w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                <span class="text-slate-400">/ 10</span>
+              </div>
+
+              <!-- Quick Buttons ประจำหมู่ -->
               <div class="flex items-center gap-2">
-                <div class="hidden sm:flex items-center gap-2 text-xs font-semibold mr-2">
-                  <span class="text-emerald-700">มา ${pPresent}</span>
-                  <span class="text-rose-700">ขาด ${pAbsent}</span>
-                  <span class="text-amber-700">ลา ${pLeave}</span>
-                  <span class="text-blue-700">สาย ${pLate}</span>
-                </div>
-                <button onclick="sortPatrolManual(${pIndex})" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm transition flex items-center gap-1" title="จัดเรียงนายหมู่-รองนายหมู่ทันที">
-                  <i data-lucide="arrow-down-up" class="w-3.5 h-3.5"></i>
-                  <span>จัดเรียงตามตำแหน่ง</span>
+                <button onclick="markPatrolUniformOk(${pIndex})" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
+                  เครื่องแบบครบหมู่นี้
                 </button>
-                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 shadow-sm transition">
+                <button onclick="markPatrolPresent(${pIndex})" class="px-3 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition">
                   มาครบหมู่นี้
                 </button>
               </div>
             </div>
+
+            <!-- รายชื่อนักเรียน + เช็คชื่อ + ตรวจเครื่องแบบ (ข้อ 2) -->
             <div class="divide-y divide-slate-100">
         `;
 
@@ -598,49 +700,64 @@
           if (student.role === "นายหมู่") roleBadgeBg = "bg-amber-100 text-amber-900 border-amber-300 font-bold";
           else if (student.role === "รองนายหมู่") roleBadgeBg = "bg-blue-100 text-blue-900 border-blue-300 font-bold";
           else if (student.role === "พลาธิการ") roleBadgeBg = "bg-purple-100 text-purple-900 border-purple-200";
-          else if (student.role === "คนครัว" || student.role === "ผู้ช่วยคนครัว") roleBadgeBg = "bg-orange-100 text-orange-900 border-orange-200";
-          else if (student.role === "คนหาฟืน" || student.role === "คนหาน้ำ") roleBadgeBg = "bg-cyan-100 text-cyan-900 border-cyan-200";
 
           let roleOptionsHtml = SCOUT_ROLES.map(r => 
             `<option value="${r}" ${student.role === r ? 'selected' : ''}>${r}</option>`
           ).join('');
 
-          html += `
-            <div class="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-50/70 transition">
-              <div class="flex items-center gap-3">
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
-                    ${sIndex + 1}
-                  </span>
-                  <div class="flex items-center gap-0.5 text-slate-400">
-                    <button onclick="moveMember(${pIndex}, ${sIndex}, -1)" class="hover:text-slate-800 ${sIndex === 0 ? 'opacity-20 cursor-not-allowed' : ''}" title="เลื่อนขึ้น" ${sIndex === 0 ? 'disabled' : ''}>
-                      <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="moveMember(${pIndex}, ${sIndex}, 1)" class="hover:text-slate-800 ${sIndex === patrol.members.length - 1 ? 'opacity-20 cursor-not-allowed' : ''}" title="เลื่อนลง" ${sIndex === patrol.members.length - 1 ? 'disabled' : ''}>
-                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                    </button>
-                  </div>
-                </div>
+          const isUniformComplete = (student.uniform === "ครบ");
 
+          html += `
+            <div class="px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition">
+              
+              <!-- ข้อมูลนักเรียน & ตำแหน่ง -->
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
+                  ${sIndex + 1}
+                </div>
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="font-bold text-sm text-slate-800">${student.name}</span>
-                    <div class="relative inline-block">
-                      <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500">
-                        ${roleOptionsHtml}
-                      </select>
-                    </div>
+                    <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none">
+                      ${roleOptionsHtml}
+                    </select>
                   </div>
                   <div class="text-xs text-slate-400 mt-0.5">รหัสประจำตัว: ${student.id}</div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-4 gap-1 sm:w-64 bg-slate-100 p-1 rounded-xl border border-slate-200 self-end md:self-center w-full sm:w-auto">
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
-                <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1.5 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-end lg:self-center w-full lg:w-auto justify-between lg:justify-end">
+                
+                <!-- เครื่องมือตรวจเครื่องแบบ (Uniform Inspection) -->
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs">
+                  <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 ${isUniformComplete ? 'bg-indigo-600 text-white shadow' : 'bg-rose-100 text-rose-700'}">
+                    <i data-lucide="${isUniformComplete ? 'shield-check' : 'shield-alert'}" class="w-3.5 h-3.5"></i>
+                    <span>${isUniformComplete ? 'เครื่องแบบครบ' : 'ไม่ครบ'}</span>
+                  </button>
+
+                  <!-- เมนูย่อยเมื่อเครื่องแบบไม่ครบ -->
+                  ${!isUniformComplete ? `
+                    <div class="flex items-center gap-1 px-1">
+                      ${UNIFORM_ITEMS.map(item => `
+                        <label class="flex items-center gap-0.5 text-[10px] text-slate-600 cursor-pointer">
+                          <input type="checkbox" onchange="toggleMissingItem(${pIndex}, ${sIndex}, '${item}')" ${(student.missing || []).includes(item) ? 'checked' : ''} class="rounded text-rose-600 focus:ring-0">
+                          <span>${item}</span>
+                        </label>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+
+                <!-- 4 ปุ่มเช็คชื่อ (มา, ขาด, ลา, สาย) -->
+                <div class="grid grid-cols-4 gap-1 w-56 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'ลา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ลา' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ลา</button>
+                  <button onclick="setStatus(${pIndex}, ${sIndex}, 'สาย')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'สาย' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">สาย</button>
+                </div>
+
               </div>
+
             </div>
           `;
         });
@@ -654,30 +771,55 @@
       lucide.createIcons();
     }
 
+    // ฟังก์ชันจัดการเครื่องแบบ
+    function toggleUniformStatus(pIndex, sIndex) {
+      const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
+      student.uniform = (student.uniform === "ครบ") ? "ไม่ครบ" : "ครบ";
+      if (student.uniform === "ครบ") student.missing = [];
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function toggleMissingItem(pIndex, sIndex, item) {
+      const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
+      if (!student.missing) student.missing = [];
+      const idx = student.missing.indexOf(item);
+      if (idx > -1) student.missing.splice(idx, 1);
+      else student.missing.push(item);
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function markPatrolUniformOk(pIndex) {
+      db[currentCategory].units[currentUnitId].patrols[pIndex].members.forEach(m => {
+        m.uniform = "ครบ";
+        m.missing = [];
+      });
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    function markAllCurrentUnitUniform(isOk) {
+      db[currentCategory].units[currentUnitId].patrols.forEach(p => {
+        p.members.forEach(m => {
+          m.uniform = isOk ? "ครบ" : "ไม่ครบ";
+          if (isOk) m.missing = [];
+        });
+      });
+      saveDatabaseState();
+      renderCurrentUnit();
+    }
+
+    // อัปเดตคะแนนกิจกรรมประจำหมู่
+    function updatePatrolScore(pIndex, score) {
+      db[currentCategory].units[currentUnitId].patrols[pIndex].score = Number(score);
+      saveDatabaseState();
+    }
+
     function changeMemberRole(patrolIndex, studentIndex, newRole) {
       const patrol = db[currentCategory].units[currentUnitId].patrols[patrolIndex];
       patrol.members[studentIndex].role = newRole;
       patrol.members = sortPatrolMembers(patrol.members);
-      saveDatabaseState();
-      renderCurrentUnit();
-    }
-
-    function sortPatrolManual(patrolIndex) {
-      const patrol = db[currentCategory].units[currentUnitId].patrols[patrolIndex];
-      patrol.members = sortPatrolMembers(patrol.members);
-      saveDatabaseState();
-      renderCurrentUnit();
-    }
-
-    function moveMember(patrolIndex, studentIndex, direction) {
-      const patrol = db[currentCategory].units[currentUnitId].patrols[patrolIndex];
-      const targetIndex = studentIndex + direction;
-      if (targetIndex < 0 || targetIndex >= patrol.members.length) return;
-
-      const temp = patrol.members[studentIndex];
-      patrol.members[studentIndex] = patrol.members[targetIndex];
-      patrol.members[targetIndex] = temp;
-
       saveDatabaseState();
       renderCurrentUnit();
     }
@@ -700,7 +842,7 @@
     }
 
     function updateBottomStats() {
-      let present = 0, absent = 0, leave = 0, late = 0;
+      let present = 0, absent = 0, leave = 0, late = 0, uniformOk = 0;
       const unitData = db[currentCategory].units[currentUnitId];
 
       unitData.patrols.forEach(p => {
@@ -709,6 +851,7 @@
           else if (m.status === 'ขาด') absent++;
           else if (m.status === 'ลา') leave++;
           else if (m.status === 'สาย') late++;
+          if (m.uniform === 'ครบ') uniformOk++;
         });
       });
 
@@ -716,32 +859,45 @@
       document.getElementById('statAbsent').innerText = absent;
       document.getElementById('statLeave').innerText = leave;
       document.getElementById('statLate').innerText = late;
+      document.getElementById('statUniformOk').innerText = uniformOk;
     }
 
+    // บันทึกลง Sheets + ยิง LINE Notify (ข้อ 4)
     async function saveToGoogleSheets() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       const checkDate = document.getElementById('checkDate').value;
       const recordedBy = document.getElementById('recordedByInput').value.trim();
+      const lineToken = localStorage.getItem('scout_line_token') || '';
 
       if (!recordedBy) {
         alert('กรุณาระบุชื่อผู้บันทึกก่อนทำการส่งข้อมูล');
         document.getElementById('recordedByInput').focus();
         return;
       }
-
       localStorage.setItem('scout_recorded_by', recordedBy);
+
       const unitData = db[currentCategory].units[currentUnitId];
       const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
 
       const studentsPayload = [];
+      const patrolScoresPayload = [];
+
       unitData.patrols.forEach(patrol => {
+        patrolScoresPayload.push({
+          patrolName: patrol.patrolName,
+          score: patrol.score !== undefined ? patrol.score : 10,
+          activityName: patrol.activity || "กิจกรรมประจำสัปดาห์"
+        });
+
         patrol.members.forEach(member => {
           studentsPayload.push({
             patrol: patrol.patrolName,
             id: member.id,
             name: member.name,
             role: member.role,
-            status: member.status
+            status: member.status,
+            uniformStatus: member.uniform || "ครบ",
+            missingUniform: member.missing || []
           });
         });
       });
@@ -751,13 +907,15 @@
         category: categoryText,
         unit: unitData.name,
         recordedBy: recordedBy,
-        students: studentsPayload
+        lineToken: lineToken,
+        students: studentsPayload,
+        patrolScores: patrolScoresPayload
       };
 
       const btnSave = document.getElementById('btnSaveSheets');
       const originalText = btnSave.innerHTML;
       btnSave.disabled = true;
-      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก...</span>`;
+      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก & ส่ง LINE...</span>`;
       lucide.createIcons();
 
       try {
@@ -769,13 +927,13 @@
 
         const result = await response.json();
         if (result.status === 'success') {
-          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- อัปเดตข้อมูลเดิม: ${result.updated || 0} คน\n- บันทึกใหม่: ${result.inserted || 0} คน\n- ผู้บันทึก: ${recordedBy}`);
+          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- อัปเดตข้อมูล: ${result.updated || 0} คน\n- เพิ่มใหม่: ${result.inserted || 0} คน\n- บันทึกคะแนนกิจกรรมประจำหมู่เรียบร้อย\n${lineToken ? '- ส่งแจ้งเตือนสรุปเข้า LINE เรียบร้อยแล้ว' : ''}`);
         } else {
           alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'เกิดข้อผิดพลาด'));
         }
       } catch (error) {
         console.warn('Network Notice:', error);
-        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว (โดย ${recordedBy}) กรุณาตรวจสอบในชีต`);
+        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) เรียบร้อยแล้ว กรุณาตรวจสอบใน Google Sheets`);
       } finally {
         btnSave.disabled = false;
         btnSave.innerHTML = originalText;
@@ -790,11 +948,12 @@
       const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
 
       let csvContent = "\uFEFF";
-      csvContent += "วันที่,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,ผู้บันทึก\n";
+      csvContent += "วันที่,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,ผู้บันทึก\n";
 
       unitData.patrols.forEach(p => {
         p.members.forEach(m => {
-          csvContent += `"${checkDate}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${m.status}","${recordedBy}"\n`;
+          const missingStr = (m.missing && m.missing.length > 0) ? m.missing.join("; ") : "-";
+          csvContent += `"${checkDate}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${recordedBy}"\n`;
         });
       });
 
@@ -808,6 +967,7 @@
       document.body.removeChild(link);
     }
 
+    // ระบบรายงาน
     function switchReportPeriod(period) {
       currentReportPeriod = period;
       ['daily', 'monthly', 'semester'].forEach(p => {
@@ -836,7 +996,7 @@
           attendanceHistoryData = json.data;
         }
       } catch (err) {
-        console.warn('โหลดประวัติจากชีตไม่สำเร็จ:', err);
+        console.warn('โหลดประวัติไม่สำเร็จ:', err);
       } finally {
         if (refIcon) refIcon.classList.remove('animate-spin');
         renderActiveReport();
@@ -879,13 +1039,14 @@
       dayData.forEach(r => {
         const key = `${r.category} ${r.unit} - ${r.patrol}`;
         if (!patrolMap[key]) {
-          patrolMap[key] = { name: key, total: 0, present: 0, absent: 0, leave: 0, late: 0 };
+          patrolMap[key] = { name: key, total: 0, present: 0, absent: 0, leave: 0, late: 0, uniformOk: 0 };
         }
         patrolMap[key].total++;
         if (r.status === 'มา') patrolMap[key].present++;
         else if (r.status === 'ขาด') patrolMap[key].absent++;
         else if (r.status === 'ลา') patrolMap[key].leave++;
         else if (r.status === 'สาย') patrolMap[key].late++;
+        if (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ') patrolMap[key].uniformOk++;
       });
 
       let html = `
@@ -903,6 +1064,7 @@
                 <th class="p-3 text-center text-rose-700">ขาด</th>
                 <th class="p-3 text-center text-amber-700">ลา</th>
                 <th class="p-3 text-center text-blue-700">สาย</th>
+                <th class="p-3 text-center text-indigo-700">เครื่องแบบครบ</th>
                 <th class="p-3 text-center font-bold">ร้อยละการมา</th>
               </tr>
             </thead>
@@ -919,6 +1081,7 @@
             <td class="p-3 text-center font-bold text-rose-600">${p.absent}</td>
             <td class="p-3 text-center font-bold text-amber-600">${p.leave}</td>
             <td class="p-3 text-center font-bold text-blue-600">${p.late}</td>
+            <td class="p-3 text-center font-bold text-indigo-600">${p.uniformOk}</td>
             <td class="p-3 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
           </tr>
         `;
@@ -1122,10 +1285,10 @@
 
     function saveConfig() {
       const url = document.getElementById('scriptUrlInput').value.trim();
-      if (url) {
-        localStorage.setItem('scout_script_url', url);
-        alert('บันทึก Web App URL เรียบร้อยแล้ว');
-      }
+      const token = document.getElementById('lineTokenInput').value.trim();
+      if (url) localStorage.setItem('scout_script_url', url);
+      localStorage.setItem('scout_line_token', token);
+      alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
       toggleConfigModal();
     }
   </script>
