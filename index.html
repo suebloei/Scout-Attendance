@@ -76,7 +76,41 @@
   <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
 
     <!-- ==================== โหมด 1: เช็คชื่อหน้าแถว ==================== -->
-    <section id="sectionCheckin" class="space-y-5">
+    <section id="sectionCheckin" class="space-y-4">
+      
+      <!-- การ์ดเลือกกิจกรรมประจำสัปดาห์ (หัวข้อกิจกรรม) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+              <i data-lucide="target" class="w-4 h-4"></i>
+            </span>
+            <div>
+              <label class="block text-xs font-bold text-slate-700">กิจกรรมประจำสัปดาห์ / ฐานการเรียนรู้</label>
+              <p class="text-[11px] text-slate-400">ระบุหัวข้อกิจกรรมเพื่อบันทึกประวัติการฝึก</p>
+            </div>
+          </div>
+
+          <div class="flex flex-1 sm:max-w-md items-center gap-2">
+            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
+              <option value="">-- เลือกหัวข้อด่วน --</option>
+              <option value="พิธีเปิดประชุมกองและระเบียบแถว">พิธีเปิดประชุมกองและระเบียบแถว</option>
+              <option value="การผูกเงื่อนเชือกและการนำไปใช้">การผูกเงื่อนเชือกและการนำไปใช้</option>
+              <option value="การอ่านแผนที่และใช้เข็มทิศ">การอ่านแผนที่และใช้เข็มทิศ</option>
+              <option value="สัญญาณมือ นกหวีด และรหัสมอส">สัญญาณมือ นกหวีด และรหัสมอส</option>
+              <option value="การปฐมพยาบาลเบื้องต้น">การปฐมพยาบาลเบื้องต้น</option>
+              <option value="การประกอบอาหารและการกางเต็นท์">การประกอบอาหารและการกางเต็นท์</option>
+              <option value="บุกเบิกและสร้างค่ายพักแรม">บุกเบิกและสร้างค่ายพักแรม</option>
+              <option value="กิจกรรมรอบกองไฟและการแสดง">กิจกรรมรอบกองไฟและการแสดง</option>
+              <option value="การเดินทางไกลและสำรวจ">การเดินทางไกลและสำรวจ</option>
+              <option value="การบริการชุมชนและจิตอาสา">การบริการชุมชนและจิตอาสา</option>
+            </select>
+            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
+          </div>
+        </div>
+      </div>
+
+      <!-- การ์ดตัวเลือกประเภทและกอง -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
@@ -282,7 +316,7 @@
     </div>
   </footer>
 
-  <!-- Modal ตั้งค่าชีตและ LINE Notify -->
+  <!-- Modal ตั้งค่า -->
   <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
@@ -300,9 +334,8 @@
           <input type="text" id="scriptUrlInput" class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">LINE Notify Token (สำหรับส่งสรุปเข้ากลุ่มครู)</label>
-          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token (ถ้ามี)..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
-          <p class="text-[10px] text-slate-400 mt-1">* หากใส่ Token เมื่อกดบันทึกจะยิงสรุปยอดเข้ากลุ่ม LINE อัตโนมัติ</p>
+          <label class="block text-xs font-bold text-slate-700 mb-1">LINE Notify Token</label>
+          <input type="text" id="lineTokenInput" placeholder="กรอก LINE Token..." class="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
@@ -317,24 +350,23 @@
     const SCOUT_ROLES = ["นายหมู่", "รองนายหมู่", "พลาธิการ", "คนครัว", "ผู้ช่วยคนครัว", "คนหาฟืน", "คนหาน้ำ", "ผู้ช่วยเหลือทั่วไป"];
     const UNIFORM_ITEMS = ["หมวก", "ผ้าผูกคอ", "วอกเกิ้ล", "ป้ายชื่อ", "รองเท้า/ถุงเท้า"];
 
-    // ฐานข้อมูลเริ่มต้น
     const initialDatabase = {
       scout: {
         units: {
           1: {
             name: "กอง 1",
             patrols: [
-              { patrolName: "หมู่จระเข้", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่จระเข้", score: 10, members: [
                 { id: "10101", name: "ด.ช. กิตติศักดิ์ ภักดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10102", name: "ด.ช. ธีรภัทร ชาญณรงค์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10103", name: "ด.ช. ภูริพัฒน์ วงศ์สวรรค์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่สิงโต", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่สิงโต", score: 10, members: [
                 { id: "10104", name: "ด.ช. อัครชัย บุญมี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10105", name: "ด.ช. พงศกร มุ่งดี", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10106", name: "ด.ช. นันทวัฒน์ เกียรติคุณ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เหยี่ยว", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่เหยี่ยว", score: 10, members: [
                 { id: "10107", name: "ด.ช. ณัฐดนัย กล้าหาญ", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10108", name: "ด.ช. วรัญญู สว่างวงศ์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10109", name: "ด.ช. ภัทรดนัย บุญยัง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -344,17 +376,17 @@
           2: {
             name: "กอง 2",
             patrols: [
-              { patrolName: "หมู่กวาง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่กวาง", score: 10, members: [
                 { id: "10201", name: "ด.ช. ศุภกิตติ์ มีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10202", name: "ด.ช. ธนากร อุดมศิลป์", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10203", name: "ด.ช. ธราธิป สายธาร", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ช้าง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่ช้าง", score: 10, members: [
                 { id: "10204", name: "ด.ช. ภาณุพงศ์ ศรีสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10205", name: "ด.ช. ชนะชัย ดินดำ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10206", name: "ด.ช. สหรัฐ สุขเกษม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่เสือ", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่เสือ", score: 10, members: [
                 { id: "10207", name: "ด.ช. อรรถพล ยอดแก้ว", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10208", name: "ด.ช. รชต มงคล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10209", name: "ด.ช. กรวิชญ์ แจ่มใส", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -364,17 +396,17 @@
           3: {
             name: "กอง 3",
             patrols: [
-              { patrolName: "หมู่หมี", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่หมี", score: 10, members: [
                 { id: "10301", name: "ด.ช. อนุพงษ์ แก้วกล้า", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10302", name: "ด.ช. ศักดา จันทร์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10303", name: "ด.ช. วงศกร ชูชาติ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่อินทรี", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่อินทรี", score: 10, members: [
                 { id: "10304", name: "ด.ช. เมธาสิทธิ์ เจริญผล", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10305", name: "ด.ช. กฤษณะ เรืองนาม", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10306", name: "ด.ช. เตชินท์ สายทอง", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่นกเงือก", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่นกเงือก", score: 10, members: [
                 { id: "10307", name: "ด.ช. ณภัทร อินทรักษ์", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10308", name: "ด.ช. ชัยวัฒน์ มั่นคง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "10309", name: "ด.ช. ทักษ์ดนัย ใจงาม", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -388,17 +420,17 @@
           1: {
             name: "กอง 1",
             patrols: [
-              { patrolName: "หมู่มะลิ", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่มะลิ", score: 10, members: [
                 { id: "20101", name: "ด.ญ. กัญญารัตน์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20102", name: "ด.ญ. ณัฐริกา บุญลือ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20103", name: "ด.ญ. ปรียาภรณ์ ชัยแก้ว", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กุหลาบ", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่กุหลาบ", score: 10, members: [
                 { id: "20104", name: "ด.ญ. วรัชยา ชัยศรี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20105", name: "ด.ญ. พิมพ์มาดา งามพริ้ง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20106", name: "ด.ญ. นภัสสร สุริยา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่บัวหลวง", score: 10, activity: "ระเบียบแถวและเงื่อนเชือก", members: [
+              { patrolName: "หมู่บัวหลวง", score: 10, members: [
                 { id: "20107", name: "ด.ญ. ชนนิกานต์ เจริญสุข", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20108", name: "ด.ญ. สลิลทิพย์ กองทอง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20109", name: "ด.ญ. อารียา เพชรรัตน์", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -408,17 +440,17 @@
           2: {
             name: "กอง 2",
             patrols: [
-              { patrolName: "หมู่ชบา", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่ชบา", score: 10, members: [
                 { id: "20201", name: "ด.ญ. รุ่งนภา สว่างจิต", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20202", name: "ด.ญ. พิชญาภา วิจิตร", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20203", name: "ด.ญ. วรรณพร ดอกไม้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่กล้วยไม้", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่กล้วยไม้", score: 10, members: [
                 { id: "20204", name: "ด.ญ. มณฑิรา หอมหวน", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20205", name: "ด.ญ. นิชาภา รัตนผล", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20206", name: "ด.ญ. ธันยพร ลือชา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่พุทธรักษา", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่พุทธรักษา", score: 10, members: [
                 { id: "20207", name: "ด.ญ. พรประภา มงคลดี", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20208", name: "ด.ญ. นฤมล ทักษิณ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20209", name: "ด.ญ. กมลวรรณ บุญพา", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -428,17 +460,17 @@
           3: {
             name: "กอง 3",
             patrols: [
-              { patrolName: "หมู่ทานตะวัน", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่ทานตะวัน", score: 10, members: [
                 { id: "20301", name: "ด.ญ. เกษราภรณ์ สดใส", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20302", name: "ด.ญ. บุษราคัม ทองเรือง", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20303", name: "ด.ญ. จิตติมา แซ่ลี้", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่ดาวเรือง", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่ดาวเรือง", score: 10, members: [
                 { id: "20304", name: "ด.ญ. ปนัดดา ศรีทอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20305", name: "ด.ญ. มัลลิกา ผ่องแผ้ว", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20306", name: "ด.ญ. ทิพวรรณ ศิริชัย", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
               ]},
-              { patrolName: "หมู่แก้ว", score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [
+              { patrolName: "หมู่แก้ว", score: 10, members: [
                 { id: "20307", name: "ด.ญ. มณีรัตน์ บุญประคอง", role: "นายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20308", name: "ด.ญ. อัจฉรา พงษ์เพ็ญ", role: "รองนายหมู่", status: "มา", uniform: "ครบ", missing: [] },
                 { id: "20309", name: "ด.ญ. อภิชญา ดวงใจ", role: "พลาธิการ", status: "มา", uniform: "ครบ", missing: [] }
@@ -457,7 +489,7 @@
     let attendanceHistoryData = [];
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedDb = localStorage.getItem('scout_db_v4');
+      const savedDb = localStorage.getItem('scout_db_v5');
       if (savedDb) {
         try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(initialDatabase)); }
       } else {
@@ -484,8 +516,14 @@
       lucide.createIcons();
     });
 
+    function applyActivityPreset(val) {
+      if (val) {
+        document.getElementById('activityTitleInput').value = val;
+      }
+    }
+
     function saveDatabaseState() {
-      localStorage.setItem('scout_db_v4', JSON.stringify(db));
+      localStorage.setItem('scout_db_v5', JSON.stringify(db));
     }
 
     function sortPatrolMembers(members) {
@@ -510,20 +548,18 @@
       });
     }
 
-    // 1. ดึงรายชื่อนักเรียนจาก Sheets (Dynamic Roster)
     async function syncRosterFromSheets() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       try {
         const res = await fetch(scriptUrl + "?action=roster");
         const json = await res.json();
         if (json.status === "success" && json.data && json.data.length > 0) {
-          // รีเซ็ตและสร้างโครงสร้างตามข้อมูลในชีต
           buildDatabaseFromRoster(json.data);
           saveDatabaseState();
           renderCurrentUnit();
           alert(`✅ ซิงค์รายชื่อสำเร็จ! ดึงข้อมูลนักเรียนจำนวน ${json.data.length} คน จาก Sheets เรียบร้อยแล้ว`);
         } else {
-          alert("ℹ️ ไม่พบข้อมูลในแท็บ Students_Roster หรือยังไม่ได้เพิ่มรายชื่อ");
+          alert("ℹ️ ไม่พบข้อมูลในแท็บ Students_Roster");
         }
       } catch (e) {
         alert("⚠️ เกิดข้อผิดพลาดในการดึงรายชื่อ: " + e.toString());
@@ -531,15 +567,11 @@
     }
 
     function buildDatabaseFromRoster(rosterList) {
-      // สร้างโครงสร้างกอง 1, 2, 3 รอไว้
       ['scout', 'guide'].forEach(cat => {
         if (!db[cat]) db[cat] = { units: {} };
         [1, 2, 3].forEach(u => {
-          if (!db[cat].units[u]) {
-            db[cat].units[u] = { name: `กอง ${u}`, patrols: [] };
-          } else {
-            db[cat].units[u].patrols = [];
-          }
+          if (!db[cat].units[u]) db[cat].units[u] = { name: `กอง ${u}`, patrols: [] };
+          else db[cat].units[u].patrols = [];
         });
       });
 
@@ -552,7 +584,7 @@
         let unitObj = db[catKey].units[unitNum];
         let patrolObj = unitObj.patrols.find(p => p.patrolName === item.patrol);
         if (!patrolObj) {
-          patrolObj = { patrolName: item.patrol, score: 10, activity: "กิจกรรมประจำสัปดาห์", members: [] };
+          patrolObj = { patrolName: item.patrol, score: 10, members: [] };
           unitObj.patrols.push(patrolObj);
         }
 
@@ -642,7 +674,6 @@
       });
     }
 
-    // แสดงการ์ดหมู่ (พร้อมคะแนนกิจกรรม & ตรวจเครื่องแบบ)
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
       const unitData = db[currentCategory].units[currentUnitId];
@@ -661,7 +692,6 @@
 
         html += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <!-- แถบหัวหมู่ และการกรอกคะแนนกิจกรรม -->
             <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full ${currentCategory === 'scout' ? 'bg-amber-700' : 'bg-emerald-700'}"></span>
@@ -669,18 +699,17 @@
                 <span class="text-xs bg-white text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full">${patrol.members.length} คน</span>
               </div>
 
-              <!-- บันทึกคะแนนกิจกรรมประจำหมู่ (ข้อ 3) -->
+              <!-- คะแนนประจำหมู่ -->
               <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-xl border border-slate-200 shadow-sm text-xs">
                 <span class="font-bold text-amber-800 flex items-center gap-1">
                   <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i> คะแนนหมู่:
                 </span>
                 <input type="number" min="0" max="10" value="${patrol.score !== undefined ? patrol.score : 10}" 
                   onchange="updatePatrolScore(${pIndex}, this.value)" 
-                  class="w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                  class="w-12 text-center font-bold text-amber-900 border border-amber-300 rounded px-1 py-0.5 focus:outline-none">
                 <span class="text-slate-400">/ 10</span>
               </div>
 
-              <!-- Quick Buttons ประจำหมู่ -->
               <div class="flex items-center gap-2">
                 <button onclick="markPatrolUniformOk(${pIndex})" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 transition">
                   เครื่องแบบครบหมู่นี้
@@ -691,7 +720,6 @@
               </div>
             </div>
 
-            <!-- รายชื่อนักเรียน + เช็คชื่อ + ตรวจเครื่องแบบ (ข้อ 2) -->
             <div class="divide-y divide-slate-100">
         `;
 
@@ -709,8 +737,6 @@
 
           html += `
             <div class="px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition">
-              
-              <!-- ข้อมูลนักเรียน & ตำแหน่ง -->
               <div class="flex items-center gap-3">
                 <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
                   ${sIndex + 1}
@@ -728,14 +754,13 @@
 
               <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-end lg:self-center w-full lg:w-auto justify-between lg:justify-end">
                 
-                <!-- เครื่องมือตรวจเครื่องแบบ (Uniform Inspection) -->
+                <!-- เครื่องแบบ -->
                 <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs">
                   <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 ${isUniformComplete ? 'bg-indigo-600 text-white shadow' : 'bg-rose-100 text-rose-700'}">
                     <i data-lucide="${isUniformComplete ? 'shield-check' : 'shield-alert'}" class="w-3.5 h-3.5"></i>
                     <span>${isUniformComplete ? 'เครื่องแบบครบ' : 'ไม่ครบ'}</span>
                   </button>
 
-                  <!-- เมนูย่อยเมื่อเครื่องแบบไม่ครบ -->
                   ${!isUniformComplete ? `
                     <div class="flex items-center gap-1 px-1">
                       ${UNIFORM_ITEMS.map(item => `
@@ -748,7 +773,7 @@
                   ` : ''}
                 </div>
 
-                <!-- 4 ปุ่มเช็คชื่อ (มา, ขาด, ลา, สาย) -->
+                <!-- เช็คสถานะ 4 ปุ่ม -->
                 <div class="grid grid-cols-4 gap-1 w-56 bg-slate-100 p-1 rounded-xl border border-slate-200">
                   <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
                   <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
@@ -757,7 +782,6 @@
                 </div>
 
               </div>
-
             </div>
           `;
         });
@@ -771,7 +795,6 @@
       lucide.createIcons();
     }
 
-    // ฟังก์ชันจัดการเครื่องแบบ
     function toggleUniformStatus(pIndex, sIndex) {
       const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
       student.uniform = (student.uniform === "ครบ") ? "ไม่ครบ" : "ครบ";
@@ -810,7 +833,6 @@
       renderCurrentUnit();
     }
 
-    // อัปเดตคะแนนกิจกรรมประจำหมู่
     function updatePatrolScore(pIndex, score) {
       db[currentCategory].units[currentUnitId].patrols[pIndex].score = Number(score);
       saveDatabaseState();
@@ -862,10 +884,10 @@
       document.getElementById('statUniformOk').innerText = uniformOk;
     }
 
-    // บันทึกลง Sheets + ยิง LINE Notify (ข้อ 4)
     async function saveToGoogleSheets() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       const checkDate = document.getElementById('checkDate').value;
+      const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
       const recordedBy = document.getElementById('recordedByInput').value.trim();
       const lineToken = localStorage.getItem('scout_line_token') || '';
 
@@ -885,8 +907,7 @@
       unitData.patrols.forEach(patrol => {
         patrolScoresPayload.push({
           patrolName: patrol.patrolName,
-          score: patrol.score !== undefined ? patrol.score : 10,
-          activityName: patrol.activity || "กิจกรรมประจำสัปดาห์"
+          score: patrol.score !== undefined ? patrol.score : 10
         });
 
         patrol.members.forEach(member => {
@@ -904,6 +925,7 @@
 
       const payload = {
         date: checkDate,
+        activity: activityTitle,
         category: categoryText,
         unit: unitData.name,
         recordedBy: recordedBy,
@@ -927,7 +949,7 @@
 
         const result = await response.json();
         if (result.status === 'success') {
-          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- อัปเดตข้อมูล: ${result.updated || 0} คน\n- เพิ่มใหม่: ${result.inserted || 0} คน\n- บันทึกคะแนนกิจกรรมประจำหมู่เรียบร้อย\n${lineToken ? '- ส่งแจ้งเตือนสรุปเข้า LINE เรียบร้อยแล้ว' : ''}`);
+          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- กิจกรรม: ${activityTitle}\n- อัปเดตข้อมูล: ${result.updated || 0} คน\n- บันทึกใหม่: ${result.inserted || 0} คน\n${lineToken ? '- ส่งแจ้งเตือนสรุปเข้า LINE เรียบร้อยแล้ว' : ''}`);
         } else {
           alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'เกิดข้อผิดพลาด'));
         }
@@ -943,17 +965,18 @@
 
     function exportToCSV() {
       const checkDate = document.getElementById('checkDate').value;
+      const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'กิจกรรมประจำสัปดาห์';
       const recordedBy = document.getElementById('recordedByInput').value.trim() || 'ผู้กำกับลูกเสือ';
       const unitData = db[currentCategory].units[currentUnitId];
       const categoryText = currentCategory === 'scout' ? 'ลูกเสือ' : 'เนตรนารี';
 
       let csvContent = "\uFEFF";
-      csvContent += "วันที่,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,ผู้บันทึก\n";
+      csvContent += "วันที่,กิจกรรม,ประเภท,กอง,หมู่,ตำแหน่ง,รหัสประจำตัว,ชื่อ-สกุล,สถานะ,เครื่องแบบ,อุปกรณ์ที่ขาด,ผู้บันทึก\n";
 
       unitData.patrols.forEach(p => {
         p.members.forEach(m => {
           const missingStr = (m.missing && m.missing.length > 0) ? m.missing.join("; ") : "-";
-          csvContent += `"${checkDate}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${recordedBy}"\n`;
+          csvContent += `"${checkDate}","${activityTitle}","${categoryText}","${unitData.name}","${p.patrolName}","${m.role}","${m.id}","${m.name}","${m.status}","${m.uniform || 'ครบ'}","${missingStr}","${recordedBy}"\n`;
         });
       });
 
@@ -967,7 +990,6 @@
       document.body.removeChild(link);
     }
 
-    // ระบบรายงาน
     function switchReportPeriod(period) {
       currentReportPeriod = period;
       ['daily', 'monthly', 'semester'].forEach(p => {
@@ -1021,8 +1043,10 @@
 
     function renderDailyReport(data) {
       const targetDate = document.getElementById('repFilterDate').value;
-      document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate}`;
       const dayData = data.filter(r => r.date === targetDate);
+      const activityName = (dayData.length > 0 && dayData[0].activity) ? dayData[0].activity : "กิจกรรมประจำสัปดาห์";
+      
+      document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
       updateKpis(dayData);
 
       if (dayData.length === 0) {
@@ -1050,8 +1074,11 @@
       });
 
       let html = `
-        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปสถิติรายหมู่ ประจำวันที่ ${targetDate}</h3>
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปสถิติประจำวันที่ ${targetDate}</h3>
+            <p class="text-xs text-amber-800 font-semibold mt-0.5">กิจกรรม: ${activityName}</p>
+          </div>
           <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">บันทึกทั้งหมด ${dayData.length} คน</span>
         </div>
         <div class="overflow-x-auto">
@@ -1279,8 +1306,7 @@
     }
 
     function toggleConfigModal() {
-      const modal = document.getElementById('configModal');
-      modal.classList.toggle('hidden');
+      document.getElementById('configModal').classList.toggle('hidden');
     }
 
     function saveConfig() {
