@@ -1479,29 +1479,60 @@
 
       allUnits.forEach(u => {
         const uData = db[u.cat].units[u.id];
-        let uTotal = 0, uPres = 0, uAbs = 0, uLev = 0, uLat = 0;
-        uData.patrols.forEach(p => {
-          p.members.forEach(m => {
-            uTotal++;
-            if (m.status === 'มา') uPres++;
-            else if (m.status === 'ขาด') uAbs++;
-            else if (m.status === 'ลา') uLev++;
-            else if (m.status === 'สาย') uLat++;
-            if (m.uniform === 'ครบ') grandUniformOk++;
-          });
+        let uTotal = 0, uPres = 0, uAbs = 0, uLev = 0, uLat = 0, uUni = 0;
+
+        // ดึงจากประวัติ Sheets (ถ้ามี) หรือประมวลผลจากข้อมูลในเครื่อง
+        const dateRowsInHistory = attendanceHistoryData.filter(r => {
+          const matchDate = (r.date === checkDate);
+          const isScout = (u.cat === 'scout');
+          const matchCat = isScout ? (r.category === 'ลูกเสือ') : (r.category === 'เนตรนารี');
+          const matchUnit = r.unit === uData.name;
+          return matchDate && matchCat && matchUnit;
         });
 
-        grandTotal += uTotal;
-        grandPresent += uPres;
-        grandAbsent += uAbs;
-        grandLeave += uLev;
-        grandLate += uLat;
+        if (dateRowsInHistory.length > 0) {
+          uTotal = dateRowsInHistory.length;
+          dateRowsInHistory.forEach(r => {
+            if (r.status === 'มา') uPres++;
+            else if (r.status === 'ขาด') uAbs++;
+            else if (r.status === 'ลา') uLev++;
+            else if (r.status === 'สาย') uLat++;
+            if (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย') uUni++;
+          });
+        } else {
+          uData.patrols.forEach(p => {
+            p.members.forEach(m => {
+              uTotal++;
+              if (m.status === 'มา') uPres++;
+              else if (m.status === 'ขาด') uAbs++;
+              else if (m.status === 'ลา') uLev++;
+              else if (m.status === 'สาย') uLat++;
+              if (m.uniform === 'ครบ') uUni++;
+            });
+          });
+        }
 
-        const isChecked = !!checkedUnitsStore[`${checkDate}_${u.cat}_${u.id}`];
+        grandTotal += uTotal;
+
+        const isChecked = (dateRowsInHistory.length > 0) || !!checkedUnitsStore[`${checkDate}_${u.cat}_${u.id}`];
         const statusMark = isChecked ? '✓' : '⚠️ ยังไม่เช็ค';
 
-        text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา ${uPres} | ขาด ${uAbs} | ลา ${uLev}`;
-        if (uLat > 0) text += ` | สาย ${uLat}`;
+        // ถ้ายังไม่ได้เช็คชื่อ ให้ยอดมา ขาด ลา สาย เป็น 0
+        const displayPres = isChecked ? uPres : 0;
+        const displayAbs = isChecked ? uAbs : 0;
+        const displayLev = isChecked ? uLev : 0;
+        const displayLat = isChecked ? uLat : 0;
+
+        if (isChecked) {
+          grandPresent += uPres;
+          grandAbsent += uAbs;
+          grandLeave += uLev;
+          grandLate += uLat;
+          grandUniformOk += uUni;
+        }
+
+        text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา ${displayPres} | ขาด ${displayAbs} | ลา ${displayLev}`;
+        if (displayLat > 0) text += ` | สาย ${displayLat}`;
         text += ` (ผกก.: ${uData.leader})\n`;
       });
 
