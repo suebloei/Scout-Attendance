@@ -1391,7 +1391,11 @@
           else if (m.status === 'ขาด') absent++;
           else if (m.status === 'ลา') leave++;
           else if (m.status === 'สาย') late++;
-          if (m.uniform === 'ครบ') uniformOk++;
+          
+          // ตรวจเครื่องแบบเฉพาะผู้ที่มาเข้าแถว (มา หรือ สาย เท่านั้น)
+          if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
+            uniformOk++;
+          }
         });
       });
 
@@ -1429,7 +1433,11 @@
           } else if (m.status === 'สาย') {
             late++;
           }
-          if (m.uniform === 'ครบ') uniformOk++;
+          
+          // เครื่องแบบนับเฉพาะคนที่มาเรียนจริง (มา หรือ สาย)
+          if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
+            uniformOk++;
+          }
         });
       });
 
@@ -1445,7 +1453,9 @@
       }
       if (late > 0) text += ` | สาย: ${late}`;
 
-      text += `\n🎖️ เครื่องแบบเรียบร้อย: ${uniformOk} นาย\n`;
+      const actualPresent = present + late;
+      const uniformPct = actualPresent > 0 ? Math.round((uniformOk / actualPresent) * 100) : 0;
+      text += `\n🎖️ เครื่องแบบเรียบร้อย: ${uniformOk} นาย (${uniformPct}% ของผู้มาเรียน)\n`;
       text += `👤 ผู้กำกับกอง: ${unitData.leader}\n`;
       if (unitData.deputies && unitData.deputies.length > 0) {
         text += `👥 รองผู้กำกับกอง: ${unitData.deputies.join(', ')}\n`;
@@ -1497,7 +1507,11 @@
             else if (r.status === 'ขาด') uAbs++;
             else if (r.status === 'ลา') uLev++;
             else if (r.status === 'สาย') uLat++;
-            if (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย') uUni++;
+            
+            // นับเครื่องแบบเฉพาะคนที่มา/สาย
+            if ((r.status === 'มา' || r.status === 'สาย') && (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย')) {
+              uUni++;
+            }
           });
         } else {
           uData.patrols.forEach(p => {
@@ -1507,7 +1521,11 @@
               else if (m.status === 'ขาด') uAbs++;
               else if (m.status === 'ลา') uLev++;
               else if (m.status === 'สาย') uLat++;
-              if (m.uniform === 'ครบ') uUni++;
+              
+              // นับเครื่องแบบเฉพาะคนที่มา/สาย
+              if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
+                uUni++;
+              }
             });
           });
         }
@@ -1537,12 +1555,15 @@
       });
 
       const avgRate = grandTotal > 0 ? Math.round((grandPresent / grandTotal) * 100) : 0;
+      const actualGrandPresent = grandPresent + grandLate;
+      const avgUniRate = actualGrandPresent > 0 ? Math.round((grandUniformOk / actualGrandPresent) * 100) : 0;
+
       text += `------------------------------------\n`;
       text += `📊 ยอดรวมทั้งระดับชั้น ม.1:\n`;
       text += `- นักเรียนทั้งหมด: ${grandTotal} นาย\n`;
       text += `- มาเรียน: ${grandPresent} นาย (${avgRate}%)\n`;
       text += `- ขาด: ${grandAbsent} | ลา: ${grandLeave} | สาย: ${grandLate} นาย\n`;
-      text += `- เครื่องแบบเรียบร้อย: ${grandUniformOk} นาย\n`;
+      text += `- เครื่องแบบเรียบร้อย: ${grandUniformOk} นาย (${avgUniRate}% ของผู้มาเรียน)\n`;
       text += `------------------------------------\n`;
       text += `⭐ ผู้กำกับกลุ่มโรงเรียน: ${schoolCommanders.groupLeader}\n`;
       text += `⭐ รองผู้กำกับกลุ่มโรงเรียน: ${schoolCommanders.groupDeputy}`;
@@ -1648,7 +1669,11 @@
             else if (r.status === 'ขาด') abs++;
             else if (r.status === 'ลา') lev++;
             else if (r.status === 'สาย') lat++;
-            if (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย') uni++;
+
+            // ตรวจเครื่องแบบเฉพาะผู้ที่มาหรือสาย
+            if ((r.status === 'มา' || r.status === 'สาย') && (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย')) {
+              uni++;
+            }
           });
         } else {
           uData.patrols.forEach(p => {
@@ -1658,7 +1683,11 @@
               else if (m.status === 'ขาด') abs++;
               else if (m.status === 'ลา') lev++;
               else if (m.status === 'สาย') lat++;
-              if (m.uniform === 'ครบ') uni++;
+
+              // ตรวจเครื่องแบบเฉพาะผู้ที่มาหรือสาย
+              if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
+                uni++;
+              }
             });
           });
         }
@@ -1749,14 +1778,16 @@
       document.getElementById('overviewUnitsGrid').innerHTML = gridHtml;
 
       const gRate = gTotal > 0 ? Math.round((gPres / gTotal) * 100) : 0;
-      const gUniRate = gTotal > 0 ? Math.round((gUni / gTotal) * 100) : 0;
+      const actualGPres = gPres + gLat;
+      const gUniRate = actualGPres > 0 ? Math.round((gUni / actualGPres) * 100) : 0;
+
       document.getElementById('ovTotalStudents').innerText = `${gTotal} นาย`;
       document.getElementById('ovTotalPresent').innerText = `${gPres} นาย`;
       document.getElementById('ovRatePresent').innerText = `คิดเป็น ${gRate}%`;
       document.getElementById('ovTotalAbsent').innerText = `${gAbs + gLev + gLat} นาย`;
       document.getElementById('ovDetailsAbsent').innerText = `ขาด ${gAbs} · ลา ${gLev} · สาย ${gLat}`;
       document.getElementById('ovTotalUniformOk').innerText = `${gUni} นาย`;
-      document.getElementById('ovRateUniform').innerText = `คิดเป็น ${gUniRate}%`;
+      document.getElementById('ovRateUniform').innerText = `${gUniRate}% ของผู้มาเรียน`;
 
       if (window.lucide) lucide.createIcons();
     }
