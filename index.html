@@ -12,8 +12,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Sarabun', sans-serif; }
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+    body { 
+      font-family: 'Sarabun', sans-serif; 
+      overflow-x: hidden;
+      width: 100%;
+    }
+    /* ซ่อน scrollbar แต่ยังสไลด์ได้ เพื่อความเรียบหรูในแอปมือถือ */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     @media print {
       body { background: #ffffff !important; padding-bottom: 0 !important; }
@@ -23,50 +31,50 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-44 sm:pb-36">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-44 sm:pb-36 overflow-x-hidden w-full">
 
   <!-- Header -->
-  <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+  <header id="navbarHeader" class="w-full text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3">
       
       <!-- โลโก้และชื่อโรงเรียน -->
-      <div class="flex items-center gap-3 w-full md:w-auto">
-        <div class="w-14 h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
+      <div class="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0 border-2 border-amber-300 overflow-hidden">
           <img src="logo.png" alt="ตราสัญลักษณ์โรงเรียนสีชมพูศึกษา" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
         </div>
-        <div>
-          <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight leading-tight">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
-          <p class="text-xs sm:text-sm text-amber-100 opacity-90">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-sm sm:text-lg md:text-xl font-bold tracking-tight leading-tight truncate">ระบบเช็คชื่อและรายงานลูกเสือ - เนตรนารี ม.1</h1>
+          <p class="text-[11px] sm:text-sm text-amber-100 opacity-90 truncate">โรงเรียนสีชมพูศึกษา | องค์การบริหารส่วนจังหวัดขอนแก่น</p>
         </div>
       </div>
 
       <!-- เมนูสลับโหมด: เช็คชื่อหน้าแถว / ภาพรวม ม.1 / สรุปรายงาน -->
-      <div class="flex items-center gap-2 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold">
-        <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow">
-          <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i>เช็คชื่อหน้าแถว
+      <div class="w-full sm:w-auto grid grid-cols-3 gap-1 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold text-center">
+        <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-2 py-1.5 rounded-lg transition bg-white text-slate-900 shadow truncate">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 inline-block mr-1"></i>เช็คชื่อหน้าแถว
         </button>
-        <button onclick="switchMainTab('overview')" id="tabBtnOverview" class="px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200">
-          <i data-lucide="layout-grid" class="w-4 h-4 inline-block mr-1"></i>ภาพรวม ม.1
+        <button onclick="switchMainTab('overview')" id="tabBtnOverview" class="px-2 py-1.5 rounded-lg transition text-white hover:text-amber-200 truncate">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 inline-block mr-1"></i>ภาพรวม ม.1
         </button>
-        <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-3 py-1.5 rounded-lg transition text-white hover:text-amber-200">
-          <i data-lucide="bar-chart-3" class="w-4 h-4 inline-block mr-1"></i>สรุปรายงาน
+        <button onclick="switchMainTab('report')" id="tabBtnReport" class="px-2 py-1.5 rounded-lg transition text-white hover:text-amber-200 truncate">
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 inline-block mr-1"></i>สรุปรายงาน
         </button>
       </div>
 
       <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ตั้งค่า -->
-      <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+      <div id="checkinHeaderTools" class="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full md:w-auto justify-between md:justify-end">
         <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-200"></i>
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-200"></i>
           <input type="date" id="checkDate" onchange="handleDateChange(this.value)" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs sm:text-sm">
         </div>
-        <div class="bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20">
-          <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
-          <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs sm:text-sm w-36 cursor-pointer">
+        <div class="flex-1 sm:flex-none bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20 min-w-0">
+          <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-300 shrink-0"></i>
+          <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs sm:text-sm w-full sm:w-36 cursor-pointer truncate">
             <!-- ตัวเลือกจะเปลี่ยนตามกองที่เลือก -->
           </select>
           <input type="text" id="customRecorderInput" placeholder="พิมพ์ชื่อผู้บันทึก..." class="hidden bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-32 border-b border-white/40">
         </div>
-        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium" title="ตั้งค่าเชื่อมต่อ">
+        <button onclick="toggleConfigModal()" class="bg-black/20 hover:bg-black/40 border border-white/20 px-2.5 py-1.5 rounded-lg flex items-center justify-center text-xs font-medium shrink-0" title="ตั้งค่าเชื่อมต่อ">
           <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
         </button>
       </div>
@@ -75,16 +83,16 @@
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-6xl mx-auto px-4 py-5 w-full flex-1">
+  <main class="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5 w-full flex-1 overflow-x-hidden">
 
     <!-- ==================== โหมด 1: เช็คชื่อหน้าแถว ==================== -->
     <section id="sectionCheckin" class="space-y-4">
       
       <!-- การ์ดเลือกกิจกรรมประจำสัปดาห์ -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4">
+        <div class="flex flex-col gap-2.5">
           <div class="flex items-center gap-2">
-            <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+            <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
               <i data-lucide="target" class="w-4 h-4"></i>
             </span>
             <div>
@@ -93,8 +101,8 @@
             </div>
           </div>
 
-          <div class="flex flex-1 sm:max-w-md items-center gap-2">
-            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
+            <select id="activityPresetSelect" onchange="applyActivityPreset(this.value)" class="w-full sm:w-auto text-xs p-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium">
               <option value="">-- เลือกหัวข้อด่วน --</option>
               <option value="พิธีเปิดประชุมกองและระเบียบแถว">พิธีเปิดประชุมกองและระเบียบแถว</option>
               <option value="การผูกเงื่อนเชือกและการนำไปใช้">การผูกเงื่อนเชือกและการนำไปใช้</option>
@@ -107,64 +115,64 @@
               <option value="การเดินทางไกลและสำรวจ">การเดินทางไกลและสำรวจ</option>
               <option value="การบริการชุมชนและจิตอาสา">การบริการชุมชนและจิตอาสา</option>
             </select>
-            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="flex-1 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
+            <input type="text" id="activityTitleInput" value="พิธีเปิดประชุมกองและระเบียบแถว" placeholder="หรือพิมพ์ระบุกิจกรรม..." class="w-full flex-1 min-w-0 text-xs p-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold text-slate-800">
           </div>
         </div>
       </div>
 
       <!-- ตัวเลือกประเภทและกอง -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ -->
-          <div class="flex p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200">
-            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition shadow bg-amber-800 text-white">
-              <img id="navScoutIcon" src="scout.jpg" alt="Scout" class="w-5 h-5 object-contain rounded-full" onerror="handleScoutImgError(this)">
-              <span>ลูกเสือ ม.1 (สีกากี)</span>
+          <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200 gap-1">
+            <button id="btnCatScout" onclick="switchCategory('scout')" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition shadow bg-amber-800 text-white">
+              <img id="navScoutIcon" src="scout.jpg" alt="Scout" class="w-5 h-5 object-contain rounded-full shrink-0" onerror="handleScoutImgError(this)">
+              <span class="truncate">ลูกเสือ ม.1 (สีกากี)</span>
             </button>
-            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-bold text-sm transition text-slate-600 hover:text-slate-900">
-              <img id="navGuideIcon" src="GirlScout.jpeg" alt="Girl Scout" class="w-5 h-5 object-contain rounded-full" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/4/4e/Girl_Guides_Association_of_Thailand.svg';">
-              <span>เนตรนารี ม.1 (สีเขียว)</span>
+            <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900">
+              <img id="navGuideIcon" src="GirlScout.jpeg" alt="Girl Scout" class="w-5 h-5 object-contain rounded-full shrink-0" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/4/4e/Girl_Guides_Association_of_Thailand.svg';">
+              <span class="truncate">เนตรนารี ม.1 (สีเขียว)</span>
             </button>
           </div>
 
-          <!-- ปุ่มเลือกกอง -->
-          <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 custom-scrollbar"></div>
+          <!-- ปุ่มเลือกกอง (ไม่ให้ตกขอบ เลื่อนปัดซ้ายขวาได้เนียนตา) -->
+          <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar"></div>
         </div>
 
         <!-- รายละเอียดผู้บังคับบัญชาประจำกอง -->
         <div id="commanderInfoBox" class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2"></div>
 
         <!-- แถบเครื่องมือและค้นหาด่วน -->
-        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-1 sm:max-w-xs items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl">
+        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div class="flex w-full sm:max-w-xs items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl">
             <i data-lucide="search" class="w-4 h-4 text-slate-400 shrink-0"></i>
             <input type="text" id="quickSearchInput" oninput="handleQuickSearch(this.value)" placeholder="ค้นหาชื่อ, รหัส, เลขที่ หรือหมู่..." class="bg-transparent text-xs w-full focus:outline-none text-slate-700">
             <button onclick="clearQuickSearch()" id="btnClearSearch" class="hidden text-slate-400 hover:text-slate-600 text-xs">✕</button>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="copyUnitSummaryForLine()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 flex items-center gap-1.5 transition shadow-sm" title="คัดลอกข้อความสรุปยอดเพื่อนำไปวางใน LINE">
-              <i data-lucide="clipboard-copy" class="w-3.5 h-3.5 text-emerald-600"></i>
-              <span>📋 คัดลอกสรุปส่ง LINE</span>
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button onclick="copyUnitSummaryForLine()" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 flex items-center gap-1.5 transition shadow-sm" title="คัดลอกข้อความสรุปยอดเพื่อนำไปวางใน LINE">
+              <i data-lucide="clipboard-copy" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+              <span>📋 สรุปส่ง LINE</span>
             </button>
-            <button onclick="printBlankRoster()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-300 flex items-center gap-1.5 transition" title="พิมพ์ตารางเปล่าสำหรับเดินตรวจภาคสนาม">
-              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-              <span>พิมพ์ใบตรวจกระดาษ A4</span>
+            <button onclick="printBlankRoster()" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-300 flex items-center gap-1.5 transition" title="พิมพ์ตารางเปล่าสำหรับเดินตรวจภาคสนาม">
+              <i data-lucide="printer" class="w-3.5 h-3.5 shrink-0"></i>
+              <span>พิมพ์ใบตรวจ A4</span>
             </button>
-            <button onclick="markAllCurrentUnitUniform(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
-              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <button onclick="markAllCurrentUnitUniform(true)" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1.5 transition">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i>
               <span>เครื่องแบบครบทั้งกอง</span>
             </button>
-            <button onclick="markAllCurrentUnitPresent()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
-              <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
-              <span>มาครบทุกคนทั้งกอง</span>
+            <button onclick="markAllCurrentUnitPresent()" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 flex items-center gap-1.5 transition">
+              <i data-lucide="check-check" class="w-3.5 h-3.5 shrink-0"></i>
+              <span>มาครบทั้งกอง</span>
             </button>
           </div>
         </div>
       </div>
 
       <!-- แสดงรายการหมู่ทั้งหมดในกอง -->
-      <div id="patrolsContainer" class="space-y-5"></div>
+      <div id="patrolsContainer" class="space-y-4 sm:space-y-5"></div>
     </section>
 
     <!-- ==================== โหมด 2: ภาพรวม ม.1 ทั้งระดับ ==================== -->
@@ -349,7 +357,7 @@
   </main>
 
   <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV) -->
-  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 sm:px-4 shadow-xl z-20 no-print pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-3 sm:px-4 shadow-2xl z-40 no-print pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
       
       <!-- แถบสรุปยอดตัวเลข: เลื่อนสไลด์ซ้าย-ขวาได้นุ่มนวล ไม่เบียดจอในแอป -->
@@ -371,16 +379,16 @@
         </div>
       </div>
 
-      <!-- แถวปุ่ม Action: ปุ่มบันทึกอยู่ก่อน แล้วตามด้วยปุ่ม CSV -->
-      <div class="flex items-center gap-2 w-full sm:w-auto">
-        <!-- ปุ่มบันทึก (อยู่ก่อน เด่นชัด แตะง่าย) -->
-        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 whitespace-nowrap active:scale-[0.98]">
+      <!-- แถวปุ่ม Action: ปรับให้ชิดขวา (justify-end) ทั้งใน Smart Phone และจอใหญ่ -->
+      <div class="flex items-center justify-end gap-2 w-full sm:w-auto">
+        <!-- ปุ่มบันทึก (อยู่ก่อน เด่นชัด แตะง่าย ชิดขวา) -->
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 whitespace-nowrap active:scale-[0.98]">
           <i data-lucide="save" class="w-4 h-4 shrink-0"></i>
           <span>บันทึก</span>
         </button>
 
-        <!-- ปุ่ม CSV (อยู่หลังปุ่มบันทึก) -->
-        <button onclick="exportToCSV()" class="w-24 sm:w-auto px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0 whitespace-nowrap active:scale-[0.98]">
+        <!-- ปุ่ม CSV (อยู่หลังปุ่มบันทึก ชิดขวา) -->
+        <button onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0 whitespace-nowrap active:scale-[0.98]">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>CSV</span>
         </button>
