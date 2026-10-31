@@ -348,38 +348,41 @@
     </div>
   </main>
 
-  <!-- Bottom Floating Bar (ปรับโครงสร้าง Responsive ไม่ล้นจอใน Mobile/App) -->
-  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 sm:py-3 px-3 sm:px-4 shadow-xl z-20 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+  <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV) -->
+  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 sm:px-4 shadow-xl z-20 no-print pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
       
-      <!-- แถบสรุปยอดตัวเลข ปรับ wrap รองรับหน้าจอเล็ก -->
-      <div class="flex items-center justify-around sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm font-bold bg-slate-50 sm:bg-transparent py-1.5 px-2 rounded-xl sm:p-0 border sm:border-0 border-slate-200">
-        <div class="flex items-center gap-1 text-emerald-700">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>มา: <span id="statPresent">0</span>
+      <!-- แถบสรุปยอดตัวเลข: เลื่อนสไลด์ซ้าย-ขวาได้นุ่มนวล ไม่เบียดจอในแอป -->
+      <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar py-1 px-1 bg-slate-50 sm:bg-transparent rounded-xl border sm:border-0 border-slate-200 shrink-0">
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
         </div>
-        <div class="flex items-center gap-1 text-rose-700">
-          <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>ขาด: <span id="statAbsent">0</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-bold whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
         </div>
-        <div class="flex items-center gap-1 text-amber-700">
-          <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>ลา: <span id="statLeave">0</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
         </div>
-        <div class="flex items-center gap-1 text-blue-700">
-          <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>สาย: <span id="statLate">0</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
         </div>
-        <div class="hidden sm:flex items-center gap-1 text-indigo-700 border-l border-slate-200 pl-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-bold whitespace-nowrap shrink-0">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
         </div>
       </div>
 
-      <!-- ปุ่ม Action 2 ปุ่ม กระชับ ไม่ล้นจอ -->
+      <!-- แถวปุ่ม Action: ปุ่มบันทึกอยู่ก่อน แล้วตามด้วยปุ่ม CSV -->
       <div class="flex items-center gap-2 w-full sm:w-auto">
-        <button onclick="exportToCSV()" class="w-1/3 sm:w-auto px-2.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0">
+        <!-- ปุ่มบันทึก (อยู่ก่อน เด่นชัด แตะง่าย) -->
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 whitespace-nowrap active:scale-[0.98]">
+          <i data-lucide="save" class="w-4 h-4 shrink-0"></i>
+          <span>บันทึก</span>
+        </button>
+
+        <!-- ปุ่ม CSV (อยู่หลังปุ่มบันทึก) -->
+        <button onclick="exportToCSV()" class="w-24 sm:w-auto px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0 whitespace-nowrap active:scale-[0.98]">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>CSV</span>
-        </button>
-        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="w-2/3 sm:w-auto flex-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 truncate">
-          <i data-lucide="cloud-upload" class="w-4 h-4 shrink-0"></i>
-          <span class="truncate">บันทึกลงชีต & ส่ง LINE</span>
         </button>
       </div>
     </div>
@@ -1936,9 +1939,9 @@
       };
 
       const btnSave = document.getElementById('btnSaveSheets');
-      const originalText = btnSave.innerHTML;
+      const originalHtml = btnSave.innerHTML;
       btnSave.disabled = true;
-      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก & ส่ง LINE...</span>`;
+      btnSave.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>กำลังบันทึก...</span>`;
       if (window.lucide) lucide.createIcons();
 
       try {
@@ -1966,7 +1969,7 @@
         alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) วันที่ ${checkDate} เรียบร้อยแล้ว กรุณาตรวจสอบใน Google Sheets`);
       } finally {
         btnSave.disabled = false;
-        btnSave.innerHTML = originalText;
+        btnSave.innerHTML = originalHtml;
         if (window.lucide) lucide.createIcons();
       }
     }
