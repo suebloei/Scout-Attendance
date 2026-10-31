@@ -69,7 +69,7 @@
           <input type="date" id="checkDate" onchange="handleDateChange(this.value)" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs w-full min-w-0">
         </div>
 
-        <!-- ช่องเลือกผู้บันทึก: 5.5 ส่วนบนมือถือ ขยายให้แตะเห็นชื่อชัดเจน ไม่โดนบีบ -->
+        <!-- ช่องเลือกผู้บันทึก: 5 ส่วนบนมือถือ ขยายให้แตะเห็นชื่อชัดเจน ไม่โดนบีบ -->
         <div class="col-span-5 sm:col-auto flex-1 bg-black/20 backdrop-blur-sm px-2 py-1.5 rounded-lg flex items-center gap-1 text-xs sm:text-sm border border-white/20 min-w-0">
           <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-300 shrink-0"></i>
           <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs sm:text-sm w-full cursor-pointer truncate font-medium">
@@ -78,7 +78,7 @@
           <input type="text" id="customRecorderInput" placeholder="พิมพ์ชื่อผู้บันทึก..." class="hidden bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-full border-b border-white/40">
         </div>
 
-        <!-- ปุ่มตั้งค่า: 1.5 ส่วนบนมือถือ -->
+        <!-- ปุ่มตั้งค่า: 2 ส่วนบนมือถือ -->
         <div class="col-span-2 sm:col-auto flex justify-end">
           <button onclick="toggleConfigModal()" class="w-full sm:w-auto bg-black/20 hover:bg-black/40 border border-white/20 px-2 py-1.5 rounded-lg flex items-center justify-center text-xs font-medium shrink-0 h-full" title="ตั้งค่าเชื่อมต่อ">
             <i data-lucide="settings" class="w-4 h-4 text-emerald-300"></i>
@@ -130,15 +130,15 @@
       <!-- ตัวเลือกประเภทและกอง -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4">
         <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ (ปรับกระชับ เอาวงเล็บออก ไม่ถูกตัด ...) -->
+          <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ (ตัดวงเล็บออก กระชับ พอดีจอ) -->
           <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200 gap-1">
             <button id="btnCatScout" onclick="switchCategory('scout')" class="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition shadow bg-amber-800 text-white whitespace-nowrap">
               <img id="navScoutIcon" src="scout.jpg" alt="Scout" class="w-4 h-4 sm:w-5 sm:h-5 object-contain rounded-full shrink-0" onerror="handleScoutImgError(this)">
-              <span>ลูกเสือ <span class="hidden xs:inline">ม.1</span></span>
+              <span>ลูกเสือ</span>
             </button>
             <button id="btnCatGuide" onclick="switchCategory('guide')" class="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
               <img id="navGuideIcon" src="GirlScout.jpeg" alt="Girl Scout" class="w-4 h-4 sm:w-5 sm:h-5 object-contain rounded-full shrink-0" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/4/4e/Girl_Guides_Association_of_Thailand.svg';">
-              <span>เนตรนารี <span class="hidden xs:inline">ม.1</span></span>
+              <span>เนตรนารี</span>
             </button>
           </div>
 
@@ -158,6 +158,11 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <!-- ปุ่มดึงข้อมูลจาก Google Sheets (Sync เข้าหน้าฟอร์ม) -->
+            <button onclick="fetchAndRestoreFromSheets(true)" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-300 flex items-center gap-1.5 transition shadow-sm" title="ดึงข้อมูลที่เคยเช็คชื่อไว้จาก Google Sheets">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-sky-600 shrink-0" id="syncCheckinIcon"></i>
+              <span>ดึงข้อมูลจากชีต</span>
+            </button>
             <button onclick="copyUnitSummaryForLine()" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 flex items-center gap-1.5 transition shadow-sm" title="คัดลอกข้อความสรุปยอดเพื่อนำไปวางใน LINE">
               <i data-lucide="clipboard-copy" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
               <span>📋 สรุปส่ง LINE</span>
@@ -363,7 +368,7 @@
     </div>
   </main>
 
-  <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV) -->
+  <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV และชิดขวา) -->
   <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-3 sm:px-4 shadow-2xl z-40 no-print pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
       
@@ -402,6 +407,31 @@
       </div>
     </div>
   </footer>
+
+  <!-- Modal แจ้งบันทึกสำเร็จพร้อมปุ่มแชร์เข้า LINE ทันที -->
+  <div id="saveSuccessModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in duration-200">
+      <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-inner">
+        <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-base sm:text-lg font-bold text-slate-800">บันทึกข้อมูลเรียบร้อยแล้ว!</h3>
+      <p class="text-xs text-slate-500 mt-1" id="saveSuccessSubtitle">ส่งข้อมูลเข้าสู่ Google Sheets สำเร็จ</p>
+
+      <!-- พรีวิวข้อความสรุปสั้น -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 my-3.5 text-left text-xs font-mono text-slate-700 max-h-36 overflow-y-auto" id="saveSuccessPreview"></div>
+
+      <!-- ปุ่มดำเนินการ -->
+      <div class="flex flex-col gap-2">
+        <button onclick="shareDirectToLine()" class="w-full py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#06C755] hover:bg-[#05b34c] shadow-md flex items-center justify-center gap-2 transition active:scale-[0.98]">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.843 2.572-5.992z"/></svg>
+          <span>แชร์สรุปเข้ากลุ่ม LINE ทันที</span>
+        </button>
+        <button onclick="closeSaveSuccessModal()" class="w-full py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal บันทึกหมายเหตุรายบุคคล (Quick Remarks) -->
   <div id="remarkModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
@@ -860,6 +890,7 @@
     let attendanceHistoryData = [];
     let currentActiveRemarkTarget = null;
     let checkedUnitsStore = {}; // เก็บตามวันที่: { "YYYY-MM-DD_category_unit": true }
+    let lastGeneratedLineText = "";
 
     window.addEventListener('DOMContentLoaded', () => {
       // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว (ผูกตามวันที่)
@@ -906,6 +937,9 @@
       applyTheme();
       renderCurrentUnit();
       if (window.lucide) lucide.createIcons();
+
+      // ดึงข้อมูลล่าสุดจาก Google Sheets มาอัปเดตสถานะฟอร์มทันทีเมื่อเปิดเว็บ
+      fetchAndRestoreFromSheets(false);
     });
 
     // Fallback เมื่อโหลดรูป scout.jpg ไม่พบ
@@ -933,6 +967,8 @@
     function handleDateChange(newDate) {
       if (currentMainTab === 'overview') {
         renderWholeGradeOverview();
+      } else if (currentMainTab === 'checkin') {
+        fetchAndRestoreFromSheets(false);
       }
     }
 
@@ -965,6 +1001,88 @@
       }
     }
 
+    // ==================== ระบบดึงข้อมูลจาก Google Sheets ลงฟอร์ม (Auto Restore) ====================
+    async function fetchAndRestoreFromSheets(notifyUser = true) {
+      const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
+      const syncIcon = document.getElementById('syncCheckinIcon');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+
+      const checkDate = document.getElementById('checkDate').value;
+      const unitData = db[currentCategory].units[currentUnitId];
+      const isScout = currentCategory === 'scout';
+      const categoryText = isScout ? 'ลูกเสือ' : 'เนตรนารี';
+
+      try {
+        const res = await fetch(scriptUrl);
+        const json = await res.json();
+        if (json.status === 'success' && Array.isArray(json.data)) {
+          attendanceHistoryData = json.data;
+
+          // กรองข้อมูลของวันที่ และกองที่กำลังเปิดอยู่
+          const matchingRows = json.data.filter(r => {
+            const isMatchDate = (r.date === checkDate);
+            const isMatchCat = isScout ? (r.category === 'ลูกเสือ') : (r.category === 'เนตรนารี' || (r.category && r.category.includes('เนตร')));
+            const isMatchUnit = (r.unit === unitData.name);
+            return isMatchDate && isMatchCat && isMatchUnit;
+          });
+
+          // บันทึกสถานะ checkedUnitsStore ของทุกกองที่มีใน Sheets
+          json.data.forEach(row => {
+            if (row.date === checkDate) {
+              const catKey = (row.category === 'เนตรนารี' || (row.category && row.category.includes('เนตร'))) ? 'guide' : 'scout';
+              let uId = 1;
+              if (row.unit && row.unit.includes('2')) uId = 2;
+              else if (row.unit && row.unit.includes('3')) uId = 3;
+              else if (row.unit && row.unit.includes('4')) uId = 4;
+              checkedUnitsStore[`${checkDate}_${catKey}_${uId}`] = true;
+            }
+          });
+          saveDatabaseState();
+
+          if (matchingRows.length > 0) {
+            // สร้าง Map ของข้อมูลนักเรียนที่ดึงมา
+            const rowMap = {};
+            matchingRows.forEach(r => {
+              if (r.id) rowMap[String(r.id).trim()] = r;
+            });
+
+            // อัปเดตข้อมูลนักเรียนใน Memory DB
+            unitData.patrols.forEach(p => {
+              p.members.forEach(m => {
+                const fetched = rowMap[String(m.id).trim()];
+                if (fetched) {
+                  m.status = fetched.status || 'มา';
+                  m.uniform = (fetched.uniformStatus === 'ครบ' || fetched.uniformStatus === 'เรียบร้อย') ? 'ครบ' : 'ไม่ครบ';
+                  if (fetched.missingItems) {
+                    m.missing = Array.isArray(fetched.missingItems) ? fetched.missingItems : String(fetched.missingItems).split(',').map(s => s.trim()).filter(Boolean);
+                  } else {
+                    m.missing = [];
+                  }
+                  m.remark = fetched.remark || '';
+                }
+              });
+            });
+
+            // อัปเดตชื่อกิจกรรม (ถ้ามีระบุในชีต)
+            if (matchingRows[0].activity) {
+              const actInp = document.getElementById('activityTitleInput');
+              if (actInp) actInp.value = matchingRows[0].activity;
+            }
+
+            renderCurrentUnit();
+            if (notifyUser) showToast(`ดึงข้อมูล ${unitData.name} (${categoryText}) วันที่ ${checkDate} จากชีตสำเร็จ!`);
+          } else {
+            if (notifyUser) showToast(`ยังไม่มีการบันทึกข้อมูลของ ${unitData.name} ในชีตสำหรับวันที่ ${checkDate}`);
+          }
+        }
+      } catch (err) {
+        console.warn('Auto-Fetch Error:', err);
+        if (notifyUser) showToast('ไม่สามารถเชื่อมต่อ Google Sheets ได้ในขณะนี้');
+      } finally {
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+      }
+    }
+
     // สลับแท็บหลัก (เช็คชื่อ / ภาพรวม ม.1 / รายงาน)
     function switchMainTab(tab) {
       currentMainTab = tab;
@@ -993,11 +1111,11 @@
         headerTools.classList.remove('hidden');
         btnCheckin.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow";
         renderCurrentUnit();
+        fetchAndRestoreFromSheets(false);
       } else if (tab === 'overview') {
         secOverview.classList.remove('hidden');
         headerTools.classList.remove('hidden');
         btnOverview.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-900 shadow";
-        // เมื่อเปิดหน้าภาพรวม ให้ดึงข้อมูลล่าสุดจาก Sheets มาเทียบสถานะอัตโนมัติ
         syncOverviewFromSheets();
       } else {
         secReport.classList.remove('hidden');
@@ -1012,6 +1130,7 @@
       currentUnitId = 1; // เริ่มต้นที่กอง 1
       applyTheme();
       renderCurrentUnit();
+      fetchAndRestoreFromSheets(false);
     }
 
     function applyTheme() {
@@ -1041,6 +1160,7 @@
       renderUnitButtonsUI();
       updateRecorderDropdown();
       renderCurrentUnit();
+      fetchAndRestoreFromSheets(false);
     }
 
     // เรนเดอร์ปุ่มกองตามจำนวนจริง (ลูกเสือ 4 กอง / เนตรนารี 3 กอง)
@@ -1352,11 +1472,13 @@
 
     function setStatus(patrolIndex, studentIndex, status) {
       db[currentCategory].units[currentUnitId].patrols[patrolIndex].members[studentIndex].status = status;
+      saveDatabaseState();
       renderCurrentUnit();
     }
 
     function markPatrolPresent(patrolIndex) {
       db[currentCategory].units[currentUnitId].patrols[patrolIndex].members.forEach(m => m.status = 'มา');
+      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -1364,6 +1486,7 @@
       db[currentCategory].units[currentUnitId].patrols.forEach(p => {
         p.members.forEach(m => m.status = 'มา');
       });
+      saveDatabaseState();
       renderCurrentUnit();
     }
 
@@ -1430,8 +1553,8 @@
       document.getElementById('statUniformOk').innerText = uniformOk;
     }
 
-    // ==================== 1. คัดลอกสรุปส่ง LINE ประจำกอง ====================
-    function copyUnitSummaryForLine() {
+    // ==================== 1. สร้างข้อความสรุปส่ง LINE ประจำกอง ====================
+    function generateUnitSummaryText() {
       const unitData = db[currentCategory].units[currentUnitId];
       const isScout = currentCategory === 'scout';
       const categoryText = isScout ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
@@ -1489,9 +1612,17 @@
       if (unitData.deputies && unitData.deputies.length > 0) {
         text += `👥 รองผู้กำกับกอง: ${unitData.deputies.join(', ')}\n`;
       }
-        text += `📝 ผู้บันทึก: ${recorder}`;
+      text += `📝 ผู้บันทึก: ${recorder}`;
 
-        copyTextToClipboard(text, `คัดลอกข้อความสรุป ${unitData.name} (${categoryText}) เรียบร้อยแล้ว สามารถนำไปวางใน LINE ได้ทันที!`);
+      return text;
+    }
+
+    function copyUnitSummaryForLine() {
+      const unitData = db[currentCategory].units[currentUnitId];
+      const isScout = currentCategory === 'scout';
+      const categoryText = isScout ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
+      const text = generateUnitSummaryText();
+      copyTextToClipboard(text, `คัดลอกข้อความสรุป ${unitData.name} (${categoryText}) เรียบร้อยแล้ว สามารถนำไปวางใน LINE ได้ทันที!`);
     }
 
     // ==================== 2. คัดลอกสรุปภาพรวม ม.1 ส่ง LINE ====================
@@ -1631,7 +1762,7 @@
         document.execCommand('copy');
         showToast(successMsg);
       } catch (e) {
-        prompt('กรุณาคัดลอกข้อความด้านล่างด้วยตนเอง:', text);
+        console.warn('Fallback copy failed', e);
       }
       document.body.removeChild(textarea);
     }
@@ -1650,6 +1781,28 @@
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
       }, 2500);
+    }
+
+    // ==================== ระบบแชร์เข้า LINE URL Scheme ====================
+    function shareDirectToLine() {
+      if (!lastGeneratedLineText) {
+        lastGeneratedLineText = generateUnitSummaryText();
+      }
+      const encodedText = encodeURIComponent(lastGeneratedLineText);
+      const lineUrl = `https://line.me/R/share?text=${encodedText}`;
+      window.open(lineUrl, '_blank');
+      closeSaveSuccessModal();
+    }
+
+    function openSaveSuccessModal(previewText) {
+      lastGeneratedLineText = previewText;
+      const previewEl = document.getElementById('saveSuccessPreview');
+      if (previewEl) previewEl.innerText = previewText;
+      document.getElementById('saveSuccessModal').classList.remove('hidden');
+    }
+
+    function closeSaveSuccessModal() {
+      document.getElementById('saveSuccessModal').classList.add('hidden');
     }
 
     // ==================== เรนเดอร์แดชบอร์ดภาพรวม ม.1 ====================
@@ -2016,16 +2169,15 @@
         checkedUnitsStore[`${checkDate}_${currentCategory}_${currentUnitId}`] = true;
         saveDatabaseState();
 
-        if (result.status === 'success') {
-          alert(`✅ บันทึกข้อมูลสำเร็จ!\n- กอง: ${unitData.name} (${categoryText} ม.1)\n- วันที่: ${checkDate}\n- กิจกรรม: ${activityTitle}\n- ผู้บันทึก: ${recordedBy}\n- อัปเดตข้อมูล: ${result.updated || 0} คน | เพิ่มใหม่: ${result.inserted || 0} คน\n${lineToken ? '- ส่งแจ้งเตือนสรุปเข้า LINE เรียบร้อยแล้ว' : ''}`);
-        } else {
-          alert('⚠️ สคริปต์แจ้งเตือน: ' + (result.message || 'บันทึกเรียบร้อย'));
-        }
+        const summaryText = generateUnitSummaryText();
+        openSaveSuccessModal(summaryText);
       } catch (error) {
         console.warn('Network Notice:', error);
         checkedUnitsStore[`${checkDate}_${currentCategory}_${currentUnitId}`] = true;
         saveDatabaseState();
-        alert(`ℹ️ ดำเนินการส่งข้อมูล ${unitData.name} (${categoryText}) วันที่ ${checkDate} เรียบร้อยแล้ว กรุณาตรวจสอบใน Google Sheets`);
+
+        const summaryText = generateUnitSummaryText();
+        openSaveSuccessModal(summaryText);
       } finally {
         btnSave.disabled = false;
         btnSave.innerHTML = originalHtml;
@@ -2386,7 +2538,7 @@
       const token = document.getElementById('lineTokenInput').value.trim();
       if (url) localStorage.setItem('scout_script_url', url);
       localStorage.setItem('scout_line_token', token);
-      alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
+      showToast('บันทึกการตั้งค่าเรียบร้อยแล้ว');
       toggleConfigModal();
     }
   </script>
