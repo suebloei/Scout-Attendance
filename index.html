@@ -23,7 +23,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-36">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col pb-44 sm:pb-36">
 
   <!-- Header -->
   <header id="navbarHeader" class="text-white shadow-lg transition-colors duration-300 no-print" style="background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);">
@@ -339,44 +339,47 @@
       </div>
     </section>
 
-    <!-- เครดิตผู้พัฒนา -->
-    <div class="mt-8 mb-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 whitespace-nowrap overflow-x-auto px-2 no-print">
+    <!-- เครดิตผู้พัฒนา (ปรับแต่งให้รองรับจอมือถือ ไม่ล้นตกขอบ) -->
+    <div class="mt-6 mb-6 flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-slate-600 px-3 text-center no-print">
       <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
         <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
       </div>
-      <span>พัฒนาโดย นายนพคุณ สืบเลย และนายสิทธิศักดิ์ สิงห์โสภา โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
+      <span class="leading-relaxed font-medium">พัฒนาโดย <b class="text-slate-800">นายนพคุณ สืบเลย</b> และ <b class="text-slate-800">นายสิทธิศักดิ์ สิงห์โสภา</b> โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
     </div>
   </main>
 
-  <!-- Bottom Floating Bar -->
-  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl z-20 no-print">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm font-bold">
-        <div class="flex items-center gap-1.5 text-emerald-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
+  <!-- Bottom Floating Bar (ปรับโครงสร้าง Responsive ไม่ล้นจอใน Mobile/App) -->
+  <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 sm:py-3 px-3 sm:px-4 shadow-xl z-20 no-print">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+      
+      <!-- แถบสรุปยอดตัวเลข ปรับ wrap รองรับหน้าจอเล็ก -->
+      <div class="flex items-center justify-around sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm font-bold bg-slate-50 sm:bg-transparent py-1.5 px-2 rounded-xl sm:p-0 border sm:border-0 border-slate-200">
+        <div class="flex items-center gap-1 text-emerald-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>มา: <span id="statPresent">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-rose-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>ขาด: <span id="statAbsent">0</span>
+        <div class="flex items-center gap-1 text-rose-700">
+          <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>ขาด: <span id="statAbsent">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-amber-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>ลา: <span id="statLeave">0</span>
+        <div class="flex items-center gap-1 text-amber-700">
+          <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>ลา: <span id="statLeave">0</span>
         </div>
-        <div class="flex items-center gap-1.5 text-blue-700">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>สาย: <span id="statLate">0</span>
+        <div class="flex items-center gap-1 text-blue-700">
+          <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>สาย: <span id="statLate">0</span>
         </div>
-        <div class="hidden md:flex items-center gap-1.5 text-indigo-700 border-l border-slate-200 pl-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
+        <div class="hidden sm:flex items-center gap-1 text-indigo-700 border-l border-slate-200 pl-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>เครื่องแบบครบ: <span id="statUniformOk">0</span>
         </div>
       </div>
 
+      <!-- ปุ่ม Action 2 ปุ่ม กระชับ ไม่ล้นจอ -->
       <div class="flex items-center gap-2 w-full sm:w-auto">
-        <button onclick="exportToCSV()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="download" class="w-4 h-4"></i>
-          <span>ส่งออก CSV</span>
+        <button onclick="exportToCSV()" class="w-1/3 sm:w-auto px-2.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>CSV</span>
         </button>
-        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="flex-1 sm:flex-none px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-2 transition bg-amber-800 hover:bg-amber-900">
-          <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-          <span>บันทึกลงชีต & ส่ง LINE</span>
+        <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="w-2/3 sm:w-auto flex-1 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 truncate">
+          <i data-lucide="cloud-upload" class="w-4 h-4 shrink-0"></i>
+          <span class="truncate">บันทึกลงชีต & ส่ง LINE</span>
         </button>
       </div>
     </div>
