@@ -1662,7 +1662,8 @@
         grandTotal += uTotal;
 
         const isChecked = (dateRowsInHistory.length > 0) || !!checkedUnitsStore[`${checkDate}_${u.cat}_${u.id}`];
-        const statusMark = isChecked ? '✓' : '⚠️ ยังไม่เช็ค';
+        // ใช้สัญลักษณ์แยกสีชัดเจนสำหรับข้อความส่ง LINE
+        const statusMark = isChecked ? '✅ เช็คแล้ว' : '🔴 ยังไม่เช็ค';
 
         // ถ้ายังไม่ได้เช็คชื่อ ให้ยอดมา ขาด ลา สาย เป็น 0
         const displayPres = isChecked ? uPres : 0;
@@ -1947,13 +1948,14 @@
               <!-- ปุ่มสถานะ: เช็คแล้วเป็นสีเขียว / ยังไม่เช็คเป็นตัวหนังสือสีแดง -->
               <div>
                 ${isChecked ? `
-                  <button onclick="jumpToUnit('${u.cat}', ${u.id})" class="w-full py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 transition flex items-center justify-center gap-1.5 shadow-xs">
+                  <button onclick="jumpToUnit('${u.cat}', ${u.id})" class="w-full py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-300 transition flex items-center justify-center gap-1.5 shadow-xs">
                     <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                    <span>เช็คชื่อแล้ว ✓</span>
+                    <span class="text-emerald-600 font-bold">เช็คแล้ว ✓</span>
                   </button>
                 ` : `
                   <button onclick="jumpToUnit('${u.cat}', ${u.id})" class="w-full py-2 rounded-xl text-xs sm:text-sm font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition flex items-center justify-center gap-1.5 shadow-xs">
-                    <span>เข้าเช็คชื่อกองนี้ →</span>
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
+                    <span class="text-rose-600 font-bold">ยังไม่เช็ค →</span>
                   </button>
                 `}
               </div>
