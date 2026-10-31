@@ -1468,14 +1468,19 @@
       let text = `${isScout ? '🏕️' : '🍀'} รายงานยอด${categoryText} ${unitData.name}\n`;
       text += `📅 ประจำวันที่: ${checkDate}\n`;
       text += `🎯 กิจกรรม: ${activityTitle}\n`;
-      text += `👥 ยอดรวม: ${total} นาย | มา: ${present}`;
+      
+      const totalAttended = present + late;
+      if (late > 0) {
+        text += `👥 ยอดรวม: ${total} นาย | มาเรียน: ${totalAttended} (ตรงเวลา ${present}, สาย ${late})`;
+      } else {
+        text += `👥 ยอดรวม: ${total} นาย | มาเรียน: ${present}`;
+      }
 
       if (notPresentDetails.length > 0) {
         text += ` | ขาด/ลา: ${absent + leave} (${notPresentDetails.join(', ')})`;
       } else {
         text += ` | ขาด: 0 | ลา: 0`;
       }
-      if (late > 0) text += ` | สาย: ${late}`;
 
       const actualPresent = present + late;
       const uniformPct = actualPresent > 0 ? Math.round((uniformOk / actualPresent) * 100) : 0;
@@ -1484,9 +1489,9 @@
       if (unitData.deputies && unitData.deputies.length > 0) {
         text += `👥 รองผู้กำกับกอง: ${unitData.deputies.join(', ')}\n`;
       }
-      text += `📝 ผู้บันทึก: ${recorder}`;
+        text += `📝 ผู้บันทึก: ${recorder}`;
 
-      copyTextToClipboard(text, `คัดลอกข้อความสรุป ${unitData.name} (${categoryText}) เรียบร้อยแล้ว สามารถนำไปวางใน LINE ได้ทันที!`);
+        copyTextToClipboard(text, `คัดลอกข้อความสรุป ${unitData.name} (${categoryText}) เรียบร้อยแล้ว สามารถนำไปวางใน LINE ได้ทันที!`);
     }
 
     // ==================== 2. คัดลอกสรุปภาพรวม ม.1 ส่ง LINE ====================
@@ -1564,28 +1569,38 @@
         const displayAbs = isChecked ? uAbs : 0;
         const displayLev = isChecked ? uLev : 0;
         const displayLat = isChecked ? uLat : 0;
+        const displayTotalAttended = isChecked ? (uPres + uLat) : 0;
 
         if (isChecked) {
-          grandPresent += uPres;
+          grandPresent += (uPres + uLat);
+          grandOnTime += uPres;
           grandAbsent += uAbs;
           grandLeave += uLev;
           grandLate += uLat;
           grandUniformOk += uUni;
         }
 
-        text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา ${displayPres} | ขาด ${displayAbs} | ลา ${displayLev}`;
-        if (displayLat > 0) text += ` | สาย ${displayLat}`;
+        if (!isChecked) {
+          text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา 0 | ขาด 0 | ลา 0`;
+        } else if (displayLat > 0) {
+          text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา ${displayTotalAttended} (ตรงเวลา ${displayPres}, สาย ${displayLat}) | ขาด ${displayAbs} | ลา ${displayLev}`;
+        } else {
+          text += `🚩 ${u.label} [${statusMark}]: ยอด ${uTotal} | มา ${displayPres} | ขาด ${displayAbs} | ลา ${displayLev}`;
+        }
         text += ` (ผกก.: ${uData.leader})\n`;
       });
 
       const avgRate = grandTotal > 0 ? Math.round((grandPresent / grandTotal) * 100) : 0;
-      const actualGrandPresent = grandPresent + grandLate;
-      const avgUniRate = actualGrandPresent > 0 ? Math.round((grandUniformOk / actualGrandPresent) * 100) : 0;
+      const avgUniRate = grandPresent > 0 ? Math.round((grandUniformOk / grandPresent) * 100) : 0;
 
       text += `------------------------------------\n`;
       text += `📊 ยอดรวมทั้งระดับชั้น ม.1:\n`;
       text += `- นักเรียนทั้งหมด: ${grandTotal} นาย\n`;
-      text += `- มาเรียน: ${grandPresent} นาย (${avgRate}%)\n`;
+      if (grandLate > 0) {
+        text += `- มาเรียน: ${grandPresent} นาย (${avgRate}%) [ตรงเวลา ${grandOnTime}, สาย ${grandLate}]\n`;
+      } else {
+        text += `- มาเรียน: ${grandPresent} นาย (${avgRate}%)\n`;
+      }
       text += `- ขาด: ${grandAbsent} | ลา: ${grandLeave} | สาย: ${grandLate} นาย\n`;
       text += `- เครื่องแบบเรียบร้อย: ${grandUniformOk} นาย (${avgUniRate}% ของผู้มาเรียน)\n`;
       text += `------------------------------------\n`;
@@ -1725,9 +1740,19 @@
         const unitDateKey = `${checkDate}_${u.cat}_${u.id}`;
         const isChecked = (dateRowsInHistory.length > 0) || !!checkedUnitsStore[unitDateKey];
 
-        // เงื่อนไข: กองที่ยังไม่ได้เช็คชื่อในวันที่เลือก ให้แสดงเป็น 0% (มา 0 คน) และปุ่มเป็นสีแดง
-        const displayPct = isChecked ? (total > 0 ? Math.round((pres / total) * 100) : 0) : 0;
-        const displayPresentText = isChecked ? `${displayPct}% (มา ${pres} คน)` : `0% (มา 0 คน)`;
+        // คำนวณผู้ที่มาเรียนจริง (ผู้ที่มาตรงเวลา + ผู้ที่มาสาย ถือว่ามาเรียน)
+        const totalActualPresent = pres + lat;
+        const displayPct = isChecked ? (total > 0 ? Math.round((totalActualPresent / total) * 100) : 0) : 0;
+        
+        let displayPresentText = `0% (มา 0 คน)`;
+        if (isChecked) {
+          if (lat > 0) {
+            displayPresentText = `${displayPct}% (มา ${totalActualPresent} คน)`;
+          } else {
+            displayPresentText = `${displayPct}% (มา ${pres} คน)`;
+          }
+        }
+
         const displayPresent = isChecked ? pres : 0;
         const displayAbsent = isChecked ? abs : 0;
         const displayLeave = isChecked ? lev : 0;
@@ -1801,12 +1826,12 @@
 
       document.getElementById('overviewUnitsGrid').innerHTML = gridHtml;
 
-      const gRate = gTotal > 0 ? Math.round((gPres / gTotal) * 100) : 0;
       const actualGPres = gPres + gLat;
+      const gRate = gTotal > 0 ? Math.round((actualGPres / gTotal) * 100) : 0;
       const gUniRate = actualGPres > 0 ? Math.round((gUni / actualGPres) * 100) : 0;
 
       document.getElementById('ovTotalStudents').innerText = `${gTotal} นาย`;
-      document.getElementById('ovTotalPresent').innerText = `${gPres} นาย`;
+      document.getElementById('ovTotalPresent').innerText = `${actualGPres} นาย`;
       document.getElementById('ovRatePresent').innerText = `คิดเป็น ${gRate}%`;
       document.getElementById('ovTotalAbsent').innerText = `${gAbs + gLev + gLat} นาย`;
       document.getElementById('ovDetailsAbsent').innerText = `ขาด ${gAbs} · ลา ${gLev} · สาย ${gLat}`;
