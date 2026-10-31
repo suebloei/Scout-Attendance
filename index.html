@@ -1499,7 +1499,7 @@
       const checkDate = document.getElementById('checkDate').value;
       const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
 
-      let grandTotal = 0, grandPresent = 0, grandAbsent = 0, grandLeave = 0, grandLate = 0, grandUniformOk = 0;
+      let grandTotal = 0, grandPresent = 0, grandOnTime = 0, grandAbsent = 0, grandLeave = 0, grandLate = 0, grandUniformOk = 0;
       let text = `🏕️🍀 รายงานยอดสรุปภาพรวมกิจกรรมลูกเสือ - เนตรนารี ม.1\n`;
       text += `🏫 โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น\n`;
       text += `📅 ประจำวันที่: ${checkDate}\n`;
@@ -1613,7 +1613,7 @@
     function copyTextToClipboard(text, successMsg) {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-          alert(successMsg);
+          showToast(successMsg);
         }).catch(() => fallbackCopy(text, successMsg));
       } else {
         fallbackCopy(text, successMsg);
@@ -1629,11 +1629,27 @@
       textarea.select();
       try {
         document.execCommand('copy');
-        alert(successMsg);
+        showToast(successMsg);
       } catch (e) {
         prompt('กรุณาคัดลอกข้อความด้านล่างด้วยตนเอง:', text);
       }
       document.body.removeChild(textarea);
+    }
+
+    function showToast(msg) {
+      const existingToast = document.getElementById('customAppToast');
+      if (existingToast) existingToast.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'customAppToast';
+      toast.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-slate-700 transition-all duration-300';
+      toast.innerHTML = `<span class="text-emerald-400">✓</span> <span>${msg}</span>`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
     }
 
     // ==================== เรนเดอร์แดชบอร์ดภาพรวม ม.1 ====================
