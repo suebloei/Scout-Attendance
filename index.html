@@ -80,7 +80,7 @@
         </button>
       </div>
 
-      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ตั้งค่า (ปรับ Layout รองรับ Smart Phone ให้กว้าง แตะเลือกชื่อได้ง่าย) -->
+      <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ปุ่มติดตั้งแอป PWA -->
       <div id="checkinHeaderTools" class="grid grid-cols-12 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-2 w-full md:w-auto">
         <!-- ช่องเลือกวันที่: 5 ส่วนบนมือถือ -->
         <div class="col-span-5 sm:col-auto bg-black/20 backdrop-blur-sm px-2 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20 min-w-0">
@@ -88,7 +88,7 @@
           <input type="date" id="checkDate" onchange="handleDateChange(this.value)" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs w-full min-w-0">
         </div>
 
-        <!-- ช่องเลือกผู้บันทึก: ขยายเต็มพื้นที่ส่วนที่เหลือบนมือถือ (7 ส่วน) แตะเห็นชื่อชัดเจน ไม่โดนบีบ -->
+        <!-- ช่องเลือกผู้บันทึก: ขยายเต็มพื้นที่ส่วนที่เหลือบนมือถือ -->
         <div class="col-span-7 sm:col-auto flex-1 bg-black/20 backdrop-blur-sm px-2 py-1.5 rounded-lg flex items-center gap-1 text-xs sm:text-sm border border-white/20 min-w-0">
           <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-300 shrink-0"></i>
           <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs sm:text-sm w-full cursor-pointer truncate font-medium">
@@ -96,6 +96,12 @@
           </select>
           <input type="text" id="customRecorderInput" placeholder="พิมพ์ชื่อผู้บันทึก..." class="hidden bg-transparent text-white placeholder-white/60 focus:outline-none text-xs sm:text-sm w-full border-b border-white/40">
         </div>
+
+        <!-- ปุ่มติดตั้งลงบนหน้าจอโฮม (PWA Install Button) -->
+        <button id="btnPwaInstall" onclick="handlePwaInstallClick()" class="hidden col-span-12 sm:col-auto bg-amber-400 hover:bg-amber-300 text-amber-950 font-bold px-3 py-1.5 rounded-lg text-xs shadow-md border border-amber-300/80 items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+          <span>ติดตั้งแอป</span>
+        </button>
       </div>
 
     </div>
@@ -380,8 +386,8 @@
     </div>
   </main>
 
-  <!-- ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Back to Top) -->
-  <button id="btnBackToTop" onclick="scrollToTop()" class="fixed bottom-24 sm:bottom-20 right-4 z-40 bg-slate-900/80 hover:bg-slate-900 text-white p-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 translate-y-12 opacity-0 pointer-events-none no-print border border-slate-700/60 active:scale-90 flex items-center justify-center" title="กลับขึ้นบนสุด">
+  <!-- ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Back to Top) - ขยับขึ้นเป็น bottom-36 บนมือถือเพื่อไม่ให้โดนแถบล่างบัง -->
+  <button id="btnBackToTop" onclick="scrollToTop()" class="fixed bottom-36 sm:bottom-24 right-4 z-40 bg-slate-900/85 hover:bg-slate-900 text-white p-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 translate-y-12 opacity-0 pointer-events-none no-print border border-slate-700/60 active:scale-90 flex items-center justify-center" title="กลับขึ้นบนสุด">
     <i data-lucide="arrow-up" class="w-5 h-5"></i>
   </button>
 
@@ -481,6 +487,36 @@
         <button onclick="clearCurrentRemark()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-600 hover:bg-rose-50">ลบหมายเหตุ</button>
         <button onclick="saveCurrentRemark()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-amber-800 text-white hover:bg-amber-900">บันทึก</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal แนะนำการติดตั้งแอปบน iPhone / iPad (iOS Safari) -->
+  <div id="iosInstallModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in duration-200">
+      <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto mb-3 shadow-inner">
+        <i data-lucide="smartphone" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-base sm:text-lg font-bold text-slate-800">วิธีติดตั้งบน iPhone / iPad</h3>
+      <p class="text-xs text-slate-500 mt-1">ติดตั้งแอปไว้บนหน้าจอโฮมเพื่อเข้าใช้งานได้ทันที</p>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 my-3.5 text-left text-xs text-slate-700 space-y-2.5">
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">1</div>
+          <p>แตะที่ปุ่ม <b>"แชร์" (Share)</b> <i data-lucide="share" class="w-3.5 h-3.5 inline-block text-sky-600 align-middle"></i> ที่แถบด้านล่างของ Safari</p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">2</div>
+          <p>เลื่อนลงแล้วแตะเลือก <b>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</b> <i data-lucide="plus-square" class="w-3.5 h-3.5 inline-block text-slate-700 align-middle"></i></p>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <div class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">3</div>
+          <p>แตะคำว่า <b>"เพิ่ม" (Add)</b> มุมขวาบน จะได้ไอคอนแอปบนหน้าจอมือถือทันที</p>
+        </div>
+      </div>
+
+      <button onclick="closeIosInstallModal()" class="w-full py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-amber-800 hover:bg-amber-900 transition shadow">
+        เข้าใจแล้ว
+      </button>
     </div>
   </div>
 
@@ -881,6 +917,7 @@
     let currentActiveRemarkTarget = null;
     let checkedUnitsStore = {}; // เก็บตามวันที่: { "YYYY-MM-DD_category_unit": true }
     let lastGeneratedLineText = "";
+    let deferredPrompt = null; // สำหรับรองรับ Android PWA Prompt
 
     window.addEventListener('DOMContentLoaded', () => {
       initPWA();
@@ -972,6 +1009,32 @@
       const manifestEl = document.getElementById('manifestPlaceholder');
       if (manifestEl) manifestEl.setAttribute('href', manifestUrl);
 
+      // แสดงปุ่มติดตั้ง PWA เมื่อไม่ได้เปิดในโหมด Standalone
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const btnInstall = document.getElementById('btnPwaInstall');
+      
+      if (!isStandalone && btnInstall) {
+        btnInstall.classList.remove('hidden');
+        btnInstall.classList.add('flex');
+      }
+
+      // ดักจับอีเวนต์ติดตั้งของ Android / Chromium
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (btnInstall) {
+          btnInstall.classList.remove('hidden');
+          btnInstall.classList.add('flex');
+        }
+      });
+
+      // ซ่อนปุ่มเมื่อติดตั้งเรียบร้อยแล้ว
+      window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        if (btnInstall) btnInstall.classList.add('hidden');
+        showToast('ติดตั้งแอปลงในหน้าจอโฮมสำเร็จแล้ว!');
+      });
+
       // ลงทะเบียน Service Worker แบบ Minimal เพื่อรองรับ Add to Home Screen
       if ('serviceWorker' in navigator) {
         const swScript = `
@@ -986,6 +1049,39 @@
         const swUrl = URL.createObjectURL(blob);
         navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW register notice:', err));
       }
+    }
+
+    // จัดการเมื่อกดปุ่ม "ติดตั้งแอป"
+    function handlePwaInstallClick() {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (deferredPrompt) {
+        // สำหรับ Android / Chrome
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIos) {
+        // สำหรับ iPhone / iPad (Safari)
+        openIosInstallModal();
+      } else {
+        // เบราว์เซอร์อื่น หรือเปิดในแอป LINE ให้คำแนะนำทั่วไป
+        showToast('แตะเมนูของเบราว์เซอร์ แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"');
+      }
+    }
+
+    function openIosInstallModal() {
+      const modal = document.getElementById('iosInstallModal');
+      if (modal) modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeIosInstallModal() {
+      const modal = document.getElementById('iosInstallModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     // ==================== ปุ่มเลื่อนกลับขึ้นบนสุด (Back to Top) ====================
