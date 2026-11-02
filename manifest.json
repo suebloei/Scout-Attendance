@@ -1,0 +1,25 @@
+{
+"name": "ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา",
+"short_name": "เช็คชื่อลูกเสือ ม.1",
+"description": "ระบบเช็คชื่อและรายงานผลกิจกรรมลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น",
+"start_url": "./index.html",
+"scope": "./",
+"display": "standalone",
+"background_color": "#FAF7F0",
+"theme_color": "#78350f",
+"orientation": "any",
+"icons": [
+{
+"src": "logo.png",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any maskable"
+},
+{
+"src": "logo.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+]
+}
