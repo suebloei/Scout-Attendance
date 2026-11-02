@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
   
-  <!-- PWA Meta Tags & Web Manifest -->
+  <!-- PWA Meta Tags & Web Manifest ชี้ไปที่ไฟล์ manifest.json แยกโดยตรง -->
   <meta name="theme-color" content="#78350f">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="เช็คชื่อลูกเสือ ม.1">
-  <meta name="mobile-web-app-capable" content="yes">
-  <!-- อนุญาตให้หมุนจออิสระทั้งใน iOS และ Android Web App -->
-  <meta name="screen-orientation" content="any">
-  <meta name="x5-orientation" content="auto">
   <link rel="apple-touch-icon" href="logo.png">
-  <link id="manifestPlaceholder" rel="manifest">
+  <link rel="manifest" href="manifest.json">
 
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -995,38 +992,6 @@
 
     // ==================== ระบบ PWA (Progressive Web App) ====================
     function initPWA() {
-      // สร้าง Web App Manifest แบบ Dynamic Data URI (ปลดล็อก orientation เป็น any เพื่อให้หมุนหน้าจอแนวนอนได้อิสระ)
-      const manifestObj = {
-        name: "ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา",
-        short_name: "เช็คชื่อลูกเสือ ม.1",
-        description: "ระบบเช็คชื่อและรายงานผลกิจกรรมลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น",
-        start_url: "./index.html",
-        display: "standalone",
-        background_color: "#FAF7F0",
-        theme_color: "#78350f",
-        orientation: "any",
-        icons: [
-          {
-            src: "logo.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "logo.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable"
-          }
-        ]
-      };
-
-      const manifestStr = JSON.stringify(manifestObj);
-      const manifestBlob = new Blob([manifestStr], { type: 'application/json' });
-      const manifestUrl = URL.createObjectURL(manifestBlob);
-      const manifestEl = document.getElementById('manifestPlaceholder');
-      if (manifestEl) manifestEl.setAttribute('href', manifestUrl);
-
       // แสดงปุ่มติดตั้ง PWA เมื่อไม่ได้เปิดในโหมด Standalone
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       const btnInstall = document.getElementById('btnPwaInstall');
@@ -1059,13 +1024,23 @@
           self.addEventListener('install', (e) => self.skipWaiting());
           self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
           self.addEventListener('fetch', (e) => {
-            // Network first
             e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
           });
         `;
         const blob = new Blob([swScript], { type: 'application/javascript' });
         const swUrl = URL.createObjectURL(blob);
         navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW register notice:', err));
+      }
+    }
+
+    // ฟังก์ชันสั่งปลดล็อกการล็อกหน้าจอระดับฮาร์ดแวร์/เบราว์เซอร์
+    function unlockScreenOrientation() {
+      try {
+        if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+          screen.orientation.unlock().catch(() => {});
+        }
+      } catch (err) {
+        console.log('Orientation notice:', err);
       }
     }
 
