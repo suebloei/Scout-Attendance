@@ -47,6 +47,7 @@
     
     .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    
     @media print {
       @page {
         size: A4 portrait;
@@ -129,13 +130,13 @@
 
       <!-- เครื่องมือ: วันที่, ชื่อผู้บันทึก, ปุ่มติดตั้งแอป PWA -->
       <div id="checkinHeaderTools" class="grid grid-cols-12 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-2 w-full md:w-auto">
-        <!-- ช่องเลือกวันที่: 5 ส่วนบนมือถือ -->
+        <!-- ช่องเลือกวันที่ -->
         <div class="col-span-5 sm:col-auto bg-black/20 backdrop-blur-sm px-2 py-1.5 rounded-lg flex items-center gap-1.5 text-xs sm:text-sm border border-white/20 min-w-0">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-200 shrink-0"></i>
           <input type="date" id="checkDate" onchange="handleDateChange(this.value)" class="bg-transparent text-white focus:outline-none cursor-pointer text-xs w-full min-w-0">
         </div>
 
-        <!-- ช่องเลือกผู้บันทึก: ขยายเต็มพื้นที่ส่วนที่เหลือบนมือถือ -->
+        <!-- ช่องเลือกผู้บันทึก -->
         <div class="col-span-7 sm:col-auto flex-1 bg-black/20 backdrop-blur-sm px-2 py-1.5 rounded-lg flex items-center gap-1 text-xs sm:text-sm border border-white/20 min-w-0">
           <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-300 shrink-0"></i>
           <select id="recorderSelect" onchange="handleRecorderChange(this.value)" class="bg-transparent text-white focus:outline-none text-xs sm:text-sm w-full cursor-pointer truncate font-medium">
@@ -195,7 +196,7 @@
       <!-- ตัวเลือกประเภทและกอง -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4">
         <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ -->
+          <!-- สลับประเภท ลูกเสือ/เนตรนารี -->
           <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200 gap-1">
             <button id="btnCatScout" onclick="switchCategory('scout')" class="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition shadow bg-amber-800 text-white whitespace-nowrap">
               <img id="navScoutIcon" src="scout.jpg" alt="Scout" class="w-4 h-4 sm:w-5 sm:h-5 object-contain rounded-full shrink-0" onerror="handleScoutImgError(this)">
@@ -223,7 +224,6 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <!-- ปุ่มดึงข้อมูลจาก Google Sheets (Sync เข้าหน้าฟอร์ม) -->
             <button onclick="fetchAndRestoreFromSheets(true)" class="flex-1 sm:flex-none justify-center px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-300 flex items-center gap-1.5 transition shadow-sm" title="ดึงข้อมูลที่เคยเช็คชื่อไว้จาก Google Sheets">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-sky-600 shrink-0" id="syncCheckinIcon"></i>
               <span>ดึงข้อมูลจากชีต</span>
@@ -442,14 +442,15 @@
 
       <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden report-print-container"></div>
 
-      <!-- ส่วนลงนามท้ายรายงาน จัดวางคู่กันพอดีหน้า A4 ระนาบตรงกัน 100% -->
+      <!-- ส่วนลงนามท้ายรายงาน A4 ระนาบตรงกัน 100% และตำแหน่งอยู่ใต้ชื่อในวงเล็บ -->
       <div class="hidden print-only pt-8 mt-6 w-full" style="page-break-inside: avoid;">
         <table style="width: 100%; border: none; border-collapse: collapse;">
           <tr style="border: none;">
             <td style="border: none; width: 50%; vertical-align: top; padding: 0 15px;">
-              <div style="width: 300px; margin: 0 auto; text-align: center;">
-                <div style="font-size: 13px; white-space: nowrap;">
-                  ลงชื่อ..........................................................
+              <div style="width: 320px; margin: 0 auto; text-align: center;">
+                <div style="display: flex; align-items: flex-end; justify-content: center; font-size: 13px;">
+                  <span style="width: 45px; text-align: left; white-space: nowrap;">ลงชื่อ</span>
+                  <span style="flex: 1; border-bottom: 1px dotted #333; height: 16px;"></span>
                 </div>
                 <div class="font-semibold" style="margin-top: 6px; font-size: 13px;" id="printReportCommanderName">(นายวีระยุทธ์ ปู่เพ็ง)</div>
                 <div style="margin-top: 3px; font-size: 12.5px; color: #1e293b;">ผู้กำกับกอง</div>
@@ -457,9 +458,10 @@
               </div>
             </td>
             <td style="border: none; width: 50%; vertical-align: top; padding: 0 15px;">
-              <div style="width: 300px; margin: 0 auto; text-align: center;">
-                <div style="font-size: 13px; white-space: nowrap;">
-                  ลงชื่อ..........................................................
+              <div style="width: 320px; margin: 0 auto; text-align: center;">
+                <div style="display: flex; align-items: flex-end; justify-content: center; font-size: 13px;">
+                  <span style="width: 45px; text-align: left; white-space: nowrap;">ลงชื่อ</span>
+                  <span style="flex: 1; border-bottom: 1px dotted #333; height: 16px;"></span>
                 </div>
                 <div class="font-semibold" style="margin-top: 6px; font-size: 13px;">(นางสุภาวดี ภาระดี)</div>
                 <div style="margin-top: 3px; font-size: 12.5px; color: #1e293b;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
@@ -1005,16 +1007,15 @@
     let currentReportPeriod = 'daily';
     let attendanceHistoryData = [];
     let currentActiveRemarkTarget = null;
-    let checkedUnitsStore = {}; // เก็บตามวันที่: { "YYYY-MM-DD_category_unit": true }
+    let checkedUnitsStore = {}; 
     let lastGeneratedLineText = "";
-    let deferredPrompt = null; // สำหรับรองรับ Android PWA Prompt
+    let deferredPrompt = null; 
 
     window.addEventListener('DOMContentLoaded', () => {
       initPWA();
       setupBackToTop();
       unlockScreenOrientation();
 
-      // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว
       const savedChecked = localStorage.getItem('scout_checked_units_by_date_v1');
       if (savedChecked) {
         try { checkedUnitsStore = JSON.parse(savedChecked); } catch (e) { checkedUnitsStore = {}; }
@@ -1022,7 +1023,6 @@
         checkedUnitsStore = {};
       }
 
-      // โหลดฐานข้อมูล
       const savedDb = localStorage.getItem('scout_official_db_v2');
       if (savedDb) {
         try { db = JSON.parse(savedDb); } catch (e) { db = JSON.parse(JSON.stringify(schoolOfficialDatabase)); }
@@ -1031,7 +1031,6 @@
       }
       sortAllPatrols();
 
-      // ดึงวันที่ปัจจุบัน
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1047,7 +1046,6 @@
       const repFilterMonth = document.getElementById('repFilterMonth');
       if (repFilterMonth) repFilterMonth.value = `${year}-${month}`;
 
-      // ตั้งค่าภาคเรียนเริ่มต้นตามเดือนปัจจุบัน (ภาค 1: พ.ค.-ก.ย. [5-9], ภาค 2: ต.ค.-มี.ค. [10-12, 1-4])
       const repFilterSemester = document.getElementById('repFilterSemester');
       if (repFilterSemester) {
         const curMonthNum = now.getMonth() + 1;
@@ -1062,7 +1060,6 @@
       renderCurrentUnit();
       if (window.lucide) lucide.createIcons();
 
-      // ดึงข้อมูลล่าสุดจาก Google Sheets มาอัปเดตสถานะฟอร์มทันทีเมื่อเปิดเว็บ
       fetchAndRestoreFromSheets(false);
     });
 
@@ -1223,7 +1220,7 @@
       }
     }
 
-    // ==================== ระบบดึงข้อมูลจาก Google Sheets ลงฟอร์ม (Auto Restore) ====================
+    // ==================== ระบบดึงข้อมูลจาก Google Sheets ลงฟอร์ม ====================
     async function fetchAndRestoreFromSheets(notifyUser = true) {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       const syncIcon = document.getElementById('syncCheckinIcon');
@@ -1300,7 +1297,6 @@
       }
     }
 
-    // สลับแท็บหลัก (เช็คชื่อ / ภาพรวม / รายงาน)
     function switchMainTab(tab) {
       currentMainTab = tab;
       const secCheckin = document.getElementById('sectionCheckin');
@@ -2256,10 +2252,10 @@
             <tr>
               <td style="text-align:center; padding: 6px; border: 1px solid #333;">${runningNo++}</td>
               <td style="text-align:center; padding: 6px; border: 1px solid #333; font-family: monospace;">${m.id}</td>
-              <td style="padding: 6px; border: 1px solid #333;">${m.name}</td>
-              <td style="text-align:center; padding: 6px; border: 1px solid #333;">${m.classRoom || ''} เลขที่ ${m.no || ''}</td>
-              <td style="padding: 6px; border: 1px solid #333;">${p.patrolName}</td>
-              <td style="text-align:center; padding: 6px; border: 1px solid #333;">${m.role}</td>
+              <td style="padding: 6px; border: 1px solid #333; white-space: nowrap;">${m.name}</td>
+              <td style="text-align:center; padding: 6px; border: 1px solid #333; white-space: nowrap;">${m.classRoom || ''} เลขที่ ${m.no || ''}</td>
+              <td style="padding: 6px; border: 1px solid #333; white-space: nowrap;">${p.patrolName}</td>
+              <td style="text-align:center; padding: 6px; border: 1px solid #333; white-space: nowrap;">${m.role}</td>
               <td style="text-align:center; padding: 6px; border: 1px solid #333;">[ &nbsp; ]</td>
               <td style="text-align:center; padding: 6px; border: 1px solid #333;">[ &nbsp; ]</td>
               <td style="padding: 6px; border: 1px solid #333;"></td>
@@ -2295,7 +2291,7 @@
                 <th style="width: 70px;">รหัส</th>
                 <th>ชื่อ - นามสกุล</th>
                 <th style="width: 90px;">ชั้น/เลขที่</th>
-                <th style="width: 100px;">หมู่</th>
+                <th style="width: 110px;">หมู่</th>
                 <th style="width: 80px;">ตำแหน่ง</th>
                 <th style="width: 50px;">มา</th>
                 <th style="width: 70px;">เครื่องแบบ</th>
@@ -2521,7 +2517,6 @@
       
       document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
 
-      // ระบุชื่อผู้กำกับกองจริงในช่องลงนามตอนพิมพ์
       const selectedCat = document.getElementById('repFilterCategory').value;
       const selectedUnit = document.getElementById('repFilterUnit').value;
       let leaderName = '';
@@ -2541,7 +2536,6 @@
         cmdNameEl.innerText = leaderName ? `(${leaderName})` : `(......................................................)`;
       }
 
-      // หากในประวัติชีตยังไม่มีข้อมูล ให้รวบรวมจากข้อมูลในหน่วยปัจจุบันที่เช็คอยู่
       let displayRecords = dayData;
       if (displayRecords.length === 0) {
         const fallback = [];
@@ -2597,7 +2591,6 @@
         else if (r.status === 'ลา') { patrolMap[key].leave++; totalLev++; }
         else if (r.status === 'สาย') { patrolMap[key].late++; totalLat++; }
 
-        // นับเครื่องแบบเฉพาะนักเรียนที่มาเรียน หรือ สาย เท่านั้น
         const isAttended = (r.status === 'มา' || r.status === 'สาย');
         if (isAttended && (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ')) {
           patrolMap[key].uniformOk++;
@@ -2647,7 +2640,6 @@
         `;
       });
 
-      // แถวรวมทั้งสิ้น (Total Row)
       const grandAttended = totalPres + totalLat;
       const grandPct = totalMem > 0 ? Math.round((grandAttended / totalMem) * 100) : 0;
       html += `
@@ -2676,7 +2668,6 @@
         else if (r.status === 'ลา') l++;
         else if (r.status === 'สาย') lt++;
 
-        // เครื่องแบบเรียบร้อย นับเฉพาะผู้ที่ "มา" หรือ "สาย" เท่านั้น
         const isAttended = (r.status === 'มา' || r.status === 'สาย');
         if (isAttended && (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ')) {
           u++;
@@ -2686,7 +2677,6 @@
       const actualPresent = p + lt;
       const rate = total > 0 ? Math.round((actualPresent / total) * 100) : 0;
 
-      // KPI บนหน้าจอ
       const kpiRate = document.getElementById('kpiRate');
       if (kpiRate) kpiRate.innerText = `${rate}%`;
       const kpiTotal = document.getElementById('kpiTotal');
@@ -2700,7 +2690,6 @@
       const kpiLate = document.getElementById('kpiLate');
       if (kpiLate) kpiLate.innerText = lt;
 
-      // KPI บนแถบพิมพ์ A4 (ตารางสรุปด้านบนก่อนพิมพ์)
       const pTotal = document.getElementById('printKpiTotal');
       if (pTotal) pTotal.innerText = `${total} คน`;
       const pPres = document.getElementById('printKpiPresent');
@@ -2877,9 +2866,9 @@
         html += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-mono text-slate-500">${s.id}</td>
-            <td class="p-3 font-semibold text-slate-800">${s.name}</td>
-            <td class="p-3 text-slate-500">${s.unit} - ${s.patrol}</td>
-            <td class="p-3 text-slate-500">${s.role || '-'}</td>
+            <td class="p-3 font-semibold text-slate-800 whitespace-nowrap">${s.name}</td>
+            <td class="p-3 text-slate-500 whitespace-nowrap">${s.unit} - ${s.patrol}</td>
+            <td class="p-3 text-slate-500 whitespace-nowrap">${s.role || '-'}</td>
             <td class="p-3 text-center font-bold text-emerald-600">${s.present}</td>
             <td class="p-3 text-center font-bold text-rose-600">${s.absent}</td>
             <td class="p-3 text-center font-bold text-amber-600">${s.leave}</td>
@@ -2902,7 +2891,6 @@
     function printKP001Book() {
       const sem = document.getElementById('repFilterSemester').value || '1';
 
-      // อ่านค่าจากตัวกรองในหน้ารายงาน
       const repCatVal = document.getElementById('repFilterCategory').value;
       const repUnitVal = document.getElementById('repFilterUnit').value;
 
@@ -2919,7 +2907,6 @@
         if (!isNaN(parsed)) targetUnitId = parsed;
       }
 
-      // ตรวจสอบความถูกต้องของกอง (เนตรนารีมี 3 กอง)
       if (targetCategory === 'guide' && targetUnitId > 3) {
         targetUnitId = 1;
       }
@@ -2931,7 +2918,6 @@
       const currentYear = new Date().getFullYear();
       const thaiYear = (currentYear > 2500) ? currentYear : (currentYear + 543);
 
-      // กรองประวัติย้อนหลังตามภาคเรียนและกองที่เลือก
       const semData = attendanceHistoryData.filter(r => {
         if (!r.date) return false;
         const parts = r.date.split('-');
@@ -2945,7 +2931,6 @@
 
       const totalSessions = Math.max(1, [...new Set(semData.map(r => r.date))].length);
 
-      // รวบรวมรายชื่อนักเรียนจากฐานข้อมูลหลัก
       const allMembers = [];
       unitData.patrols.forEach(p => {
         p.members.forEach(m => {
@@ -2957,18 +2942,15 @@
       });
 
       let passCount = 0;
-      let failCount = 0;
       let memberRowsHtml = '';
 
       allMembers.forEach((m, idx) => {
-        // นับครั้งที่มาเรียนจริงจากประวัติ (รวมทั้ง 'มา' และ 'สาย')
         const myRecords = semData.filter(r => String(r.id).trim() === String(m.id).trim());
         let attended = 0;
 
         if (myRecords.length > 0) {
           attended = myRecords.filter(r => r.status === 'มา' || r.status === 'สาย').length;
         } else {
-          // หากยังไม่มีประวัติในชีต ให้ดึงจากสถานะที่เช็คอยู่ในหน้าปัจจุบัน
           attended = (m.status === 'มา' || m.status === 'สาย') ? 1 : 0;
         }
 
@@ -2977,31 +2959,38 @@
 
         if (isPass) {
           passCount++;
-        } else {
-          failCount++;
         }
 
         const classNoStr = `${m.classRoom || ''} เลขที่ ${m.no || ''}`.trim();
+        const isLeader = m.role === 'นายหมู่';
+        const isDeputy = m.role === 'รองนายหมู่';
+        
+        // สไตล์ Badge ผ/มผ และสีสลับแถว
+        const rowBg = (idx % 2 === 1) ? '#f8fafc' : '#ffffff';
+        const roleStyle = isLeader ? 'background:#fef3c7; color:#92400e; font-weight:bold; padding:2px 6px; border-radius:4px;' : (isDeputy ? 'background:#e0f2fe; color:#0369a1; font-weight:bold; padding:2px 6px; border-radius:4px;' : '');
 
         memberRowsHtml += `
-          <tr>
-            <td style="text-align: center; padding: 5px 3px;">${idx + 1}</td>
-            <td style="text-align: center; font-family: monospace; padding: 5px 3px;">${m.id}</td>
-            <td style="text-align: left; padding: 5px 6px; white-space: nowrap;">${m.name}</td>
-            <td style="text-align: center; padding: 5px 3px; white-space: nowrap;">${classNoStr}</td>
-            <td style="text-align: left; padding: 5px 6px; white-space: nowrap;">${m.patrolName}</td>
-            <td style="text-align: center; padding: 5px 3px; white-space: nowrap;">${m.role || '-'}</td>
-            <td style="text-align: center; padding: 5px 3px; font-weight: bold;">${attended}/${totalSessions}</td>
-            <td style="text-align: center; padding: 5px 3px; font-weight: bold;">${pct}%</td>
-            <td style="text-align: center; padding: 5px 3px; font-weight: bold; color: ${isPass ? '#15803d' : '#b91c1c'};">${isPass ? 'ผ' : 'มผ'}</td>
-            <td style="text-align: center; padding: 5px 3px;">${m.remark || '-'}</td>
+          <tr style="background-color: ${rowBg};">
+            <td style="text-align: center; padding: 6px 3px;">${idx + 1}</td>
+            <td style="text-align: center; font-family: monospace; padding: 6px 3px;">${m.id}</td>
+            <td style="text-align: left; padding: 6px 8px; white-space: nowrap; font-weight: 500;">${m.name}</td>
+            <td style="text-align: center; padding: 6px 4px; white-space: nowrap;">${classNoStr}</td>
+            <td style="text-align: left; padding: 6px 8px; white-space: nowrap; color: #1e293b;">${m.patrolName}</td>
+            <td style="text-align: center; padding: 6px 4px; white-space: nowrap;">${roleStyle ? `<span style="${roleStyle}">${m.role}</span>` : (m.role || '-')}</td>
+            <td style="text-align: center; padding: 6px 4px; font-weight: bold;">${attended}/${totalSessions}</td>
+            <td style="text-align: center; padding: 6px 4px; font-weight: bold;">${pct}%</td>
+            <td style="text-align: center; padding: 6px 4px;">
+              <span style="display:inline-block; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-size: 11px; ${isPass ? 'background:#dcfce7; color:#15803d; border:1px solid #86efac;' : 'background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;'}">
+                ${isPass ? 'ผ' : 'มผ'}
+              </span>
+            </td>
+            <td style="text-align: center; padding: 6px 4px; color: #64748b;">${m.remark || '-'}</td>
           </tr>
         `;
       });
 
       const totalStudents = allMembers.length;
-      // ประกันความถูกต้องของตัวเลขตารางแรก: ผ่าน + ไม่ผ่าน ต้องเท่ากับยอดนักเรียนทั้งหมด
-      failCount = totalStudents - passCount;
+      const failCount = totalStudents - passCount;
 
       const win = window.open('', '_blank');
       const htmlContent = `
@@ -3050,13 +3039,14 @@
               margin-top: 6px;
             }
             th, td {
-              border: 1px solid #111;
+              border: 1px solid #94a3b8;
               padding: 4px 5px;
             }
             th {
-              background-color: #f1f5f9;
+              background-color: #f8fafc;
               font-weight: 700;
               text-align: center;
+              color: #1e293b;
             }
             .approval-box {
               border: 1px solid #111;
@@ -3087,6 +3077,11 @@
             @media print {
               .no-print-bar { display: none !important; }
               body { margin: 0; padding: 0; }
+              table th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
             }
           </style>
         </head>
@@ -3121,7 +3116,7 @@
                 <div><b>ประเภท:</b> กิจกรรมพัฒนาผู้เรียน (${categoryText})</div>
               </div>
 
-              <!-- ตารางแรก: สรุปผลการประเมินเพื่อเสนอขออนุมัติ (ตัวเลขตรงเป๊ะ) -->
+              <!-- ตารางแรก: สรุปผลการประเมินเพื่อเสนอขออนุมัติ -->
               <div style="padding: 0 5px;">
                 <p style="margin: 0 0 5px 0; font-size: 13px; font-weight: 500;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
                 <div class="font-bold text-center" style="margin-bottom: 5px; font-size: 13.5px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
@@ -3145,7 +3140,7 @@
                 </table>
               </div>
 
-              <!-- รายชื่อผู้กำกับกอง และรองผู้กำกับกอง (จัดเป็นตาราง 2 คอลัมน์สมมาตร ตรงแนวเดียวกัน) -->
+              <!-- รายชื่อผู้กำกับกอง และรองผู้กำกับกอง (ตาราง 2 คอลัมน์สมมาตร) -->
               <div style="margin-top: 6px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
                   <tr style="border: none;">
@@ -3179,7 +3174,7 @@
                 </table>
               </div>
 
-              <!-- สายการลงนาม 3 ฝ่าย (จัดคอลัมน์กว้างเท่ากัน 33.33% ตำแหน่งตรงกันทุกจุด) -->
+              <!-- สายการลงนาม 3 ฝ่าย (33.33% เท่ากันทุกช่อง) -->
               <div style="margin-top: 4px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
                   <tr style="border: none; text-align: center; font-size: 12px;">
@@ -3203,7 +3198,7 @@
               </div>
             </div>
 
-            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการสถานศึกษา (คอลัมน์สมมาตร 50/50 ตรงแนวกับบล็อกบน) -->
+            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการสถานศึกษา -->
             <div class="approval-box" style="margin-bottom: 1mm;">
               <table style="width: 100%; border: none;">
                 <tr style="border: none;">
@@ -3247,7 +3242,7 @@
                   <th style="width: 175px;">ชื่อ - สกุล</th>
                   <th style="width: 85px;">ชั้น/เลขที่</th>
                   <th style="width: 120px;">หมู่</th>
-                  <th style="width: 80px;">ตำแหน่ง</th>
+                  <th style="width: 85px;">ตำแหน่ง</th>
                   <th style="width: 65px;">เวลาเรียน</th>
                   <th style="width: 50px;">ร้อยละ</th>
                   <th style="width: 55px;">ผลประเมิน</th>
