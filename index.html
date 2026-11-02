@@ -48,10 +48,43 @@
     .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     @media print {
-      body { background: #ffffff !important; padding-bottom: 0 !important; }
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm 10mm 12mm;
+      }
+      body { 
+        background: #ffffff !important; 
+        padding-bottom: 0 !important; 
+        color: #000 !important;
+      }
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+      .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; border: none !important; }
+      
+      /* ปรับให้หน้ารายงานพอดี 1 แผ่น A4 */
+      #sectionReport {
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .report-print-container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .report-table-official {
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      .report-table-official th, .report-table-official td {
+        border: 1px solid #333333 !important;
+        padding: 5px 6px !important;
+        color: #000 !important;
+      }
+      .report-table-official th {
+        background-color: #f1f5f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
     }
 
     /* Animation สำหรับป้ายเตือนขาดติดต่อกัน */
@@ -318,7 +351,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-100">
           <div>
             <label class="block text-xs font-semibold text-slate-500 mb-1">ประเภท</label>
-            <select id="repFilterCategory" onchange="renderActiveReport()" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
+            <select id="repFilterCategory" onchange="handleReportCategoryChange(); renderActiveReport();" class="w-full text-xs sm:text-sm p-2 rounded-lg border border-slate-200 bg-slate-50 font-medium">
               <option value="all">ทั้งหมด (ลูกเสือ + เนตรนารี)</option>
               <option value="ลูกเสือ">ลูกเสือ ม.1</option>
               <option value="เนตรนารี">เนตรนารี ม.1</option>
@@ -352,8 +385,8 @@
         </div>
       </div>
 
-      <!-- บัตรสรุป KPI -->
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <!-- บัตรสรุป KPI บนหน้าจอ (ซ่อนตอนพิมพ์เพื่อประหยัดพื้นที่หน้ากระดาษ A4) -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 no-print">
         <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <span class="text-xs font-semibold text-slate-500">อัตราการมาเรียน</span>
           <div class="mt-2 flex items-baseline gap-2">
@@ -379,20 +412,62 @@
         </div>
       </div>
 
-      <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"></div>
+      <!-- แถบสรุปสถิติทางการสำหรับการพิมพ์ A4 โดยเฉพาะ (กะทัดรัด สวยงาม ไม่กินพื้นที่) -->
+      <div class="hidden print-only mb-3">
+        <table class="report-table-official text-xs text-center w-full">
+          <thead>
+            <tr>
+              <th style="padding: 4px;">จำนวนสมาชิกทั้งหมด</th>
+              <th style="padding: 4px;">มาเรียน</th>
+              <th style="padding: 4px;">ขาด</th>
+              <th style="padding: 4px;">ลา</th>
+              <th style="padding: 4px;">สาย</th>
+              <th style="padding: 4px;">เครื่องแบบเรียบร้อย</th>
+              <th style="padding: 4px;">ร้อยละการมาเรียน</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="font-bold text-xs">
+              <td id="printKpiTotal" style="padding: 5px;">0 คน</td>
+              <td id="printKpiPresent" style="padding: 5px; color: #15803d;">0</td>
+              <td id="printKpiAbsent" style="padding: 5px; color: #b91c1c;">0</td>
+              <td id="printKpiLeave" style="padding: 5px; color: #b45309;">0</td>
+              <td id="printKpiLate" style="padding: 5px; color: #1d4ed8;">0</td>
+              <td id="printKpiUniform" style="padding: 5px;">0</td>
+              <td id="printKpiRate" style="padding: 5px;">0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <!-- ส่วนลงนามท้ายรายงาน -->
-      <div class="hidden print-only pt-12 mt-8 grid grid-cols-2 text-center text-xs">
-        <div>
-          <p>ลงชื่อ......................................................ผู้กำกับกองลูกเสือ</p>
-          <p class="mt-1">(......................................................)</p>
-          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
-        </div>
-        <div>
-          <p>ลงชื่อ......................................................รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</p>
-          <p class="mt-1">(นางสุภาวดี ภาระดี)</p>
-          <p class="mt-1">วันที่ ...... เดือน .................... พ.ศ. ........</p>
-        </div>
+      <div id="reportContentArea" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden report-print-container"></div>
+
+      <!-- ส่วนลงนามท้ายรายงาน จัดวางคู่กันพอดีหน้า A4 ระนาบตรงกัน 100% -->
+      <div class="hidden print-only pt-8 mt-6 w-full" style="page-break-inside: avoid;">
+        <table style="width: 100%; border: none; border-collapse: collapse;">
+          <tr style="border: none;">
+            <td style="border: none; width: 50%; vertical-align: top; padding: 0 15px;">
+              <div style="width: 300px; margin: 0 auto; text-align: center;">
+                <div style="font-size: 13px; white-space: nowrap;">
+                  ลงชื่อ..........................................................
+                </div>
+                <div class="font-semibold" style="margin-top: 6px; font-size: 13px;" id="printReportCommanderName">(นายวีระยุทธ์ ปู่เพ็ง)</div>
+                <div style="margin-top: 3px; font-size: 12.5px; color: #1e293b;">ผู้กำกับกอง</div>
+                <div style="margin-top: 5px; color: #475569; font-size: 11.5px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+              </div>
+            </td>
+            <td style="border: none; width: 50%; vertical-align: top; padding: 0 15px;">
+              <div style="width: 300px; margin: 0 auto; text-align: center;">
+                <div style="font-size: 13px; white-space: nowrap;">
+                  ลงชื่อ..........................................................
+                </div>
+                <div class="font-semibold" style="margin-top: 6px; font-size: 13px;">(นางสุภาวดี ภาระดี)</div>
+                <div style="margin-top: 3px; font-size: 12.5px; color: #1e293b;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
+                <div style="margin-top: 5px; color: #475569; font-size: 11.5px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     </section>
 
@@ -2375,6 +2450,35 @@
       renderActiveReport();
     }
 
+    function handleReportCategoryChange() {
+      const cat = document.getElementById('repFilterCategory').value;
+      const unitSelect = document.getElementById('repFilterUnit');
+      const curUnitVal = unitSelect.value;
+
+      if (cat === 'เนตรนารี') {
+        unitSelect.innerHTML = `
+          <option value="all">ทุกกอง</option>
+          <option value="กอง 1">กอง 1</option>
+          <option value="กอง 2">กอง 2</option>
+          <option value="กอง 3">กอง 3</option>
+        `;
+        if (curUnitVal === 'กอง 4') {
+          unitSelect.value = 'กอง 1';
+        } else {
+          unitSelect.value = curUnitVal;
+        }
+      } else {
+        unitSelect.innerHTML = `
+          <option value="all">ทุกกอง</option>
+          <option value="กอง 1">กอง 1</option>
+          <option value="กอง 2">กอง 2</option>
+          <option value="กอง 3">กอง 3</option>
+          <option value="กอง 4">กอง 4</option>
+        `;
+        unitSelect.value = curUnitVal;
+      }
+    }
+
     async function fetchSheetDataForReports() {
       const scriptUrl = localStorage.getItem('scout_script_url') || DEFAULT_SCRIPT_URL;
       const refIcon = document.getElementById('refreshIcon');
@@ -2413,12 +2517,61 @@
     function renderDailyReport(data) {
       const targetDate = document.getElementById('repFilterDate').value;
       const dayData = data.filter(r => r.date === targetDate);
-      const activityName = (dayData.length > 0 && dayData[0].activity) ? dayData[0].activity : "กิจกรรมประจำสัปดาห์";
+      const activityName = (dayData.length > 0 && dayData[0].activity) ? dayData[0].activity : (document.getElementById('activityTitleInput') ? document.getElementById('activityTitleInput').value : "กิจกรรมประจำสัปดาห์");
       
       document.getElementById('printReportSubtitle').innerText = `รายงานการมาเรียนประจำวัน: ${targetDate} | กิจกรรม: ${activityName}`;
-      updateKpis(dayData);
 
-      if (dayData.length === 0) {
+      // ระบุชื่อผู้กำกับกองจริงในช่องลงนามตอนพิมพ์
+      const selectedCat = document.getElementById('repFilterCategory').value;
+      const selectedUnit = document.getElementById('repFilterUnit').value;
+      let leaderName = '';
+
+      if (selectedCat !== 'all' && selectedUnit !== 'all') {
+        const catKey = (selectedCat === 'เนตรนารี') ? 'guide' : 'scout';
+        const uNum = parseInt(selectedUnit.replace('กอง', '').trim(), 10) || 1;
+        if (db[catKey] && db[catKey].units[uNum]) {
+          leaderName = db[catKey].units[uNum].leader;
+        }
+      } else if (db[currentCategory] && db[currentCategory].units[currentUnitId]) {
+        leaderName = db[currentCategory].units[currentUnitId].leader;
+      }
+      
+      const cmdNameEl = document.getElementById('printReportCommanderName');
+      if (cmdNameEl) {
+        cmdNameEl.innerText = leaderName ? `(${leaderName})` : `(......................................................)`;
+      }
+
+      // หากในประวัติชีตยังไม่มีข้อมูล ให้รวบรวมจากข้อมูลในหน่วยปัจจุบันที่เช็คอยู่
+      let displayRecords = dayData;
+      if (displayRecords.length === 0) {
+        const fallback = [];
+        const activeCatKey = (selectedCat === 'เนตรนารี') ? 'guide' : 'scout';
+        const uNum = parseInt(selectedUnit.replace('กอง', '').trim(), 10) || currentUnitId;
+        const curU = db[activeCatKey] && db[activeCatKey].units[uNum] ? db[activeCatKey].units[uNum] : db[currentCategory].units[currentUnitId];
+        
+        if (curU) {
+          curU.patrols.forEach(p => {
+            p.members.forEach(m => {
+              fallback.push({
+                date: targetDate,
+                category: (activeCatKey === 'guide') ? 'เนตรนารี' : 'ลูกเสือ',
+                unit: curU.name,
+                patrol: p.patrolName,
+                id: m.id,
+                name: m.name,
+                status: m.status || 'มา',
+                uniformStatus: m.uniform || 'ครบ',
+                remark: m.remark || ''
+              });
+            });
+          });
+        }
+        displayRecords = fallback;
+      }
+
+      updateKpis(displayRecords);
+
+      if (displayRecords.length === 0) {
         document.getElementById('reportContentArea').innerHTML = `
           <div class="p-10 text-center text-slate-400">
             <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
@@ -2429,62 +2582,139 @@
       }
 
       const patrolMap = {};
-      dayData.forEach(r => {
+      let totalMem = 0, totalPres = 0, totalAbs = 0, totalLev = 0, totalLat = 0, totalUni = 0;
+
+      displayRecords.forEach(r => {
         const key = `${r.category} ${r.unit} - ${r.patrol}`;
         if (!patrolMap[key]) {
           patrolMap[key] = { name: key, total: 0, present: 0, absent: 0, leave: 0, late: 0, uniformOk: 0 };
         }
         patrolMap[key].total++;
-        if (r.status === 'มา') patrolMap[key].present++;
-        else if (r.status === 'ขาด') patrolMap[key].absent++;
-        else if (r.status === 'ลา') patrolMap[key].leave++;
-        else if (r.status === 'สาย') patrolMap[key].late++;
-        if (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ') patrolMap[key].uniformOk++;
+        totalMem++;
+
+        if (r.status === 'มา') { patrolMap[key].present++; totalPres++; }
+        else if (r.status === 'ขาด') { patrolMap[key].absent++; totalAbs++; }
+        else if (r.status === 'ลา') { patrolMap[key].leave++; totalLev++; }
+        else if (r.status === 'สาย') { patrolMap[key].late++; totalLat++; }
+
+        // นับเครื่องแบบเฉพาะนักเรียนที่มาเรียน หรือ สาย เท่านั้น
+        const isAttended = (r.status === 'มา' || r.status === 'สาย');
+        if (isAttended && (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ')) {
+          patrolMap[key].uniformOk++;
+          totalUni++;
+        }
       });
 
       let html = `
-        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+        <div class="p-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 no-print">
           <div>
             <h3 class="font-bold text-slate-800 text-sm sm:text-base">สรุปสถิติประจำวันที่ ${targetDate}</h3>
             <p class="text-xs text-amber-800 font-semibold mt-0.5">กิจกรรม: ${activityName}</p>
           </div>
-          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">บันทึกทั้งหมด ${dayData.length} คน</span>
+          <span class="text-xs bg-slate-100 px-2.5 py-1 rounded-full text-slate-600">บันทึกทั้งหมด ${displayRecords.length} คน</span>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+          <table class="report-table-official w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-700 border-b border-slate-300 font-bold">
               <tr>
-                <th class="p-3">กอง / หมู่</th>
-                <th class="p-3 text-center">จำนวนสมาชิก</th>
-                <th class="p-3 text-center text-emerald-700">มา</th>
-                <th class="p-3 text-center text-rose-700">ขาด</th>
-                <th class="p-3 text-center text-amber-700">ลา</th>
-                <th class="p-3 text-center text-blue-700">สาย</th>
-                <th class="p-3 text-center text-indigo-700">เครื่องแบบครบ</th>
-                <th class="p-3 text-center font-bold">ร้อยละการมา</th>
+                <th class="p-2 sm:p-2.5 text-left">กอง / หมู่</th>
+                <th class="p-2 sm:p-2.5 text-center whitespace-nowrap">จำนวนสมาชิก</th>
+                <th class="p-2 sm:p-2.5 text-center text-emerald-700 whitespace-nowrap">มา</th>
+                <th class="p-2 sm:p-2.5 text-center text-rose-700 whitespace-nowrap">ขาด</th>
+                <th class="p-2 sm:p-2.5 text-center text-amber-700 whitespace-nowrap">ลา</th>
+                <th class="p-2 sm:p-2.5 text-center text-blue-700 whitespace-nowrap">สาย</th>
+                <th class="p-2 sm:p-2.5 text-center text-indigo-700 whitespace-nowrap">เครื่องแบบครบ</th>
+                <th class="p-2 sm:p-2.5 text-center font-bold whitespace-nowrap">ร้อยละการมา</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
+            <tbody class="divide-y divide-slate-200">
       `;
 
       Object.values(patrolMap).forEach(p => {
-        const pct = Math.round((p.present / p.total) * 100);
+        const actualPresent = p.present + p.late;
+        const pct = p.total > 0 ? Math.round((actualPresent / p.total) * 100) : 0;
         html += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-semibold text-slate-800">${p.name}</td>
-            <td class="p-3 text-center font-medium">${p.total}</td>
-            <td class="p-3 text-center font-bold text-emerald-600">${p.present}</td>
-            <td class="p-3 text-center font-bold text-rose-600">${p.absent}</td>
-            <td class="p-3 text-center font-bold text-amber-600">${p.leave}</td>
-            <td class="p-3 text-center font-bold text-blue-600">${p.late}</td>
-            <td class="p-3 text-center font-bold text-indigo-600">${p.uniformOk}</td>
-            <td class="p-3 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
+            <td class="p-2 sm:p-2.5 font-semibold text-slate-800" style="white-space: nowrap;">${p.name}</td>
+            <td class="p-2 sm:p-2.5 text-center font-medium">${p.total}</td>
+            <td class="p-2 sm:p-2.5 text-center font-bold text-emerald-600">${p.present}</td>
+            <td class="p-2 sm:p-2.5 text-center font-bold text-rose-600">${p.absent}</td>
+            <td class="p-2 sm:p-2.5 text-center font-bold text-amber-600">${p.leave}</td>
+            <td class="p-2 sm:p-2.5 text-center font-bold text-blue-600">${p.late}</td>
+            <td class="p-2 sm:p-2.5 text-center font-bold text-indigo-600">${p.uniformOk}</td>
+            <td class="p-2 sm:p-2.5 text-center font-extrabold ${pct >= 80 ? 'text-emerald-700' : 'text-rose-700'}">${pct}%</td>
           </tr>
         `;
       });
 
-      html += `</tbody></table></div>`;
+      // แถวรวมทั้งสิ้น (Total Row)
+      const grandAttended = totalPres + totalLat;
+      const grandPct = totalMem > 0 ? Math.round((grandAttended / totalMem) * 100) : 0;
+      html += `
+            <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
+              <td class="p-2 sm:p-2.5 text-left font-bold" style="white-space: nowrap;">รวมทั้งสิ้น</td>
+              <td class="p-2 sm:p-2.5 text-center">${totalMem}</td>
+              <td class="p-2 sm:p-2.5 text-center text-emerald-700">${totalPres}</td>
+              <td class="p-2 sm:p-2.5 text-center text-rose-700">${totalAbs}</td>
+              <td class="p-2 sm:p-2.5 text-center text-amber-700">${totalLev}</td>
+              <td class="p-2 sm:p-2.5 text-center text-blue-700">${totalLat}</td>
+              <td class="p-2 sm:p-2.5 text-center text-indigo-700">${totalUni}</td>
+              <td class="p-2 sm:p-2.5 text-center text-emerald-800">${grandPct}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
+
       document.getElementById('reportContentArea').innerHTML = html;
+    }
+
+    function updateKpis(records) {
+      let p = 0, a = 0, l = 0, lt = 0, u = 0;
+      records.forEach(r => {
+        if (r.status === 'มา') p++;
+        else if (r.status === 'ขาด') a++;
+        else if (r.status === 'ลา') l++;
+        else if (r.status === 'สาย') lt++;
+
+        // เครื่องแบบเรียบร้อย นับเฉพาะผู้ที่ "มา" หรือ "สาย" เท่านั้น
+        const isAttended = (r.status === 'มา' || r.status === 'สาย');
+        if (isAttended && (r.uniformStatus === 'เรียบร้อย' || r.uniformStatus === 'ครบ')) {
+          u++;
+        }
+      });
+      const total = records.length;
+      const actualPresent = p + lt;
+      const rate = total > 0 ? Math.round((actualPresent / total) * 100) : 0;
+
+      // KPI บนหน้าจอ
+      const kpiRate = document.getElementById('kpiRate');
+      if (kpiRate) kpiRate.innerText = `${rate}%`;
+      const kpiTotal = document.getElementById('kpiTotal');
+      if (kpiTotal) kpiTotal.innerText = `จาก ${total} รายการ`;
+      const kpiPresent = document.getElementById('kpiPresent');
+      if (kpiPresent) kpiPresent.innerText = p;
+      const kpiAbsent = document.getElementById('kpiAbsent');
+      if (kpiAbsent) kpiAbsent.innerText = a;
+      const kpiLeave = document.getElementById('kpiLeave');
+      if (kpiLeave) kpiLeave.innerText = l;
+      const kpiLate = document.getElementById('kpiLate');
+      if (kpiLate) kpiLate.innerText = lt;
+
+      // KPI บนแถบพิมพ์ A4 (ตารางสรุปด้านบนก่อนพิมพ์)
+      const pTotal = document.getElementById('printKpiTotal');
+      if (pTotal) pTotal.innerText = `${total} คน`;
+      const pPres = document.getElementById('printKpiPresent');
+      if (pPres) pPres.innerText = `${p}`;
+      const pAbs = document.getElementById('printKpiAbsent');
+      if (pAbs) pAbs.innerText = `${a}`;
+      const pLev = document.getElementById('printKpiLeave');
+      if (pLev) pLev.innerText = `${l}`;
+      const pLat = document.getElementById('printKpiLate');
+      if (pLat) pLat.innerText = `${lt}`;
+      const pUni = document.getElementById('printKpiUniform');
+      if (pUni) pUni.innerText = `${u}`;
+      const pRate = document.getElementById('printKpiRate');
+      if (pRate) pRate.innerText = `${rate}%`;
     }
 
     function renderMonthlyReport(data) {
@@ -2668,31 +2898,35 @@
       document.getElementById('reportContentArea').innerHTML = html;
     }
 
-    function updateKpis(records) {
-      let p = 0, a = 0, l = 0, lt = 0;
-      records.forEach(r => {
-        if (r.status === 'มา') p++;
-        else if (r.status === 'ขาด') a++;
-        else if (r.status === 'ลา') l++;
-        else if (r.status === 'สาย') lt++;
-      });
-      const total = records.length;
-      const rate = total > 0 ? Math.round((p / total) * 100) : 0;
-
-      document.getElementById('kpiRate').innerText = `${rate}%`;
-      document.getElementById('kpiTotal').innerText = `จาก ${total} รายการ`;
-      document.getElementById('kpiPresent').innerText = p;
-      document.getElementById('kpiAbsent').innerText = a;
-      document.getElementById('kpiLeave').innerText = l;
-      document.getElementById('kpiLate').innerText = lt;
-    }
-
     // ==================== ฟังก์ชันจัดทำและพิมพ์รูปเล่ม กพ.001 (ฉบับสมบูรณ์) ====================
     function printKP001Book() {
       const sem = document.getElementById('repFilterSemester').value || '1';
-      const isScout = (currentCategory === 'scout');
+
+      // อ่านค่าจากตัวกรองในหน้ารายงาน
+      const repCatVal = document.getElementById('repFilterCategory').value;
+      const repUnitVal = document.getElementById('repFilterUnit').value;
+
+      let targetCategory = currentCategory;
+      if (repCatVal === 'เนตรนารี') {
+        targetCategory = 'guide';
+      } else if (repCatVal === 'ลูกเสือ') {
+        targetCategory = 'scout';
+      }
+
+      let targetUnitId = currentUnitId;
+      if (repUnitVal && repUnitVal !== 'all') {
+        const parsed = parseInt(repUnitVal.replace('กอง', '').trim(), 10);
+        if (!isNaN(parsed)) targetUnitId = parsed;
+      }
+
+      // ตรวจสอบความถูกต้องของกอง (เนตรนารีมี 3 กอง)
+      if (targetCategory === 'guide' && targetUnitId > 3) {
+        targetUnitId = 1;
+      }
+
+      const isScout = (targetCategory === 'scout');
       const categoryText = isScout ? 'กิจกรรมลูกเสือ' : 'กิจกรรมเนตรนารี';
-      const unitData = db[currentCategory].units[currentUnitId];
+      const unitData = db[targetCategory].units[targetUnitId];
 
       const currentYear = new Date().getFullYear();
       const thaiYear = (currentYear > 2500) ? currentYear : (currentYear + 543);
@@ -2727,20 +2961,25 @@
       let memberRowsHtml = '';
 
       allMembers.forEach((m, idx) => {
-        // นับครั้งที่มาเรียนจริงจากประวัติ
+        // นับครั้งที่มาเรียนจริงจากประวัติ (รวมทั้ง 'มา' และ 'สาย')
         const myRecords = semData.filter(r => String(r.id).trim() === String(m.id).trim());
-        let attended = myRecords.filter(r => r.status === 'มา' || r.status === 'สาย').length;
+        let attended = 0;
 
-        // หากยังไม่มีประวัติในชีต ให้ใช้ข้อมูลที่กำลังเลือกอยู่ในหน้าเว็บ
-        if (myRecords.length === 0) {
+        if (myRecords.length > 0) {
+          attended = myRecords.filter(r => r.status === 'มา' || r.status === 'สาย').length;
+        } else {
+          // หากยังไม่มีประวัติในชีต ให้ดึงจากสถานะที่เช็คอยู่ในหน้าปัจจุบัน
           attended = (m.status === 'มา' || m.status === 'สาย') ? 1 : 0;
         }
 
         const pct = Math.round((attended / totalSessions) * 100);
-        const isPass = pct >= 80;
+        const isPass = (pct >= 80);
 
-        if (isPass) passCount++;
-        else failCount++;
+        if (isPass) {
+          passCount++;
+        } else {
+          failCount++;
+        }
 
         const classNoStr = `${m.classRoom || ''} เลขที่ ${m.no || ''}`.trim();
 
@@ -2761,30 +3000,8 @@
       });
 
       const totalStudents = allMembers.length;
-
-      // จัดทำบล็อกรายชื่อผู้กำกับกองและรองผู้กำกับกองแยกรายบุคคลแบบกล่องลายเซ็น
-      const commandersList = [
-        { role: "ผู้กำกับกอง", name: unitData.leader }
-      ];
-      if (unitData.deputies && unitData.deputies.length > 0) {
-        unitData.deputies.forEach(depName => {
-          commandersList.push({ role: "รองผู้กำกับกอง", name: depName });
-        });
-      }
-
-      // คำนวณความกว้างคอลัมน์ตามจำนวนผู้กำกับ/รองผู้กำกับ (เช่น 2, 3 หรือ 4 คน)
-      const colWidthPct = (100 / commandersList.length).toFixed(2);
-      let commandersSignaturesHtml = '<table style="width: 100%; border: none;"><tr style="border: none; text-align: center; font-size: 11px;">';
-      commandersList.forEach(cmd => {
-        commandersSignaturesHtml += `
-          <td style="border: none; width: ${colWidthPct}%; padding: 4px; vertical-align: top;">
-            <div class="font-bold">${cmd.role}</div>
-            <div style="margin-top: 20px;">ลงชื่อ..................................................</div>
-            <div style="margin-top: 3px;">(${cmd.name})</div>
-          </td>
-        `;
-      });
-      commandersSignaturesHtml += '</tr></table>';
+      // ประกันความถูกต้องของตัวเลขตารางแรก: ผ่าน + ไม่ผ่าน ต้องเท่ากับยอดนักเรียนทั้งหมด
+      failCount = totalStudents - passCount;
 
       const win = window.open('', '_blank');
       const htmlContent = `
@@ -2843,7 +3060,7 @@
             }
             .approval-box {
               border: 1px solid #111;
-              padding: 8px 12px;
+              padding: 12px 16px;
               margin-top: 10px;
               border-radius: 4px;
             }
@@ -2883,19 +3100,19 @@
           </div>
 
           <!-- ==================== หน้า 1: หน้าปกราชการ กพ.001 (Single-page fit & Balanced Spacing) ==================== -->
-          <div class="page" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 265mm; padding: 5mm 2mm;">
-            <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="page" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 265mm; padding: 4mm 2mm;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
               <!-- ส่วนหัวตราโรงเรียน -->
               <div class="text-center" style="margin-bottom: 2px;">
-                <img src="logo.png" alt="Logo" style="width: 82px; height: 82px; object-fit: contain;" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
-                <div class="font-bold" style="font-size: 18px; margin-top: 6px; letter-spacing: 0.5px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
-                <div class="font-bold" style="font-size: 16px; margin-top: 2px;">โรงเรียนสีชมพูศึกษา</div>
-                <div style="font-size: 13px; margin-top: 2px;">ตำบลวังเพิ่ม อำเภอสีชมพู จังหวัดขอนแก่น</div>
-                <div style="font-size: 13px;">สังกัดองค์การบริหารส่วนจังหวัดขอนแก่น</div>
+                <img src="logo.png" alt="Logo" style="width: 80px; height: 80px; object-fit: contain;" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
+                <div class="font-bold" style="font-size: 17.5px; margin-top: 5px; letter-spacing: 0.5px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+                <div class="font-bold" style="font-size: 15.5px; margin-top: 2px;">โรงเรียนสีชมพูศึกษา</div>
+                <div style="font-size: 12.5px; margin-top: 2px;">ตำบลวังเพิ่ม อำเภอสีชมพู จังหวัดขอนแก่น</div>
+                <div style="font-size: 12.5px;">สังกัดองค์การบริหารส่วนจังหวัดขอนแก่น</div>
               </div>
 
               <!-- ข้อมูลกิจกรรม ภาคเรียน และปีการศึกษา -->
-              <div style="padding: 0 10px; font-size: 13.5px; line-height: 1.7; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding-top: 8px; padding-bottom: 8px;">
+              <div style="padding: 0 10px; font-size: 13px; line-height: 1.65; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding-top: 6px; padding-bottom: 6px;">
                 <div style="display: flex; justify-content: space-between;">
                   <div><b>ภาคเรียนที่จัดกิจกรรม:</b> ${sem}</div>
                   <div><b>ปีการศึกษา:</b> ${thaiYear}</div>
@@ -2904,57 +3121,57 @@
                 <div><b>ประเภท:</b> กิจกรรมพัฒนาผู้เรียน (${categoryText})</div>
               </div>
 
-              <!-- ตารางสรุปผลการประเมินเพื่อเสนอขออนุมัติ -->
+              <!-- ตารางแรก: สรุปผลการประเมินเพื่อเสนอขออนุมัติ (ตัวเลขตรงเป๊ะ) -->
               <div style="padding: 0 5px;">
-                <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 500;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
-                <div class="font-bold text-center" style="margin-bottom: 6px; font-size: 14px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+                <p style="margin: 0 0 5px 0; font-size: 13px; font-weight: 500;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
+                <div class="font-bold text-center" style="margin-bottom: 5px; font-size: 13.5px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
                 <table>
                   <thead>
                     <tr>
-                      <th style="width: 25%; padding: 7px;">จำนวนนักเรียน (คน)</th>
-                      <th style="width: 25%; padding: 7px;">ผ่าน (ผ)</th>
-                      <th style="width: 25%; padding: 7px;">ไม่ผ่าน (มผ)</th>
-                      <th style="width: 25%; padding: 7px;">หมายเหตุ</th>
+                      <th style="width: 25%; padding: 6px;">จำนวนนักเรียน (คน)</th>
+                      <th style="width: 25%; padding: 6px;">ผ่าน (ผ)</th>
+                      <th style="width: 25%; padding: 6px;">ไม่ผ่าน (มผ)</th>
+                      <th style="width: 25%; padding: 6px;">หมายเหตุ</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="text-center font-bold" style="font-size: 14px;">
-                      <td style="padding: 8px;">${totalStudents}</td>
-                      <td style="padding: 8px; color: #15803d;">${passCount}</td>
-                      <td style="padding: 8px; color: #b91c1c;">${failCount}</td>
-                      <td style="padding: 8px; font-weight: normal;">-</td>
+                    <tr class="text-center font-bold" style="font-size: 13.5px;">
+                      <td style="padding: 7px;">${totalStudents}</td>
+                      <td style="padding: 7px; color: #15803d;">${passCount}</td>
+                      <td style="padding: 7px; color: ${failCount > 0 ? '#b91c1c' : '#334155'};">${failCount}</td>
+                      <td style="padding: 7px; font-weight: normal;">-</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <!-- รายชื่อผู้กำกับกอง และรองผู้กำกับกอง (จัดเป็น Grid 2 คอลัมน์ แถวละ 2 คน สวยงาม ไม่อัดแน่น) -->
-              <div style="margin-top: 8px; padding: 0 5px;">
+              <!-- รายชื่อผู้กำกับกอง และรองผู้กำกับกอง (จัดเป็นตาราง 2 คอลัมน์สมมาตร ตรงแนวเดียวกัน) -->
+              <div style="margin-top: 6px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
                   <tr style="border: none;">
-                    <td style="border: none; width: 50%; padding: 8px 15px; vertical-align: top; text-align: center;">
-                      <div class="font-bold" style="font-size: 13px;">ผู้กำกับกอง</div>
-                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
-                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.leader})</div>
+                    <td style="border: none; width: 50%; padding: 6px 12px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 12.5px;">ผู้กำกับกอง</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 3px; font-size: 12px;">(${unitData.leader})</div>
                     </td>
-                    <td style="border: none; width: 50%; padding: 8px 15px; vertical-align: top; text-align: center;">
-                      <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
-                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
-                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies && unitData.deputies[0] ? unitData.deputies[0] : '-'})</div>
+                    <td style="border: none; width: 50%; padding: 6px 12px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 12.5px;">รองผู้กำกับกอง</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 3px; font-size: 12px;">(${unitData.deputies && unitData.deputies[0] ? unitData.deputies[0] : '-'})</div>
                     </td>
                   </tr>
                   ${(unitData.deputies && unitData.deputies.length > 1) ? `
                   <tr style="border: none;">
-                    <td style="border: none; width: 50%; padding: 12px 15px 4px 15px; vertical-align: top; text-align: center;">
-                      <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
-                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
-                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies[1]})</div>
+                    <td style="border: none; width: 50%; padding: 10px 12px 2px 12px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 12.5px;">รองผู้กำกับกอง</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 3px; font-size: 12px;">(${unitData.deputies[1]})</div>
                     </td>
-                    <td style="border: none; width: 50%; padding: 12px 15px 4px 15px; vertical-align: top; text-align: center;">
+                    <td style="border: none; width: 50%; padding: 10px 12px 2px 12px; vertical-align: top; text-align: center;">
                       ${unitData.deputies[2] ? `
-                        <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
-                        <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
-                        <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies[2]})</div>
+                        <div class="font-bold" style="font-size: 12.5px;">รองผู้กำกับกอง</div>
+                        <div style="margin-top: 24px;">ลงชื่อ..........................................................</div>
+                        <div style="margin-top: 3px; font-size: 12px;">(${unitData.deputies[2]})</div>
                       ` : ''}
                     </td>
                   </tr>
@@ -2962,52 +3179,53 @@
                 </table>
               </div>
 
-              <!-- สายการลงนาม 3 ฝ่าย (หัวหน้ากิจกรรม, หัวหน้ากิจกรรมพัฒนาผู้เรียน, หัวหน้ากลุ่มบริหารงานวิชาการ) -->
-              <div style="margin-top: 6px; padding: 0 5px;">
+              <!-- สายการลงนาม 3 ฝ่าย (จัดคอลัมน์กว้างเท่ากัน 33.33% ตำแหน่งตรงกันทุกจุด) -->
+              <div style="margin-top: 4px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
                   <tr style="border: none; text-align: center; font-size: 12px;">
-                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                    <td style="border: none; width: 33.33%; padding: 4px 6px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากิจกรรม</div>
-                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
-                      <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 3px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
                     </td>
-                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                    <td style="border: none; width: 33.33%; padding: 4px 6px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากิจกรรมพัฒนาผู้เรียน</div>
-                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
-                      <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 3px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
                     </td>
-                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                    <td style="border: none; width: 33.33%; padding: 4px 6px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากลุ่มบริหารงานวิชาการ</div>
-                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
-                      <div style="margin-top: 4px;">(นางสาวอารญา ผุยเบ้า)</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 3px;">(นางสาวอารญา ผุยเบ้า)</div>
                     </td>
                   </tr>
                 </table>
               </div>
             </div>
 
-            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการสถานศึกษา -->
-            <div class="approval-box" style="margin-bottom: 2mm; padding: 14px 16px;">
-              <div style="display: flex; justify-content: space-between; font-size: 12.5px;">
-                <div style="width: 48%; text-align: center;">
-                  <div class="font-bold" style="margin-bottom: 28px; font-size: 13px;">เรียนเสนอเพื่อพิจารณา</div>
-                  <div>ลงชื่อ..........................................................</div>
-                  <div style="margin-top: 4px; font-weight: 500;">(นางสุภาวดี ภาระดี)</div>
-                  <div style="font-size: 11.5px; margin-top: 3px; color: #334155;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
-                  <div style="font-size: 11.5px; margin-top: 4px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
-                </div>
-
-                <div style="width: 48%; text-align: center; border-left: 1px dashed #94a3b8; padding-left: 14px;">
-                  <div style="margin-bottom: 18px; font-size: 13px;">
-                    <span style="display: inline-block; margin-right: 24px;">[ &nbsp; ] อนุมัติ</span>
-                    <span>[ &nbsp; ] ไม่อนุมัติ</span>
-                  </div>
-                  <div>ลงชื่อ..........................................................</div>
-                  <div style="margin-top: 4px;" class="font-bold">(นางสุภลักษณ์ ดียิ่ง)</div>
-                  <div style="font-size: 11.5px; margin-top: 3px; color: #334155;">ผู้อำนวยการโรงเรียนสีชมพูศึกษา</div>
-                  <div style="font-size: 11.5px; margin-top: 4px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
-                </div>
-              </div>
+            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการสถานศึกษา (คอลัมน์สมมาตร 50/50 ตรงแนวกับบล็อกบน) -->
+            <div class="approval-box" style="margin-bottom: 1mm;">
+              <table style="width: 100%; border: none;">
+                <tr style="border: none;">
+                  <td style="border: none; width: 50%; padding: 4px 12px; vertical-align: top; text-align: center;">
+                    <div class="font-bold" style="margin-bottom: 24px; font-size: 13px;">เรียนเสนอเพื่อพิจารณา</div>
+                    <div>ลงชื่อ..........................................................</div>
+                    <div style="margin-top: 3px; font-weight: 500;">(นางสุภาวดี ภาระดี)</div>
+                    <div style="font-size: 11.5px; margin-top: 2px; color: #334155;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
+                    <div style="font-size: 11px; margin-top: 3px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                  </td>
+                  <td style="border: none; width: 50%; padding: 4px 12px; vertical-align: top; text-align: center; border-left: 1px dashed #94a3b8;">
+                    <div style="margin-bottom: 16px; font-size: 12.5px;">
+                      <span style="display: inline-block; margin-right: 20px;">[ &nbsp; ] อนุมัติ</span>
+                      <span>[ &nbsp; ] ไม่อนุมัติ</span>
+                    </div>
+                    <div>ลงชื่อ..........................................................</div>
+                    <div style="margin-top: 3px;" class="font-bold">(นางสุภลักษณ์ ดียิ่ง)</div>
+                    <div style="font-size: 11.5px; margin-top: 2px; color: #334155;">ผู้อำนวยการโรงเรียนสีชมพูศึกษา</div>
+                    <div style="font-size: 11px; margin-top: 3px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                  </td>
+                </tr>
+              </table>
             </div>
           </div>
 
