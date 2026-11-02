@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
+  
+  <!-- PWA Meta Tags & Web Manifest -->
+  <meta name="theme-color" content="#78350f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="เช็คชื่อลูกเสือ ม.1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link id="manifestPlaceholder" rel="manifest">
+
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -28,6 +38,15 @@
       .no-print { display: none !important; }
       .print-only { display: block !important; }
       .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+    }
+
+    /* Animation สำหรับป้ายเตือนขาดติดต่อกัน */
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(0.97); }
+    }
+    .badge-consecutive-absent {
+      animation: pulse-subtle 2s infinite ease-in-out;
     }
   </style>
 </head>
@@ -360,6 +379,11 @@
       <span class="leading-relaxed font-medium">พัฒนาโดย <b class="text-slate-800">นายนพคุณ สืบเลย</b> และ <b class="text-slate-800">นายสิทธิศักดิ์ สิงห์โสภา</b> โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น</span>
     </div>
   </main>
+
+  <!-- ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Back to Top) -->
+  <button id="btnBackToTop" onclick="scrollToTop()" class="fixed bottom-24 sm:bottom-20 right-4 z-40 bg-slate-900/80 hover:bg-slate-900 text-white p-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 translate-y-12 opacity-0 pointer-events-none no-print border border-slate-700/60 active:scale-90 flex items-center justify-center" title="กลับขึ้นบนสุด">
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
 
   <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV และชิดขวา) -->
   <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-3 sm:px-4 shadow-2xl z-40 no-print pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
@@ -859,6 +883,9 @@
     let lastGeneratedLineText = "";
 
     window.addEventListener('DOMContentLoaded', () => {
+      initPWA();
+      setupBackToTop();
+
       // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว (ผูกตามวันที่)
       const savedChecked = localStorage.getItem('scout_checked_units_by_date_v1');
       if (savedChecked) {
@@ -910,6 +937,77 @@
       // ดึงข้อมูลล่าสุดจาก Google Sheets มาอัปเดตสถานะฟอร์มทันทีเมื่อเปิดเว็บ
       fetchAndRestoreFromSheets(false);
     });
+
+    // ==================== ระบบ PWA (Progressive Web App) ====================
+    function initPWA() {
+      // สร้าง Web App Manifest แบบ Dynamic Data URI
+      const manifestObj = {
+        name: "ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา",
+        short_name: "เช็คชื่อลูกเสือ ม.1",
+        description: "ระบบเช็คชื่อและรายงานผลกิจกรรมลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น",
+        start_url: "./index.html",
+        display: "standalone",
+        background_color: "#FAF7F0",
+        theme_color: "#78350f",
+        orientation: "portrait",
+        icons: [
+          {
+            src: "logo.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
+            src: "logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
+          }
+        ]
+      };
+
+      const manifestStr = JSON.stringify(manifestObj);
+      const manifestBlob = new Blob([manifestStr], { type: 'application/json' });
+      const manifestUrl = URL.createObjectURL(manifestBlob);
+      const manifestEl = document.getElementById('manifestPlaceholder');
+      if (manifestEl) manifestEl.setAttribute('href', manifestUrl);
+
+      // ลงทะเบียน Service Worker แบบ Minimal เพื่อรองรับ Add to Home Screen
+      if ('serviceWorker' in navigator) {
+        const swScript = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => {
+            // Network first
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+          });
+        `;
+        const blob = new Blob([swScript], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW register notice:', err));
+      }
+    }
+
+    // ==================== ปุ่มเลื่อนกลับขึ้นบนสุด (Back to Top) ====================
+    function setupBackToTop() {
+      const btn = document.getElementById('btnBackToTop');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          btn.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+          btn.classList.add('translate-y-0', 'opacity-100');
+        } else {
+          btn.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none');
+          btn.classList.remove('translate-y-0', 'opacity-100');
+        }
+      });
+    }
+
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
 
     // Fallback เมื่อโหลดรูป scout.jpg ไม่พบ
     function handleScoutImgError(img) {
@@ -1206,6 +1304,28 @@
       return (select && select.value) ? select.value : 'ผู้กำกับลูกเสือ';
     }
 
+    // ฟังก์ชันคำนวณจำนวนครั้งที่ขาดติดต่อกันจากประวัติที่ผ่านมา
+    function getConsecutiveAbsentCount(studentId) {
+      if (!attendanceHistoryData || attendanceHistoryData.length === 0) return 0;
+      
+      const targetId = String(studentId).trim();
+      // ดึงประวัติของนักเรียนคนนี้ทั้งหมด และเรียงวันที่จากใหม่ไปเก่า
+      const studentRecords = attendanceHistoryData
+        .filter(r => String(r.id).trim() === targetId && r.date)
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      let count = 0;
+      for (const rec of studentRecords) {
+        if (rec.status === 'ขาด') {
+          count++;
+        } else if (rec.status === 'มา' || rec.status === 'สาย') {
+          // หากพบวันที่มาหรือสาย ให้หยุดนับเนื่องจากไม่ได้ขาดติดต่อกันแล้ว
+          break;
+        }
+      }
+      return count;
+    }
+
     // เรนเดอร์การ์ดหมู่และรายชื่อนักเรียน
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
@@ -1291,8 +1411,12 @@
 
           const isUniformComplete = (student.uniform === "ครบ");
 
+          // ตรวจสอบการขาดติดต่อกัน 3 ครั้งขึ้นไป
+          const consecutiveAbsent = getConsecutiveAbsentCount(student.id);
+          const hasConsecutiveAlert = consecutiveAbsent >= 3;
+
           html += `
-            <div class="student-row px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition" data-search="${student.name} ${student.id} ${student.classRoom} ${student.no} ${patrol.patrolName}">
+            <div class="student-row px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-50/70 transition ${hasConsecutiveAlert ? 'bg-rose-50/40 border-l-4 border-l-rose-500' : ''}" data-search="${student.name} ${student.id} ${student.classRoom} ${student.no} ${patrol.patrolName}">
               <!-- ข้อมูลนักเรียน -->
               <div class="flex items-center gap-3">
                 <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-200">
@@ -1305,6 +1429,15 @@
                     <select onchange="changeMemberRole(${pIndex}, ${sIndex}, this.value)" class="text-[11px] py-0.5 px-2 rounded-md font-semibold border ${roleBadgeBg} cursor-pointer focus:outline-none">
                       ${roleOptionsHtml}
                     </select>
+
+                    <!-- ป้ายเตือนภัยขาดติดต่อกัน 3 ครั้งขึ้นไป -->
+                    ${hasConsecutiveAlert ? `
+                      <span class="badge-consecutive-absent inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs" title="ขาดติดต่อกัน ${consecutiveAbsent} ครั้งขึ้นไป ผู้กำกับโปรดติดตาม">
+                        <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-200"></i>
+                        <span>ขาดติดต่อกัน ${consecutiveAbsent} ครั้ง</span>
+                      </span>
+                    ` : ''}
+
                     <!-- ปุ่มเปิดหมายเหตุรายบุคคล -->
                     <button onclick="openRemarkModal(${pIndex}, ${sIndex})" class="text-[11px] px-2 py-0.5 rounded-md border flex items-center gap-1 transition ${student.remark ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-700'}">
                       <i data-lucide="edit-2" class="w-3 h-3"></i>
