@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
   
   <!-- PWA Meta Tags & Web Manifest -->
@@ -11,6 +11,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="เช็คชื่อลูกเสือ ม.1">
   <meta name="mobile-web-app-capable" content="yes">
+  <!-- อนุญาตให้หมุนจออิสระทั้งใน iOS และ Android Web App -->
+  <meta name="screen-orientation" content="any">
+  <meta name="x5-orientation" content="auto">
   <link rel="apple-touch-icon" href="logo.png">
   <link id="manifestPlaceholder" rel="manifest">
 
@@ -27,6 +30,20 @@
       overflow-x: hidden;
       width: 100%;
     }
+    /* ปรับแต่งระยะ padding ด้านล่างให้เหมาะสมกับหน้าจอแนวนอน (Landscape) เพื่อไม่ให้ล้น */
+    @media (orientation: landscape) and (max-height: 550px) {
+      body {
+        padding-bottom: 5.5rem !important;
+      }
+      #bottomCheckinBar {
+        padding-top: 0.35rem !important;
+        padding-bottom: calc(0.35rem + env(safe-area-inset-bottom)) !important;
+      }
+      #btnBackToTop {
+        bottom: 5.5rem !important;
+      }
+    }
+
     /* ซ่อน scrollbar แต่ยังสไลด์ได้ เพื่อความเรียบหรูในแอปมือถือ */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -922,6 +939,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       initPWA();
       setupBackToTop();
+      unlockScreenOrientation();
 
       // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว (ผูกตามวันที่)
       const savedChecked = localStorage.getItem('scout_checked_units_by_date_v1');
@@ -1048,6 +1066,19 @@
         const blob = new Blob([swScript], { type: 'application/javascript' });
         const swUrl = URL.createObjectURL(blob);
         navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW register notice:', err));
+      }
+    }
+
+    // ฟังก์ชันสั่งปลดล็อกการล็อกหน้าจอระดับฮาร์ดแวร์/เบราว์เซอร์
+    function unlockScreenOrientation() {
+      try {
+        if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+          screen.orientation.unlock().catch(() => {
+            // กรณีเบราว์เซอร์ไม่อนุญาตให้อนล็อกก่อนมี User Gesture
+          });
+        }
+      } catch (err) {
+        console.log('Orientation unlock not supported or requires gesture:', err);
       }
     }
 
