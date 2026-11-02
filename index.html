@@ -2761,7 +2761,30 @@
       });
 
       const totalStudents = allMembers.length;
-      const deputiesList = (unitData.deputies && unitData.deputies.length > 0) ? unitData.deputies.join(', ') : '-';
+
+      // จัดทำบล็อกรายชื่อผู้กำกับกองและรองผู้กำกับกองแยกรายบุคคลแบบกล่องลายเซ็น
+      const commandersList = [
+        { role: "ผู้กำกับกอง", name: unitData.leader }
+      ];
+      if (unitData.deputies && unitData.deputies.length > 0) {
+        unitData.deputies.forEach(depName => {
+          commandersList.push({ role: "รองผู้กำกับกอง", name: depName });
+        });
+      }
+
+      // คำนวณความกว้างคอลัมน์ตามจำนวนผู้กำกับ/รองผู้กำกับ (เช่น 2, 3 หรือ 4 คน)
+      const colWidthPct = (100 / commandersList.length).toFixed(2);
+      let commandersSignaturesHtml = '<table style="width: 100%; border: none;"><tr style="border: none; text-align: center; font-size: 11px;">';
+      commandersList.forEach(cmd => {
+        commandersSignaturesHtml += `
+          <td style="border: none; width: ${colWidthPct}%; padding: 4px; vertical-align: top;">
+            <div class="font-bold">${cmd.role}</div>
+            <div style="margin-top: 20px;">ลงชื่อ..................................................</div>
+            <div style="margin-top: 3px;">(${cmd.name})</div>
+          </td>
+        `;
+      });
+      commandersSignaturesHtml += '</tr></table>';
 
       const win = window.open('', '_blank');
       const htmlContent = `
@@ -2776,14 +2799,14 @@
           <style>
             @page {
               size: A4 portrait;
-              margin: 12mm 15mm 12mm 15mm;
+              margin: 10mm 14mm 10mm 14mm;
             }
             * {
               box-sizing: border-box;
             }
             body {
               font-family: 'Sarabun', sans-serif;
-              font-size: 13px;
+              font-size: 12.5px;
               line-height: 1.35;
               color: #111;
               margin: 0;
@@ -2792,7 +2815,7 @@
             }
             .page {
               width: 100%;
-              min-height: 267mm;
+              min-height: 270mm;
               position: relative;
               page-break-after: always;
             }
@@ -2807,7 +2830,7 @@
             table {
               width: 100%;
               border-collapse: collapse;
-              margin-top: 8px;
+              margin-top: 6px;
             }
             th, td {
               border: 1px solid #111;
@@ -2820,8 +2843,8 @@
             }
             .approval-box {
               border: 1px solid #111;
-              padding: 10px 14px;
-              margin-top: 14px;
+              padding: 8px 12px;
+              margin-top: 10px;
               border-radius: 4px;
             }
             .no-print-bar {
@@ -2831,7 +2854,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              margin-bottom: 20px;
+              margin-bottom: 16px;
             }
             .btn-print {
               background: #78350f;
@@ -2859,18 +2882,20 @@
             <button onclick="window.print()" class="btn-print">🖨️ พิมพ์เอกสาร / บันทึกเป็น PDF</button>
           </div>
 
-          <!-- ==================== หน้า 1: หน้าปกราชการ กพ.001 (Single-page fit) ==================== -->
-          <div class="page" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div class="text-center" style="margin-bottom: 8px;">
-                <img src="logo.png" alt="Logo" style="width: 75px; height: 75px; object-fit: contain;" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
-                <div class="font-bold" style="font-size: 17px; margin-top: 4px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
-                <div class="font-bold" style="font-size: 15px;">โรงเรียนสีชมพูศึกษา</div>
-                <div style="font-size: 12px;">ตำบลวังเพิ่ม อำเภอสีชมพู จังหวัดขอนแก่น</div>
-                <div style="font-size: 12px;">สังกัดองค์การบริหารส่วนจังหวัดขอนแก่น</div>
+          <!-- ==================== หน้า 1: หน้าปกราชการ กพ.001 (Single-page fit & Balanced Spacing) ==================== -->
+          <div class="page" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 265mm; padding: 5mm 2mm;">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- ส่วนหัวตราโรงเรียน -->
+              <div class="text-center" style="margin-bottom: 2px;">
+                <img src="logo.png" alt="Logo" style="width: 82px; height: 82px; object-fit: contain;" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
+                <div class="font-bold" style="font-size: 18px; margin-top: 6px; letter-spacing: 0.5px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+                <div class="font-bold" style="font-size: 16px; margin-top: 2px;">โรงเรียนสีชมพูศึกษา</div>
+                <div style="font-size: 13px; margin-top: 2px;">ตำบลวังเพิ่ม อำเภอสีชมพู จังหวัดขอนแก่น</div>
+                <div style="font-size: 13px;">สังกัดองค์การบริหารส่วนจังหวัดขอนแก่น</div>
               </div>
 
-              <div style="margin-top: 14px; padding: 0 10px; font-size: 13px; line-height: 1.6;">
+              <!-- ข้อมูลกิจกรรม ภาคเรียน และปีการศึกษา -->
+              <div style="padding: 0 10px; font-size: 13.5px; line-height: 1.7; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding-top: 8px; padding-bottom: 8px;">
                 <div style="display: flex; justify-content: space-between;">
                   <div><b>ภาคเรียนที่จัดกิจกรรม:</b> ${sem}</div>
                   <div><b>ปีการศึกษา:</b> ${thaiYear}</div>
@@ -2879,64 +2904,81 @@
                 <div><b>ประเภท:</b> กิจกรรมพัฒนาผู้เรียน (${categoryText})</div>
               </div>
 
-              <!-- รายชื่อผู้กำกับตามตำแหน่ง -->
-              <div style="margin-top: 16px; padding: 0 10px; font-size: 12.5px;">
-                <table style="width: 100%; border: none;">
-                  <tr style="border: none;">
-                    <td style="border: none; width: 50%; padding: 4px 8px; vertical-align: top;">
-                      <div class="font-bold">ผู้กำกับกอง:</div>
-                      <div style="margin-top: 2px;">${unitData.leader}</div>
-                      <div style="margin-top: 18px;">ลงชื่อ..........................................................</div>
-                    </td>
-                    <td style="border: none; width: 50%; padding: 4px 8px; vertical-align: top;">
-                      <div class="font-bold">รองผู้กำกับกอง:</div>
-                      <div style="margin-top: 2px;">${deputiesList}</div>
-                      <div style="margin-top: 18px;">ลงชื่อ..........................................................</div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-              <div style="margin-top: 14px; padding: 0 10px; font-size: 12.5px;">
-                <p style="margin: 0 0 6px 0;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
-                <div class="font-bold text-center" style="margin-bottom: 4px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+              <!-- ตารางสรุปผลการประเมินเพื่อเสนอขออนุมัติ -->
+              <div style="padding: 0 5px;">
+                <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 500;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
+                <div class="font-bold text-center" style="margin-bottom: 6px; font-size: 14px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
                 <table>
                   <thead>
                     <tr>
-                      <th style="width: 25%;">จำนวนนักเรียน (คน)</th>
-                      <th style="width: 25%;">ผ่าน (ผ)</th>
-                      <th style="width: 25%;">ไม่ผ่าน (มผ)</th>
-                      <th style="width: 25%;">หมายเหตุ</th>
+                      <th style="width: 25%; padding: 7px;">จำนวนนักเรียน (คน)</th>
+                      <th style="width: 25%; padding: 7px;">ผ่าน (ผ)</th>
+                      <th style="width: 25%; padding: 7px;">ไม่ผ่าน (มผ)</th>
+                      <th style="width: 25%; padding: 7px;">หมายเหตุ</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="text-center font-bold">
-                      <td style="padding: 6px;">${totalStudents}</td>
-                      <td style="padding: 6px; color: #15803d;">${passCount}</td>
-                      <td style="padding: 6px; color: #b91c1c;">${failCount}</td>
-                      <td style="padding: 6px; font-weight: normal;">-</td>
+                    <tr class="text-center font-bold" style="font-size: 14px;">
+                      <td style="padding: 8px;">${totalStudents}</td>
+                      <td style="padding: 8px; color: #15803d;">${passCount}</td>
+                      <td style="padding: 8px; color: #b91c1c;">${failCount}</td>
+                      <td style="padding: 8px; font-weight: normal;">-</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <!-- สายการลงนาม 3 ฝ่าย -->
-              <div style="margin-top: 16px; padding: 0 10px;">
+              <!-- รายชื่อผู้กำกับกอง และรองผู้กำกับกอง (จัดเป็น Grid 2 คอลัมน์ แถวละ 2 คน สวยงาม ไม่อัดแน่น) -->
+              <div style="margin-top: 8px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
-                  <tr style="border: none; text-align: center; font-size: 11.5px;">
-                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                  <tr style="border: none;">
+                    <td style="border: none; width: 50%; padding: 8px 15px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 13px;">ผู้กำกับกอง</div>
+                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.leader})</div>
+                    </td>
+                    <td style="border: none; width: 50%; padding: 8px 15px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
+                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies && unitData.deputies[0] ? unitData.deputies[0] : '-'})</div>
+                    </td>
+                  </tr>
+                  ${(unitData.deputies && unitData.deputies.length > 1) ? `
+                  <tr style="border: none;">
+                    <td style="border: none; width: 50%; padding: 12px 15px 4px 15px; vertical-align: top; text-align: center;">
+                      <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
+                      <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies[1]})</div>
+                    </td>
+                    <td style="border: none; width: 50%; padding: 12px 15px 4px 15px; vertical-align: top; text-align: center;">
+                      ${unitData.deputies[2] ? `
+                        <div class="font-bold" style="font-size: 13px;">รองผู้กำกับกอง</div>
+                        <div style="margin-top: 26px;">ลงชื่อ..........................................................</div>
+                        <div style="margin-top: 4px; font-size: 12.5px;">(${unitData.deputies[2]})</div>
+                      ` : ''}
+                    </td>
+                  </tr>
+                  ` : ''}
+                </table>
+              </div>
+
+              <!-- สายการลงนาม 3 ฝ่าย (หัวหน้ากิจกรรม, หัวหน้ากิจกรรมพัฒนาผู้เรียน, หัวหน้ากลุ่มบริหารงานวิชาการ) -->
+              <div style="margin-top: 6px; padding: 0 5px;">
+                <table style="width: 100%; border: none;">
+                  <tr style="border: none; text-align: center; font-size: 12px;">
+                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากิจกรรม</div>
-                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
                       <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
                     </td>
-                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากิจกรรมพัฒนาผู้เรียน</div>
-                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
                       <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
                     </td>
-                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                    <td style="border: none; width: 33.33%; padding: 6px 8px; vertical-align: top;">
                       <div class="font-bold">หัวหน้ากลุ่มบริหารงานวิชาการ</div>
-                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 28px;">ลงชื่อ..................................................</div>
                       <div style="margin-top: 4px;">(นางสาวอารญา ผุยเบ้า)</div>
                     </td>
                   </tr>
@@ -2944,26 +2986,26 @@
               </div>
             </div>
 
-            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการ -->
-            <div class="approval-box" style="margin-bottom: 5px;">
-              <div style="display: flex; justify-content: space-between; font-size: 12px;">
+            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการสถานศึกษา -->
+            <div class="approval-box" style="margin-bottom: 2mm; padding: 14px 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px;">
                 <div style="width: 48%; text-align: center;">
-                  <div class="font-bold" style="margin-bottom: 24px;">เรียนเสนอเพื่อพิจารณา</div>
+                  <div class="font-bold" style="margin-bottom: 28px; font-size: 13px;">เรียนเสนอเพื่อพิจารณา</div>
                   <div>ลงชื่อ..........................................................</div>
-                  <div style="margin-top: 3px;">(นางสุภาวดี ภาระดี)</div>
-                  <div style="font-size: 11px; margin-top: 2px;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
-                  <div style="font-size: 11px; margin-top: 2px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                  <div style="margin-top: 4px; font-weight: 500;">(นางสุภาวดี ภาระดี)</div>
+                  <div style="font-size: 11.5px; margin-top: 3px; color: #334155;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
+                  <div style="font-size: 11.5px; margin-top: 4px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
                 </div>
 
-                <div style="width: 48%; text-align: center; border-left: 1px dashed #94a3b8; padding-left: 10px;">
-                  <div style="margin-bottom: 14px;">
-                    <span style="display: inline-block; margin-right: 18px;">[ &nbsp; ] อนุมัติ</span>
+                <div style="width: 48%; text-align: center; border-left: 1px dashed #94a3b8; padding-left: 14px;">
+                  <div style="margin-bottom: 18px; font-size: 13px;">
+                    <span style="display: inline-block; margin-right: 24px;">[ &nbsp; ] อนุมัติ</span>
                     <span>[ &nbsp; ] ไม่อนุมัติ</span>
                   </div>
                   <div>ลงชื่อ..........................................................</div>
-                  <div style="margin-top: 3px;" class="font-bold">(นางสุภลักษณ์ ดียิ่ง)</div>
-                  <div style="font-size: 11px; margin-top: 2px;">ผู้อำนวยการโรงเรียนสีชมพูศึกษา</div>
-                  <div style="font-size: 11px; margin-top: 2px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                  <div style="margin-top: 4px;" class="font-bold">(นางสุภลักษณ์ ดียิ่ง)</div>
+                  <div style="font-size: 11.5px; margin-top: 3px; color: #334155;">ผู้อำนวยการโรงเรียนสีชมพูศึกษา</div>
+                  <div style="font-size: 11.5px; margin-top: 4px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
                 </div>
               </div>
             </div>
