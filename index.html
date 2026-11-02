@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <title>ระบบเช็คชื่อและรายงานลูกเสือ-เนตรนารี ม.1 | โรงเรียนสีชมพูศึกษา</title>
   
-  <!-- PWA Meta Tags & Web Manifest ชี้ไปที่ไฟล์ manifest.json แยกโดยตรง -->
+  <!-- PWA Meta Tags & Web Manifest ชี้ไปที่ไฟล์ manifest.json แยกโดยตรง เพื่อรองรับการหมุนแนวนอน -->
   <meta name="theme-color" content="#78350f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <!-- เมนูสลับโหมด: เช็คชื่อหน้าแถว / ภาพรวม ม.1 / สรุปรายงาน -->
+      <!-- เมนูสลับโหมด: เช็คชื่อ / ภาพรวม / รายงาน -->
       <div class="w-full sm:w-auto grid grid-cols-3 gap-1 bg-black/25 p-1 rounded-xl border border-white/20 text-xs sm:text-sm font-semibold text-center">
         <button onclick="switchMainTab('checkin')" id="tabBtnCheckin" class="px-2 py-1.5 rounded-lg transition bg-white text-slate-900 shadow truncate">
           <i data-lucide="check-circle" class="w-3.5 h-3.5 inline-block mr-1"></i>เช็คชื่อ
@@ -162,7 +162,7 @@
       <!-- ตัวเลือกประเภทและกอง -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 sm:p-4">
         <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ (ตัดวงเล็บออก กระชับ พอดีจอ) -->
+          <!-- สลับประเภท ลูกเสือ/เนตรนารี พร้อมตราสัญลักษณ์ -->
           <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl w-full md:w-auto border border-slate-200 gap-1">
             <button id="btnCatScout" onclick="switchCategory('scout')" class="flex items-center justify-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm transition shadow bg-amber-800 text-white whitespace-nowrap">
               <img id="navScoutIcon" src="scout.jpg" alt="Scout" class="w-4 h-4 sm:w-5 sm:h-5 object-contain rounded-full shrink-0" onerror="handleScoutImgError(this)">
@@ -174,7 +174,7 @@
             </button>
           </div>
 
-          <!-- ปุ่มเลือกกอง (ไม่ให้ตกขอบ เลื่อนปัดซ้ายขวาได้เนียนตา) -->
+          <!-- ปุ่มเลือกกอง -->
           <div id="unitButtonsContainer" class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 no-scrollbar"></div>
         </div>
 
@@ -298,7 +298,12 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- ปุ่มจัดทำรูปเล่ม กพ.001 (PDF/พิมพ์) สีน้ำตาลทองตามมาตรฐานวัดผล -->
+            <button onclick="printKP001Book()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-800 hover:bg-amber-900 text-white flex items-center gap-1.5 transition shadow active:scale-95">
+              <i data-lucide="book-open" class="w-4 h-4 text-amber-200"></i>
+              <span>📕 พิมพ์เล่ม กพ.001 (PDF)</span>
+            </button>
             <button onclick="fetchSheetDataForReports()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1.5 transition">
               <i data-lucide="refresh-cw" class="w-4 h-4" id="refreshIcon"></i>
               <span>ดึงข้อมูลจากชีต</span>
@@ -391,7 +396,7 @@
       </div>
     </section>
 
-    <!-- เครดิตผู้พัฒนา (ปรับแต่งให้รองรับจอมือถือ ไม่ล้นตกขอบ) -->
+    <!-- เครดิตผู้พัฒนา -->
     <div class="mt-6 mb-6 flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-slate-600 px-3 text-center no-print">
       <div class="w-5 h-5 rounded-full overflow-hidden shrink-0 border border-slate-300">
         <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
@@ -400,16 +405,16 @@
     </div>
   </main>
 
-  <!-- ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Back to Top) - ขยับขึ้นเป็น bottom-36 บนมือถือเพื่อไม่ให้โดนแถบล่างบัง -->
+  <!-- ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Back to Top) -->
   <button id="btnBackToTop" onclick="scrollToTop()" class="fixed bottom-36 sm:bottom-24 right-4 z-40 bg-slate-900/85 hover:bg-slate-900 text-white p-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 translate-y-12 opacity-0 pointer-events-none no-print border border-slate-700/60 active:scale-90 flex items-center justify-center" title="กลับขึ้นบนสุด">
     <i data-lucide="arrow-up" class="w-5 h-5"></i>
   </button>
 
-  <!-- Bottom Floating Bar (แถบล่างปรับปรุงใหม่: สไลด์ซ้ายขวาได้ + ปุ่มบันทึกอยู่ก่อน CSV และชิดขวา) -->
+  <!-- Bottom Floating Bar -->
   <footer id="bottomCheckinBar" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2.5 px-3 sm:px-4 shadow-2xl z-40 no-print pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
       
-      <!-- แถบสรุปยอดตัวเลข: เลื่อนสไลด์ซ้าย-ขวาได้นุ่มนวล ไม่เบียดจอในแอป -->
+      <!-- แถบสรุปยอดตัวเลข -->
       <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar py-1 px-1 bg-slate-50 sm:bg-transparent rounded-xl border sm:border-0 border-slate-200 shrink-0">
         <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold whitespace-nowrap shrink-0">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>มา: <span id="statPresent">0</span>
@@ -428,15 +433,13 @@
         </div>
       </div>
 
-      <!-- แถวปุ่ม Action: ปรับให้ชิดขวา (justify-end) ทั้งใน Smart Phone และจอใหญ่ -->
+      <!-- แถวปุ่ม Action -->
       <div class="flex items-center justify-end gap-2 w-full sm:w-auto">
-        <!-- ปุ่มบันทึก (อยู่ก่อน เด่นชัด แตะง่าย ชิดขวา) -->
         <button onclick="saveToGoogleSheets()" id="btnSaveSheets" class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow flex items-center justify-center gap-1.5 transition bg-amber-800 hover:bg-amber-900 whitespace-nowrap active:scale-[0.98]">
           <i data-lucide="save" class="w-4 h-4 shrink-0"></i>
           <span>บันทึก</span>
         </button>
 
-        <!-- ปุ่ม CSV (อยู่หลังปุ่มบันทึก ชิดขวา) -->
         <button onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center justify-center gap-1 transition shrink-0 whitespace-nowrap active:scale-[0.98]">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>CSV</span>
@@ -454,10 +457,8 @@
       <h3 class="text-base sm:text-lg font-bold text-slate-800">บันทึกข้อมูลเรียบร้อยแล้ว!</h3>
       <p class="text-xs text-slate-500 mt-1" id="saveSuccessSubtitle">ส่งข้อมูลเข้าสู่ Google Sheets สำเร็จ</p>
 
-      <!-- พรีวิวข้อความสรุปสั้น -->
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 my-3.5 text-left text-xs font-mono text-slate-700 max-h-36 overflow-y-auto" id="saveSuccessPreview"></div>
 
-      <!-- ปุ่มดำเนินการ -->
       <div class="flex flex-col gap-2">
         <button onclick="shareDirectToLine()" class="w-full py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-[#06C755] hover:bg-[#05b34c] shadow-md flex items-center justify-center gap-2 transition active:scale-[0.98]">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.843 2.572-5.992z"/></svg>
@@ -938,7 +939,7 @@
       setupBackToTop();
       unlockScreenOrientation();
 
-      // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว (ผูกตามวันที่)
+      // โหลดการตั้งค่าสถานะกองที่เคยเช็คชื่อแล้ว
       const savedChecked = localStorage.getItem('scout_checked_units_by_date_v1');
       if (savedChecked) {
         try { checkedUnitsStore = JSON.parse(savedChecked); } catch (e) { checkedUnitsStore = {}; }
@@ -955,7 +956,7 @@
       }
       sortAllPatrols();
 
-      // ดึงวันที่ปัจจุบันตามเวลาท้องถิ่นของเครื่อง (Local Time YYYY-MM-DD)
+      // ดึงวันที่ปัจจุบัน
       const now = new Date();
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -971,10 +972,10 @@
       const repFilterMonth = document.getElementById('repFilterMonth');
       if (repFilterMonth) repFilterMonth.value = `${year}-${month}`;
 
-      // ตั้งค่าภาคเรียนเริ่มต้นอัตโนมัติตามเดือนปัจจุบัน (ภาค 1: พ.ค.-ก.ย. [5-9], ภาค 2: ต.ค.-มี.ค. [10-12, 1-4])
+      // ตั้งค่าภาคเรียนเริ่มต้นตามเดือนปัจจุบัน (ภาค 1: พ.ค.-ก.ย. [5-9], ภาค 2: ต.ค.-มี.ค. [10-12, 1-4])
       const repFilterSemester = document.getElementById('repFilterSemester');
       if (repFilterSemester) {
-        const curMonthNum = now.getMonth() + 1; // 1 - 12
+        const curMonthNum = now.getMonth() + 1;
         if (curMonthNum >= 5 && curMonthNum <= 9) {
           repFilterSemester.value = "1";
         } else {
@@ -992,7 +993,6 @@
 
     // ==================== ระบบ PWA (Progressive Web App) ====================
     function initPWA() {
-      // แสดงปุ่มติดตั้ง PWA เมื่อไม่ได้เปิดในโหมด Standalone
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       const btnInstall = document.getElementById('btnPwaInstall');
       
@@ -1001,7 +1001,6 @@
         btnInstall.classList.add('flex');
       }
 
-      // ดักจับอีเวนต์ติดตั้งของ Android / Chromium
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -1011,14 +1010,12 @@
         }
       });
 
-      // ซ่อนปุ่มเมื่อติดตั้งเรียบร้อยแล้ว
       window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
         if (btnInstall) btnInstall.classList.add('hidden');
         showToast('ติดตั้งแอปลงในหน้าจอโฮมสำเร็จแล้ว!');
       });
 
-      // ลงทะเบียน Service Worker แบบ Minimal เพื่อรองรับ Add to Home Screen
       if ('serviceWorker' in navigator) {
         const swScript = `
           self.addEventListener('install', (e) => self.skipWaiting());
@@ -1033,36 +1030,20 @@
       }
     }
 
-    // ฟังก์ชันสั่งปลดล็อกการล็อกหน้าจอระดับฮาร์ดแวร์/เบราว์เซอร์
     function unlockScreenOrientation() {
       try {
         if (screen.orientation && typeof screen.orientation.unlock === 'function') {
           screen.orientation.unlock().catch(() => {});
         }
       } catch (err) {
-        console.log('Orientation notice:', err);
+        console.log('Orientation unlock notice:', err);
       }
     }
 
-    // ฟังก์ชันสั่งปลดล็อกการล็อกหน้าจอระดับฮาร์ดแวร์/เบราว์เซอร์
-    function unlockScreenOrientation() {
-      try {
-        if (screen.orientation && typeof screen.orientation.unlock === 'function') {
-          screen.orientation.unlock().catch(() => {
-            // กรณีเบราว์เซอร์ไม่อนุญาตให้อนล็อกก่อนมี User Gesture
-          });
-        }
-      } catch (err) {
-        console.log('Orientation unlock not supported or requires gesture:', err);
-      }
-    }
-
-    // จัดการเมื่อกดปุ่ม "ติดตั้งแอป"
     function handlePwaInstallClick() {
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
       if (deferredPrompt) {
-        // สำหรับ Android / Chrome
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
@@ -1071,10 +1052,8 @@
           deferredPrompt = null;
         });
       } else if (isIos) {
-        // สำหรับ iPhone / iPad (Safari)
         openIosInstallModal();
       } else {
-        // เบราว์เซอร์อื่น หรือเปิดในแอป LINE ให้คำแนะนำทั่วไป
         showToast('แตะเมนูของเบราว์เซอร์ แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"');
       }
     }
@@ -1111,7 +1090,6 @@
       });
     }
 
-    // Fallback เมื่อโหลดรูป scout.jpg ไม่พบ
     function handleScoutImgError(img) {
       if (!img.dataset.retry) {
         img.dataset.retry = "1";
@@ -1187,7 +1165,6 @@
         if (json.status === 'success' && Array.isArray(json.data)) {
           attendanceHistoryData = json.data;
 
-          // กรองข้อมูลของวันที่ และกองที่กำลังเปิดอยู่
           const matchingRows = json.data.filter(r => {
             const isMatchDate = (r.date === checkDate);
             const isMatchCat = isScout ? (r.category === 'ลูกเสือ') : (r.category === 'เนตรนารี' || (r.category && r.category.includes('เนตร')));
@@ -1195,7 +1172,6 @@
             return isMatchDate && isMatchCat && isMatchUnit;
           });
 
-          // บันทึกสถานะ checkedUnitsStore ของทุกกองที่มีใน Sheets
           json.data.forEach(row => {
             if (row.date === checkDate) {
               const catKey = (row.category === 'เนตรนารี' || (row.category && row.category.includes('เนตร'))) ? 'guide' : 'scout';
@@ -1209,13 +1185,11 @@
           saveDatabaseState();
 
           if (matchingRows.length > 0) {
-            // สร้าง Map ของข้อมูลนักเรียนที่ดึงมา
             const rowMap = {};
             matchingRows.forEach(r => {
               if (r.id) rowMap[String(r.id).trim()] = r;
             });
 
-            // อัปเดตข้อมูลนักเรียนใน Memory DB
             unitData.patrols.forEach(p => {
               p.members.forEach(m => {
                 const fetched = rowMap[String(m.id).trim()];
@@ -1232,7 +1206,6 @@
               });
             });
 
-            // อัปเดตชื่อกิจกรรม (ถ้ามีระบุในชีต)
             if (matchingRows[0].activity) {
               const actInp = document.getElementById('activityTitleInput');
               if (actInp) actInp.value = matchingRows[0].activity;
@@ -1252,7 +1225,7 @@
       }
     }
 
-    // สลับแท็บหลัก (เช็คชื่อ / ภาพรวม ม.1 / รายงาน)
+    // สลับแท็บหลัก (เช็คชื่อ / ภาพรวม / รายงาน)
     function switchMainTab(tab) {
       currentMainTab = tab;
       const secCheckin = document.getElementById('sectionCheckin');
@@ -1296,7 +1269,7 @@
 
     function switchCategory(cat) {
       currentCategory = cat;
-      currentUnitId = 1; // เริ่มต้นที่กอง 1
+      currentUnitId = 1;
       applyTheme();
       renderCurrentUnit();
       fetchAndRestoreFromSheets(false);
@@ -1332,7 +1305,6 @@
       fetchAndRestoreFromSheets(false);
     }
 
-    // เรนเดอร์ปุ่มกองตามจำนวนจริง (ลูกเสือ 4 กอง / เนตรนารี 3 กอง)
     function renderUnitButtonsUI() {
       const container = document.getElementById('unitButtonsContainer');
       const isScout = currentCategory === 'scout';
@@ -1351,7 +1323,6 @@
       container.innerHTML = html;
     }
 
-    // อัปเดตรายชื่อผู้กำกับและรองผู้กำกับของกองที่เลือกในช่องผู้บันทึกอัตโนมัติ
     function updateRecorderDropdown() {
       const unit = db[currentCategory].units[currentUnitId];
       const select = document.getElementById('recorderSelect');
@@ -1361,14 +1332,12 @@
       select.innerHTML = '';
       customInput.classList.add('hidden');
 
-      // เพิ่มผู้กำกับกอง (ใส่คลาส text-slate-800 bg-white เพื่อให้อ่านออกในเบราว์เซอร์มือถือ)
       const optLeader = document.createElement('option');
       optLeader.value = unit.leader;
       optLeader.text = `${unit.leader} (ผกก.กอง)`;
       optLeader.className = "text-slate-800 bg-white font-sans";
       select.appendChild(optLeader);
 
-      // เพิ่มรองผู้กำกับกอง
       if (unit.deputies && unit.deputies.length > 0) {
         unit.deputies.forEach(dep => {
           const optDep = document.createElement('option');
@@ -1379,7 +1348,6 @@
         });
       }
 
-      // ตัวเลือกพิมพ์ชื่อคนอื่น
       const optOther = document.createElement('option');
       optOther.value = "CUSTOM_OTHER";
       optOther.text = "✏️ ระบุชื่ออื่น...";
@@ -1406,12 +1374,10 @@
       return (select && select.value) ? select.value : 'ผู้กำกับลูกเสือ';
     }
 
-    // ฟังก์ชันคำนวณจำนวนครั้งที่ขาดติดต่อกันจากประวัติที่ผ่านมา
     function getConsecutiveAbsentCount(studentId) {
       if (!attendanceHistoryData || attendanceHistoryData.length === 0) return 0;
       
       const targetId = String(studentId).trim();
-      // ดึงประวัติของนักเรียนคนนี้ทั้งหมด และเรียงวันที่จากใหม่ไปเก่า
       const studentRecords = attendanceHistoryData
         .filter(r => String(r.id).trim() === targetId && r.date)
         .sort((a, b) => b.date.localeCompare(a.date));
@@ -1421,14 +1387,12 @@
         if (rec.status === 'ขาด') {
           count++;
         } else if (rec.status === 'มา' || rec.status === 'สาย') {
-          // หากพบวันที่มาหรือสาย ให้หยุดนับเนื่องจากไม่ได้ขาดติดต่อกันแล้ว
           break;
         }
       }
       return count;
     }
 
-    // เรนเดอร์การ์ดหมู่และรายชื่อนักเรียน
     function renderCurrentUnit() {
       const container = document.getElementById('patrolsContainer');
       const unitData = db[currentCategory].units[currentUnitId];
@@ -1437,7 +1401,6 @@
       const isScout = currentCategory === 'scout';
       const categoryLabel = isScout ? 'ลูกเสือ ม.1' : 'เนตรนารี ม.1';
 
-      // แสดงการ์ดผู้บังคับบัญชาประจำกอง
       const infoBox = document.getElementById('commanderInfoBox');
       if (infoBox) {
         infoBox.innerHTML = `
@@ -1512,8 +1475,6 @@
           ).join('');
 
           const isUniformComplete = (student.uniform === "ครบ");
-
-          // ตรวจสอบการขาดติดต่อกัน 3 ครั้งขึ้นไป
           const consecutiveAbsent = getConsecutiveAbsentCount(student.id);
           const hasConsecutiveAlert = consecutiveAbsent >= 3;
 
@@ -1532,7 +1493,6 @@
                       ${roleOptionsHtml}
                     </select>
 
-                    <!-- ป้ายเตือนภัยขาดติดต่อกัน 3 ครั้งขึ้นไป -->
                     ${hasConsecutiveAlert ? `
                       <span class="badge-consecutive-absent inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-xs" title="ขาดติดต่อกัน ${consecutiveAbsent} ครั้งขึ้นไป ผู้กำกับโปรดติดตาม">
                         <i data-lucide="alert-triangle" class="w-3 h-3 text-amber-200"></i>
@@ -1540,7 +1500,6 @@
                       </span>
                     ` : ''}
 
-                    <!-- ปุ่มเปิดหมายเหตุรายบุคคล -->
                     <button onclick="openRemarkModal(${pIndex}, ${sIndex})" class="text-[11px] px-2 py-0.5 rounded-md border flex items-center gap-1 transition ${student.remark ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200 hover:text-slate-700'}">
                       <i data-lucide="edit-2" class="w-3 h-3"></i>
                       <span>${student.remark ? student.remark : 'หมายเหตุ'}</span>
@@ -1552,7 +1511,6 @@
 
               <!-- เครื่องมือตรวจเครื่องแบบ & 4 ปุ่มเช็คชื่อ -->
               <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-end lg:self-center w-full lg:w-auto justify-between lg:justify-end">
-                <!-- ตรวจเครื่องแบบ -->
                 <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 p-1 rounded-xl text-xs">
                   <button onclick="toggleUniformStatus(${pIndex}, ${sIndex})" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 ${isUniformComplete ? 'bg-indigo-600 text-white shadow' : 'bg-rose-100 text-rose-700'}">
                     <i data-lucide="${isUniformComplete ? 'shield-check' : 'shield-alert'}" class="w-3.5 h-3.5"></i>
@@ -1571,7 +1529,6 @@
                   ` : ''}
                 </div>
 
-                <!-- 4 ปุ่มเช็คชื่อ (มา, ขาด, ลา, สาย) -->
                 <div class="grid grid-cols-4 gap-1 w-56 bg-slate-100 p-1 rounded-xl border border-slate-200">
                   <button onclick="setStatus(${pIndex}, ${sIndex}, 'มา')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'มา' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">มา</button>
                   <button onclick="setStatus(${pIndex}, ${sIndex}, 'ขาด')" class="py-1 text-xs font-bold rounded-lg transition ${student.status === 'ขาด' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'}">ขาด</button>
@@ -1593,7 +1550,6 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // ระบบค้นหาด่วนแบบเรียลไทม์
     function handleQuickSearch(query) {
       const q = query.trim().toLowerCase();
       const rows = document.querySelectorAll('.student-row');
@@ -1622,7 +1578,6 @@
       inp.focus();
     }
 
-    // ฟังก์ชันจัดการเครื่องแบบ
     function toggleUniformStatus(pIndex, sIndex) {
       const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
       student.uniform = (student.uniform === "ครบ") ? "ไม่ครบ" : "ครบ";
@@ -1694,7 +1649,6 @@
       renderCurrentUnit();
     }
 
-    // Modal หมายเหตุรายบุคคล
     function openRemarkModal(pIndex, sIndex) {
       currentActiveRemarkTarget = { pIndex, sIndex };
       const student = db[currentCategory].units[currentUnitId].patrols[pIndex].members[sIndex];
@@ -1743,7 +1697,6 @@
           else if (m.status === 'ลา') leave++;
           else if (m.status === 'สาย') late++;
           
-          // ตรวจเครื่องแบบเฉพาะผู้ที่มาเข้าแถว (มา หรือ สาย เท่านั้น)
           if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
             uniformOk++;
           }
@@ -1757,7 +1710,7 @@
       document.getElementById('statUniformOk').innerText = uniformOk;
     }
 
-    // ==================== 1. สร้างข้อความสรุปส่ง LINE ประจำกอง ====================
+    // ==================== สร้างข้อความสรุปส่ง LINE ประจำกอง ====================
     function generateUnitSummaryText() {
       const unitData = db[currentCategory].units[currentUnitId];
       const isScout = currentCategory === 'scout';
@@ -1785,7 +1738,6 @@
             late++;
           }
           
-          // เครื่องแบบนับเฉพาะคนที่มาเรียนจริง (มา หรือ สาย)
           if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
             uniformOk++;
           }
@@ -1829,7 +1781,7 @@
       copyTextToClipboard(text, `คัดลอกข้อความสรุป ${unitData.name} (${categoryText}) เรียบร้อยแล้ว สามารถนำไปวางใน LINE ได้ทันที!`);
     }
 
-    // ==================== 2. คัดลอกสรุปภาพรวม ม.1 ส่ง LINE ====================
+    // ==================== คัดลอกสรุปภาพรวม ม.1 ส่ง LINE ====================
     function copyWholeGradeSummaryForLine() {
       const checkDate = document.getElementById('checkDate').value;
       const activityTitle = document.getElementById('activityTitleInput').value.trim() || 'พิธีเปิดประชุมกองและระเบียบแถว';
@@ -1855,7 +1807,6 @@
         const uData = db[u.cat].units[u.id];
         let uTotal = 0, uPres = 0, uAbs = 0, uLev = 0, uLat = 0, uUni = 0;
 
-        // ดึงจากประวัติ Sheets (ถ้ามี) หรือประมวลผลจากข้อมูลในเครื่อง
         const dateRowsInHistory = attendanceHistoryData.filter(r => {
           const matchDate = (r.date === checkDate);
           const isScout = (u.cat === 'scout');
@@ -1872,7 +1823,6 @@
             else if (r.status === 'ลา') uLev++;
             else if (r.status === 'สาย') uLat++;
             
-            // นับเครื่องแบบเฉพาะคนที่มา/สาย
             if ((r.status === 'มา' || r.status === 'สาย') && (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย')) {
               uUni++;
             }
@@ -1886,7 +1836,6 @@
               else if (m.status === 'ลา') uLev++;
               else if (m.status === 'สาย') uLat++;
               
-              // นับเครื่องแบบเฉพาะคนที่มา/สาย
               if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
                 uUni++;
               }
@@ -1897,10 +1846,8 @@
         grandTotal += uTotal;
 
         const isChecked = (dateRowsInHistory.length > 0) || !!checkedUnitsStore[`${checkDate}_${u.cat}_${u.id}`];
-        // ใช้สัญลักษณ์แยกสีชัดเจนสำหรับข้อความส่ง LINE
         const statusMark = isChecked ? '✅ เช็คแล้ว' : '🔴 ยังไม่เช็ค';
 
-        // ถ้ายังไม่ได้เช็คชื่อ ให้ยอดมา ขาด ลา สาย เป็น 0
         const displayPres = isChecked ? uPres : 0;
         const displayAbs = isChecked ? uAbs : 0;
         const displayLev = isChecked ? uLev : 0;
@@ -2022,7 +1969,6 @@
         if (json.status === 'success' && Array.isArray(json.data)) {
           attendanceHistoryData = json.data;
           
-          // ตรวจจับกองที่มีการส่งข้อมูลเข้ามาใน Sheets ตามวันที่เลือก
           const checkDate = document.getElementById('checkDate').value;
           json.data.forEach(row => {
             if (row.date === checkDate) {
@@ -2066,7 +2012,6 @@
         const uData = db[u.cat].units[u.id];
         let total = 0, pres = 0, abs = 0, lev = 0, lat = 0, uni = 0;
 
-        // คำนวณจากข้อมูลประวัติใน Sheets (ถ้ามี) หรือจากข้อมูลหน้าเว็บ
         const dateRowsInHistory = attendanceHistoryData.filter(r => {
           const matchDate = (r.date === checkDate);
           const isScout = (u.cat === 'scout');
@@ -2083,7 +2028,6 @@
             else if (r.status === 'ลา') lev++;
             else if (r.status === 'สาย') lat++;
 
-            // ตรวจเครื่องแบบเฉพาะผู้ที่มาหรือสาย
             if ((r.status === 'มา' || r.status === 'สาย') && (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย')) {
               uni++;
             }
@@ -2097,7 +2041,6 @@
               else if (m.status === 'ลา') lev++;
               else if (m.status === 'สาย') lat++;
 
-              // ตรวจเครื่องแบบเฉพาะผู้ที่มาหรือสาย
               if ((m.status === 'มา' || m.status === 'สาย') && m.uniform === 'ครบ') {
                 uni++;
               }
@@ -2110,11 +2053,9 @@
         const isScout = u.cat === 'scout';
         const cardHeaderBg = isScout ? 'bg-amber-800 text-white' : 'bg-emerald-800 text-white';
         
-        // ตรวจสอบสถานะการเช็คชื่อตาม "วันที่" ปัจจุบันที่เลือก (ทั้งจาก Sheets และ Store)
         const unitDateKey = `${checkDate}_${u.cat}_${u.id}`;
         const isChecked = (dateRowsInHistory.length > 0) || !!checkedUnitsStore[unitDateKey];
 
-        // คำนวณผู้ที่มาเรียนจริง (ผู้ที่มาตรงเวลา + ผู้ที่มาสาย ถือว่ามาเรียน)
         const totalActualPresent = pres + lat;
         const displayPct = isChecked ? (total > 0 ? Math.round((totalActualPresent / total) * 100) : 0) : 0;
         
@@ -2180,7 +2121,6 @@
                 </div>
               </div>
 
-              <!-- ปุ่มสถานะ: เช็คแล้วเป็นสีเขียว / ยังไม่เช็คเป็นตัวหนังสือสีแดง -->
               <div>
                 ${isChecked ? `
                   <button onclick="jumpToUnit('${u.cat}', ${u.id})" class="w-full py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-300 transition flex items-center justify-center gap-1.5 shadow-xs">
@@ -2371,7 +2311,6 @@
 
         const result = await response.json();
         
-        // บันทึกสถานะว่ากองนี้เช็คชื่อแล้ว "ในวันที่ checkDate"
         checkedUnitsStore[`${checkDate}_${currentCategory}_${currentUnitId}`] = true;
         saveDatabaseState();
 
@@ -2638,9 +2577,6 @@
       const sem = document.getElementById('repFilterSemester').value;
       document.getElementById('printReportSubtitle').innerText = `รายงานผลการประเมินเวลาเรียน กิจกรรมลูกเสือ-เนตรนารี ม.1 (ภาคเรียนที่ ${sem})`;
 
-      // กรองข้อมูลตามช่วงเดือนของภาคเรียน
-      // ภาค 1: พ.ค. - ก.ย. (เดือน 05 - 09)
-      // ภาค 2: ต.ค. - มี.ค. (เดือน 10 - 12 และ 01 - 04)
       const semData = data.filter(r => {
         if (!r.date) return false;
         const parts = r.date.split('-');
@@ -2749,6 +2685,337 @@
       document.getElementById('kpiAbsent').innerText = a;
       document.getElementById('kpiLeave').innerText = l;
       document.getElementById('kpiLate').innerText = lt;
+    }
+
+    // ==================== ฟังก์ชันจัดทำและพิมพ์รูปเล่ม กพ.001 (ฉบับสมบูรณ์) ====================
+    function printKP001Book() {
+      const sem = document.getElementById('repFilterSemester').value || '1';
+      const isScout = (currentCategory === 'scout');
+      const categoryText = isScout ? 'กิจกรรมลูกเสือ' : 'กิจกรรมเนตรนารี';
+      const unitData = db[currentCategory].units[currentUnitId];
+
+      const currentYear = new Date().getFullYear();
+      const thaiYear = (currentYear > 2500) ? currentYear : (currentYear + 543);
+
+      // กรองประวัติย้อนหลังตามภาคเรียนและกองที่เลือก
+      const semData = attendanceHistoryData.filter(r => {
+        if (!r.date) return false;
+        const parts = r.date.split('-');
+        if (parts.length < 2) return false;
+        const m = parseInt(parts[1], 10);
+        const matchSem = (sem === '1') ? (m >= 5 && m <= 9) : ((m >= 10 && m <= 12) || (m >= 1 && m <= 4));
+        const matchCat = isScout ? (r.category === 'ลูกเสือ') : (r.category === 'เนตรนารี' || (r.category && r.category.includes('เนตร')));
+        const matchUnit = (r.unit === unitData.name);
+        return matchSem && matchCat && matchUnit;
+      });
+
+      const totalSessions = Math.max(1, [...new Set(semData.map(r => r.date))].length);
+
+      // รวบรวมรายชื่อนักเรียนจากฐานข้อมูลหลัก
+      const allMembers = [];
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          allMembers.push({
+            ...m,
+            patrolName: p.patrolName
+          });
+        });
+      });
+
+      let passCount = 0;
+      let failCount = 0;
+      let memberRowsHtml = '';
+
+      allMembers.forEach((m, idx) => {
+        // นับครั้งที่มาเรียนจริงจากประวัติ
+        const myRecords = semData.filter(r => String(r.id).trim() === String(m.id).trim());
+        let attended = myRecords.filter(r => r.status === 'มา' || r.status === 'สาย').length;
+
+        // หากยังไม่มีประวัติในชีต ให้ใช้ข้อมูลที่กำลังเลือกอยู่ในหน้าเว็บ
+        if (myRecords.length === 0) {
+          attended = (m.status === 'มา' || m.status === 'สาย') ? 1 : 0;
+        }
+
+        const pct = Math.round((attended / totalSessions) * 100);
+        const isPass = pct >= 80;
+
+        if (isPass) passCount++;
+        else failCount++;
+
+        const classNoStr = `${m.classRoom || ''} เลขที่ ${m.no || ''}`.trim();
+
+        memberRowsHtml += `
+          <tr>
+            <td style="text-align: center; padding: 5px 3px;">${idx + 1}</td>
+            <td style="text-align: center; font-family: monospace; padding: 5px 3px;">${m.id}</td>
+            <td style="text-align: left; padding: 5px 6px; white-space: nowrap;">${m.name}</td>
+            <td style="text-align: center; padding: 5px 3px; white-space: nowrap;">${classNoStr}</td>
+            <td style="text-align: left; padding: 5px 6px; white-space: nowrap;">${m.patrolName}</td>
+            <td style="text-align: center; padding: 5px 3px; white-space: nowrap;">${m.role || '-'}</td>
+            <td style="text-align: center; padding: 5px 3px; font-weight: bold;">${attended}/${totalSessions}</td>
+            <td style="text-align: center; padding: 5px 3px; font-weight: bold;">${pct}%</td>
+            <td style="text-align: center; padding: 5px 3px; font-weight: bold; color: ${isPass ? '#15803d' : '#b91c1c'};">${isPass ? 'ผ' : 'มผ'}</td>
+            <td style="text-align: center; padding: 5px 3px;">${m.remark || '-'}</td>
+          </tr>
+        `;
+      });
+
+      const totalStudents = allMembers.length;
+      const deputiesList = (unitData.deputies && unitData.deputies.length > 0) ? unitData.deputies.join(', ') : '-';
+
+      const win = window.open('', '_blank');
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="th">
+        <head>
+          <meta charset="UTF-8">
+          <title>แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน (กพ.001) - ${categoryText} ${unitData.name}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 12mm 15mm 12mm 15mm;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Sarabun', sans-serif;
+              font-size: 13px;
+              line-height: 1.35;
+              color: #111;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+            }
+            .page {
+              width: 100%;
+              min-height: 267mm;
+              position: relative;
+              page-break-after: always;
+            }
+            .page:last-child {
+              page-break-after: avoid;
+            }
+            .text-center { text-align: center; }
+            .text-left { text-align: left; }
+            .text-right { text-align: right; }
+            .font-bold { font-weight: 700; }
+            
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 8px;
+            }
+            th, td {
+              border: 1px solid #111;
+              padding: 4px 5px;
+            }
+            th {
+              background-color: #f1f5f9;
+              font-weight: 700;
+              text-align: center;
+            }
+            .approval-box {
+              border: 1px solid #111;
+              padding: 10px 14px;
+              margin-top: 14px;
+              border-radius: 4px;
+            }
+            .no-print-bar {
+              background: #f8fafc;
+              border-bottom: 1px solid #e2e8f0;
+              padding: 10px 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+            }
+            .btn-print {
+              background: #78350f;
+              color: white;
+              padding: 8px 18px;
+              border-radius: 8px;
+              border: none;
+              font-family: 'Sarabun', sans-serif;
+              font-size: 14px;
+              font-weight: bold;
+              cursor: pointer;
+            }
+            @media print {
+              .no-print-bar { display: none !important; }
+              body { margin: 0; padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print-bar">
+            <div>
+              <b style="font-size: 15px;">ตัวอย่างเอกสารรูปเล่ม กพ.001 (แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน)</b>
+              <div style="font-size: 12px; color: #64748b;">พร้อมสั่งพิมพ์หรือบันทึกเป็น PDF (A4 แนวตั้ง หน้าปก 1 แผ่นพอดีเป๊ะ)</div>
+            </div>
+            <button onclick="window.print()" class="btn-print">🖨️ พิมพ์เอกสาร / บันทึกเป็น PDF</button>
+          </div>
+
+          <!-- ==================== หน้า 1: หน้าปกราชการ กพ.001 (Single-page fit) ==================== -->
+          <div class="page" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="text-center" style="margin-bottom: 8px;">
+                <img src="logo.png" alt="Logo" style="width: 75px; height: 75px; object-fit: contain;" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/d/1wM8tH8C3N6pY';">
+                <div class="font-bold" style="font-size: 17px; margin-top: 4px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+                <div class="font-bold" style="font-size: 15px;">โรงเรียนสีชมพูศึกษา</div>
+                <div style="font-size: 12px;">ตำบลวังเพิ่ม อำเภอสีชมพู จังหวัดขอนแก่น</div>
+                <div style="font-size: 12px;">สังกัดองค์การบริหารส่วนจังหวัดขอนแก่น</div>
+              </div>
+
+              <div style="margin-top: 14px; padding: 0 10px; font-size: 13px; line-height: 1.6;">
+                <div style="display: flex; justify-content: space-between;">
+                  <div><b>ภาคเรียนที่จัดกิจกรรม:</b> ${sem}</div>
+                  <div><b>ปีการศึกษา:</b> ${thaiYear}</div>
+                </div>
+                <div><b>ชื่อกิจกรรม:</b> กิจกรรม${isScout ? 'ลูกเสือสามัญรุ่นใหญ่' : 'เนตรนารีสามัญรุ่นใหญ่'} ม.1 (${unitData.name})</div>
+                <div><b>ประเภท:</b> กิจกรรมพัฒนาผู้เรียน (${categoryText})</div>
+              </div>
+
+              <!-- รายชื่อผู้กำกับตามตำแหน่ง -->
+              <div style="margin-top: 16px; padding: 0 10px; font-size: 12.5px;">
+                <table style="width: 100%; border: none;">
+                  <tr style="border: none;">
+                    <td style="border: none; width: 50%; padding: 4px 8px; vertical-align: top;">
+                      <div class="font-bold">ผู้กำกับกอง:</div>
+                      <div style="margin-top: 2px;">${unitData.leader}</div>
+                      <div style="margin-top: 18px;">ลงชื่อ..........................................................</div>
+                    </td>
+                    <td style="border: none; width: 50%; padding: 4px 8px; vertical-align: top;">
+                      <div class="font-bold">รองผู้กำกับกอง:</div>
+                      <div style="margin-top: 2px;">${deputiesList}</div>
+                      <div style="margin-top: 18px;">ลงชื่อ..........................................................</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="margin-top: 14px; padding: 0 10px; font-size: 12.5px;">
+                <p style="margin: 0 0 6px 0;">ได้เสนอผลการเข้าร่วมกิจกรรมเพื่อโปรดพิจารณาอนุมัติดังนี้</p>
+                <div class="font-bold text-center" style="margin-bottom: 4px;">การอนุมัติผลการประเมินกิจกรรมพัฒนาผู้เรียน</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">จำนวนนักเรียน (คน)</th>
+                      <th style="width: 25%;">ผ่าน (ผ)</th>
+                      <th style="width: 25%;">ไม่ผ่าน (มผ)</th>
+                      <th style="width: 25%;">หมายเหตุ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="text-center font-bold">
+                      <td style="padding: 6px;">${totalStudents}</td>
+                      <td style="padding: 6px; color: #15803d;">${passCount}</td>
+                      <td style="padding: 6px; color: #b91c1c;">${failCount}</td>
+                      <td style="padding: 6px; font-weight: normal;">-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- สายการลงนาม 3 ฝ่าย -->
+              <div style="margin-top: 16px; padding: 0 10px;">
+                <table style="width: 100%; border: none;">
+                  <tr style="border: none; text-align: center; font-size: 11.5px;">
+                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                      <div class="font-bold">หัวหน้ากิจกรรม</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
+                    </td>
+                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                      <div class="font-bold">หัวหน้ากิจกรรมพัฒนาผู้เรียน</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 4px;">(นายสิทธิศักดิ์ สิงห์โสภา)</div>
+                    </td>
+                    <td style="border: none; width: 33.33%; padding: 4px; vertical-align: top;">
+                      <div class="font-bold">หัวหน้ากลุ่มบริหารงานวิชาการ</div>
+                      <div style="margin-top: 24px;">ลงชื่อ..................................................</div>
+                      <div style="margin-top: 4px;">(นางสาวอารญา ผุยเบ้า)</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- กล่องเรียนเสนอเพื่อพิจารณา และคำอนุมัติของผู้อำนวยการ -->
+            <div class="approval-box" style="margin-bottom: 5px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                <div style="width: 48%; text-align: center;">
+                  <div class="font-bold" style="margin-bottom: 24px;">เรียนเสนอเพื่อพิจารณา</div>
+                  <div>ลงชื่อ..........................................................</div>
+                  <div style="margin-top: 3px;">(นางสุภาวดี ภาระดี)</div>
+                  <div style="font-size: 11px; margin-top: 2px;">รองผู้อำนวยการกลุ่มบริหารงานวิชาการ</div>
+                  <div style="font-size: 11px; margin-top: 2px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                </div>
+
+                <div style="width: 48%; text-align: center; border-left: 1px dashed #94a3b8; padding-left: 10px;">
+                  <div style="margin-bottom: 14px;">
+                    <span style="display: inline-block; margin-right: 18px;">[ &nbsp; ] อนุมัติ</span>
+                    <span>[ &nbsp; ] ไม่อนุมัติ</span>
+                  </div>
+                  <div>ลงชื่อ..........................................................</div>
+                  <div style="margin-top: 3px;" class="font-bold">(นางสุภลักษณ์ ดียิ่ง)</div>
+                  <div style="font-size: 11px; margin-top: 2px;">ผู้อำนวยการโรงเรียนสีชมพูศึกษา</div>
+                  <div style="font-size: 11px; margin-top: 2px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== หน้า 2 เป็นต้นไป: แบบประเมินผลการเรียนรายบุคคล ==================== -->
+          <div class="page">
+            <div class="text-center" style="margin-bottom: 10px;">
+              <div class="font-bold" style="font-size: 15px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน (กพ.001)</div>
+              <div style="font-size: 13px;">${categoryText} ชั้นมัธยมศึกษาปีที่ 1 ${unitData.name} | ภาคเรียนที่ ${sem} ปีการศึกษา ${thaiYear}</div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+                เกณฑ์การประเมิน: เวลาเข้าร่วมกิจกรรมไม่น้อยกว่าร้อยละ 80 (ผ่าน = ผ / ไม่ผ่าน = มผ) | จำนวนครั้งที่จัดกิจกรรม: ${totalSessions} ครั้ง
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 32px;">ที่</th>
+                  <th style="width: 60px;">รหัส</th>
+                  <th style="width: 175px;">ชื่อ - สกุล</th>
+                  <th style="width: 85px;">ชั้น/เลขที่</th>
+                  <th style="width: 120px;">หมู่</th>
+                  <th style="width: 80px;">ตำแหน่ง</th>
+                  <th style="width: 65px;">เวลาเรียน</th>
+                  <th style="width: 50px;">ร้อยละ</th>
+                  <th style="width: 55px;">ผลประเมิน</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${memberRowsHtml}
+              </tbody>
+            </table>
+
+            <div style="margin-top: 14px; font-size: 12px; display: flex; justify-content: space-between; border-top: 1px solid #111; padding-top: 8px;">
+              <div><b>สรุปผลการประเมินทั้งกอง:</b> นักเรียนทั้งหมด ${totalStudents} คน | ผ่าน (ผ) ${passCount} คน (${totalStudents > 0 ? Math.round((passCount/totalStudents)*100) : 0}%) | ไม่ผ่าน (มผ) ${failCount} คน</div>
+              <div><b>ผู้ตรวจประเมิน:</b> ${unitData.leader}</div>
+            </div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              // พรีวิวพร้อมสั่งพิมพ์
+            };
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      win.document.write(htmlContent);
+      win.document.close();
     }
   </script>
 </body>
