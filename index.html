@@ -977,7 +977,7 @@
 
     // ==================== ระบบ PWA (Progressive Web App) ====================
     function initPWA() {
-      // สร้าง Web App Manifest แบบ Dynamic Data URI
+      // สร้าง Web App Manifest แบบ Dynamic Data URI (ปลดล็อก orientation เป็น any เพื่อให้หมุนหน้าจอแนวนอนได้อิสระ)
       const manifestObj = {
         name: "ระบบเช็คชื่อลูกเสือ-เนตรนารี ม.1 โรงเรียนสีชมพูศึกษา",
         short_name: "เช็คชื่อลูกเสือ ม.1",
@@ -986,7 +986,7 @@
         display: "standalone",
         background_color: "#FAF7F0",
         theme_color: "#78350f",
-        orientation: "portrait",
+        orientation: "any",
         icons: [
           {
             src: "logo.png",
