@@ -3197,7 +3197,25 @@
                 </table>
               </div>
 
-              <!-- สายการลงนาม 3 ฝ่าย (33.33% เท่ากันทุกช่อง) -->
+              <!-- สายการลงนามระดับกลุ่มโรงเรียน: รองผู้กำกับกลุ่มโรงเรียน และ ผู้กำกับกลุ่มโรงเรียน (สลับขึ้นมาอยู่ก่อน) -->
+              <div style="margin-top: 4px; padding: 0 5px;">
+                <table style="width: 100%; border: none;">
+                  <tr style="border: none; text-align: center; font-size: 11.5px;">
+                    <td style="border: none; width: 50%; padding: 3px 8px; vertical-align: top;">
+                      <div class="font-bold">รองผู้กำกับกลุ่มโรงเรียน</div>
+                      <div style="margin-top: 20px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 2px;">(${schoolCommanders.groupDeputy})</div>
+                    </td>
+                    <td style="border: none; width: 50%; padding: 3px 8px; vertical-align: top;">
+                      <div class="font-bold">ผู้กำกับกลุ่มโรงเรียน</div>
+                      <div style="margin-top: 20px;">ลงชื่อ..........................................................</div>
+                      <div style="margin-top: 2px;">(${schoolCommanders.groupLeader})</div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- สายการลงนาม 3 ฝ่าย: หัวหน้ากิจกรรม / พัฒนาผู้เรียน / บริหารงานวิชาการ (สลับลงมาอยู่ด้านล่าง) -->
               <div style="margin-top: 4px; padding: 0 5px;">
                 <table style="width: 100%; border: none;">
                   <tr style="border: none; text-align: center; font-size: 11.5px;">
@@ -3215,24 +3233,6 @@
                       <div class="font-bold">หัวหน้ากลุ่มบริหารงานวิชาการ</div>
                       <div style="margin-top: 20px;">ลงชื่อ..................................................</div>
                       <div style="margin-top: 2px;">(นางสาวอารญา ผุยเบ้า)</div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-
-              <!-- สายการลงนามระดับกลุ่มโรงเรียน: รองผู้กำกับกลุ่มโรงเรียน และ ผู้กำกับกลุ่มโรงเรียน -->
-              <div style="margin-top: 4px; padding: 0 5px;">
-                <table style="width: 100%; border: none;">
-                  <tr style="border: none; text-align: center; font-size: 11.5px;">
-                    <td style="border: none; width: 50%; padding: 3px 8px; vertical-align: top;">
-                      <div class="font-bold">รองผู้กำกับกลุ่มโรงเรียน</div>
-                      <div style="margin-top: 20px;">ลงชื่อ..........................................................</div>
-                      <div style="margin-top: 2px;">(${schoolCommanders.groupDeputy})</div>
-                    </td>
-                    <td style="border: none; width: 50%; padding: 3px 8px; vertical-align: top;">
-                      <div class="font-bold">ผู้กำกับกลุ่มโรงเรียน</div>
-                      <div style="margin-top: 20px;">ลงชื่อ..........................................................</div>
-                      <div style="margin-top: 2px;">(${schoolCommanders.groupLeader})</div>
                     </td>
                   </tr>
                 </table>
@@ -3265,8 +3265,128 @@
             </div>
           </div>
 
-          <!-- ==================== หน้า 2 เป็นต้นไป: แบบประเมินผลการเรียนรายบุคคล ==================== -->
-          <div class="page">
+          <!-- ==================== หน้า 2 (ลำดับที่ 2): แบบบันทึกการจัดกิจกรรมรายสัปดาห์ (Logbook 1 ชม./สัปดาห์ รวม 20 ชม.) ==================== -->
+          <div class="page" style="padding-top: 2mm;">
+            <div class="text-center" style="margin-bottom: 6px;">
+              <div class="font-bold" style="font-size: 15px;">แบบบันทึกการจัดกิจกรรมการเรียนรู้ลูกเสือ - เนตรนารี รายสัปดาห์</div>
+              <div style="font-size: 12.5px; font-weight: 600;">${categoryText} ชั้นมัธยมศึกษาปีที่ 1 ${unitData.name} | ภาคเรียนที่ ${sem} ปีการศึกษา ${thaiYear}</div>
+              <div style="font-size: 11px; color: #334155; margin-top: 2px;">
+                เวลาเรียนรวมตลอดภาคเรียน 20 ชั่วโมง (1 ชั่วโมง/สัปดาห์) | โรงเรียนสีชมพูศึกษา องค์การบริหารส่วนจังหวัดขอนแก่น
+              </div>
+            </div>
+
+            <table style="font-size: 11px; margin-top: 4px;">
+              <thead>
+                <tr style="background-color: #f1f5f9;">
+                  <th style="width: 32px; padding: 4px;">ครั้งที่</th>
+                  <th style="width: 78px; padding: 4px;">วัน/เดือน/ปี</th>
+                  <th style="padding: 4px; text-align: left;">แผนการจัดกิจกรรม / เรื่องที่ฝึก</th>
+                  <th style="width: 48px; padding: 4px;">จำนวนชั่วโมง</th>
+                  <th style="width: 48px; padding: 4px;">มา (คน)</th>
+                  <th style="width: 48px; padding: 4px;">ขาด/ลา</th>
+                  <th style="width: 70px; padding: 4px;">เครื่องแบบครบ</th>
+                  <th style="width: 140px; padding: 4px;">ผลการจัดกิจกรรม / ปัญหาที่พบ</th>
+                  <th style="width: 60px; padding: 4px;">ผู้สอนลงนาม</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(() => {
+                  const defaultTopics = [
+                    "พิธีเปิดประชุมกองและระเบียบแถว",
+                    "การเดินทางไกลและสำรวจ",
+                    "การทำความเคารพ ระเบียบแถวบุคคลท่ามือเปล่า",
+                    "ระเบียบแถวประกอบไม้พลอง และการใช้สัญญาณมือ",
+                    "สัญญาณนกหวีด และรหัสสลับรหัสมอส",
+                    "การผูกเงื่อนเชือกเบื้องต้น (เงื่อนพิรอด, ขัดสมาธิ)",
+                    "การผูกเงื่อนเชือกประยุกต์ (ผูกร่น, ผูกรั้ง, บ่วงสายธนู)",
+                    "การผูกแน่น (ผูกกากบาท, ผูกทแยง, ผูกประกบ)",
+                    "การใช้เข็มทิศ และการหาทิศทาง",
+                    "การอ่านแผนที่ภูมิประเทศ และการทำแผนที่สังเขป",
+                    "การปฐมพยาบาลเบื้องต้น (ห้ามเลือด, เข้าเฝือกชั่วคราว)",
+                    "การเคลื่อนย้ายผู้บาดเจ็บ และการใช้ผ้าพันแผลสามเหลี่ยม",
+                    "สุขอนามัยในค่ายพักแรม และการประกอบอาหารชาวค่าย",
+                    "การบุกเบิก การกางเต็นท์ และการสร้างค่ายพักแรม",
+                    "การสร้างอุปกรณ์เครื่องใช้ในค่ายพักแรมจากไม้ไผ่",
+                    "ทักษะการสังเกต สะกดรอย และการสำรวจธรรมชาติ",
+                    "กิจกรรมเดินทางไกล และทดสอบฐานทักษะลูกเสือ",
+                    "กิจกรรมชุมนุมรอบกองไฟ และการแสดงประจำหมู่",
+                    "การบำเพ็ญประโยชน์ บริการชุมชนและจิตอาสา",
+                    "พิธีปิดประชุมกอง และการประเมินผลสมรรถนะประจำภาคเรียน"
+                  ];
+
+                  const sortedSessionDates = [...new Set(semData.map(r => r.date))].sort();
+                  let rows = "";
+
+                  for (let i = 0; i < 20; i++) {
+                    const sessionDate = sortedSessionDates[i] || "";
+                    let actName = defaultTopics[i];
+                    let presStr = "-";
+                    let absStr = "-";
+                    let uniStr = "-";
+                    let signStr = "-";
+
+                    if (sessionDate) {
+                      const recordsOnDate = semData.filter(r => r.date === sessionDate);
+                      if (recordsOnDate.length > 0 && recordsOnDate[0].activity) {
+                        actName = recordsOnDate[0].activity;
+                      }
+                      const presCount = recordsOnDate.filter(r => r.status === 'มา' || r.status === 'สาย').length;
+                      const notPresCount = recordsOnDate.filter(r => r.status === 'ขาด' || r.status === 'ลา').length;
+                      const uniCount = recordsOnDate.filter(r => (r.status === 'มา' || r.status === 'สาย') && (r.uniformStatus === 'ครบ' || r.uniformStatus === 'เรียบร้อย')).length;
+                      
+                      presStr = `<span style="color:#15803d; font-weight:bold;">${presCount}</span>`;
+                      absStr = `<span style="color:#b91c1c; font-weight:bold;">${notPresCount}</span>`;
+                      uniStr = `${uniCount} (${presCount > 0 ? Math.round((uniCount/presCount)*100) : 0}%)`;
+                      signStr = `<span style="color:#15803d; font-weight:600;">ลงชื่อแล้ว</span>`;
+                    }
+
+                    rows += `
+                      <tr>
+                        <td style="text-align: center; font-weight: bold; padding: 3px 2px;">${i + 1}</td>
+                        <td style="text-align: center; padding: 3px 2px; font-family: monospace;">${sessionDate || `สัปดาห์ที่ ${i + 1}`}</td>
+                        <td style="padding: 3px 5px; text-align: left;">${actName}</td>
+                        <td style="text-align: center; font-weight: 600; padding: 3px 2px;">1</td>
+                        <td style="text-align: center; padding: 3px 2px;">${presStr}</td>
+                        <td style="text-align: center; padding: 3px 2px;">${absStr}</td>
+                        <td style="text-align: center; padding: 3px 2px;">${uniStr}</td>
+                        <td style="padding: 3px 4px; font-size: 10px; color: #334155;">จัดกิจกรรมตามแผน ลูกเสือให้ความร่วมมือดี</td>
+                        <td style="text-align: center; font-size: 10.5px; padding: 3px 2px;">${signStr}</td>
+                      </tr>
+                    `;
+                  }
+                  return rows;
+                })()}
+                <tr style="background-color: #f8fafc; font-weight: bold;">
+                  <td colspan="3" style="text-align: right; padding: 4px 8px;">รวมเวลาจัดกิจกรรมทั้งสิ้นตลอดภาคเรียน:</td>
+                  <td style="text-align: center; padding: 4px;">20 ชม.</td>
+                  <td colspan="5" style="padding: 4px 8px; font-size: 10.5px; color: #334155;">
+                    เกณฑ์เวลาเรียนขั้นต่ำ 80% (ต้องเข้าร่วมไม่น้อยกว่า 16 ชั่วโมง หรือ 16 ครั้ง)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- ช่องลงนามรับรองท้ายแบบบันทึกรายสัปดาห์ -->
+            <div style="margin-top: 14px; display: flex; justify-content: flex-end; padding-right: 20px;">
+              <div style="width: 280px; text-align: center; font-size: 12px;">
+                <div style="display: flex; align-items: flex-end; justify-content: center;">
+                  <span style="width: 45px; text-align: left;">ลงชื่อ</span>
+                  <span style="flex: 1; border-bottom: 1px dotted #333; height: 16px;"></span>
+                  <span style="margin-left: 5px;">ผู้กำกับกอง</span>
+                </div>
+                <div style="margin-top: 4px; font-weight: bold;">(${unitData.leader})</div>
+                <div style="font-size: 11px; color: #475569; margin-top: 1px;">ผู้กำกับกิจกรรม${categoryText} กอง ${targetUnitId}</div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 3px;">วันที่ ...... เดือน .................... พ.ศ. ........</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 6px; font-size: 10px; color: #64748b;">
+              * บันทึกตามเกณฑ์ระเบียบกระทรวงศึกษาธิการ ว่าด้วยการจัดกิจกรรมพัฒนาผู้เรียน
+            </div>
+          </div>
+
+          <!-- ==================== หน้า 3 (ลำดับที่ 3): แบบประเมินผลการเรียนรายบุคคล (ผ/มผ) ==================== -->
+          <div class="page" style="padding-top: 2mm;">
             <div class="text-center" style="margin-bottom: 10px;">
               <div class="font-bold" style="font-size: 15px;">แบบบันทึกผลการประเมินกิจกรรมพัฒนาผู้เรียน (กพ.001)</div>
               <div style="font-size: 13px;">${categoryText} ชั้นมัธยมศึกษาปีที่ 1 ${unitData.name} | ภาคเรียนที่ ${sem} ปีการศึกษา ${thaiYear}</div>
