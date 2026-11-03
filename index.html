@@ -1183,6 +1183,19 @@
       localStorage.setItem('scout_checked_units_by_date_v1', JSON.stringify(checkedUnitsStore));
     }
 
+    function resetUnitToDefaultPresent(unitData) {
+      if (!unitData || !unitData.patrols) return;
+      unitData.patrols.forEach(p => {
+        p.members.forEach(m => {
+          m.status = 'มา';
+          m.uniform = 'ครบ';
+          m.missing = [];
+          m.remark = '';
+        });
+      });
+      saveDatabaseState();
+    }
+
     function handleDateChange(newDate) {
       if (currentMainTab === 'overview') {
         renderWholeGradeOverview();
@@ -1286,12 +1299,22 @@
             renderCurrentUnit();
             if (notifyUser) showToast(`ดึงข้อมูล ${unitData.name} (${categoryText}) วันที่ ${checkDate} จากชีตสำเร็จ!`);
           } else {
-            if (notifyUser) showToast(`ยังไม่มีการบันทึกข้อมูลของ ${unitData.name} ในชีตสำหรับวันที่ ${checkDate}`);
+            // หากวันที่เลือกเป็นคนละวันกับที่บันทึกใน Google Sheets (ยังไม่มีการบันทึกในวันนี้) ให้รีเซ็ตทุกคนเป็น "มา" และเครื่องแบบครบทั้งหมด
+            resetUnitToDefaultPresent(unitData);
+            renderCurrentUnit();
+            if (notifyUser) showToast(`วันที่ ${checkDate} ยังไม่มีข้อมูลในชีต ระบบตั้งค่าเริ่มต้นเป็น "มาครบทุกคน" ให้เรียบร้อย`);
           }
+        } else {
+          // หากเชื่อมต่อชีตไม่ได้ หรือไม่มีข้อมูล ให้ตรวจสอบและคงสถานะเริ่มต้น
+          resetUnitToDefaultPresent(unitData);
+          renderCurrentUnit();
         }
       } catch (err) {
         console.warn('Auto-Fetch Error:', err);
-        if (notifyUser) showToast('ไม่สามารถเชื่อมต่อ Google Sheets ได้ในขณะนี้');
+        // เมื่อเกิดข้อผิดพลาดในการดึงข้อมูล และไม่มีข้อมูล ให้รีเซ็ตเป็นมาทุกคนเพื่อพร้อมเช็คชื่อใหม่
+        resetUnitToDefaultPresent(unitData);
+        renderCurrentUnit();
+        if (notifyUser) showToast('ไม่พบข้อมูลบันทึกของวันนี้ ตั้งค่าเป็น "มาครบทุกคน" ให้แล้ว');
       } finally {
         if (syncIcon) syncIcon.classList.remove('animate-spin');
       }
